@@ -1,26 +1,27 @@
 version: '3.8'
 
 services:
-  # MySQL Database
-  mysql:
-    image: mysql:8.0
-    container_name: mysql-db
+  # SQL Server Database
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sqlserver-db
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: "YourStrong@Passw0rd"
-      MYSQL_DATABASE: "productdb"
-      MYSQL_USER: "sa"
-      MYSQL_PASSWORD: "YourStrong@Passw0rd"
+      ACCEPT_EULA: "Y"
+      SA_PASSWORD: "YourStrong@Passw0rd"
+      MSSQL_PID: "Express"
     ports:
-      - "3306:3306"
+      - "1433:1433"
     volumes:
-      - mysql-data:/var/lib/mysql
+      - sqlserver-data:/var/opt/mssql
     networks:
       - spring-network
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      timeout: 20s
-      retries: 10
+      test: ["CMD-SHELL", "/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P YourStrong@Passw0rd -Q 'SELECT 1' || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
   # Spring Boot Application
   spring-app:
@@ -32,11 +33,11 @@ services:
     ports:
       - "8080:8080"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/productdb?createDatabaseIfNotExist=true
-      SPRING_DATASOURCE_USERNAME: sa
-      SPRING_DATASOURCE_PASSWORD: YourStrong@Passw0rd
+      SPRING_DATASOURCE_URL: "jdbc:sqlserver://sqlserver:1433;databaseName=productdb;encrypt=true;trustServerCertificate=true"
+      SPRING_DATASOURCE_USERNAME: "sa"
+      SPRING_DATASOURCE_PASSWORD: "YourStrong@Passw0rd"
     depends_on:
-      mysql:
+      sqlserver:
         condition: service_healthy
     networks:
       - spring-network
@@ -46,4 +47,4 @@ networks:
     driver: bridge
 
 volumes:
-  mysql-data:
+  sqlserver-data:
