@@ -1,12 +1,13 @@
 package com.example.demo.service;
 
-import com.example.demo.repository.*;
-import com.example.demo.model.*;
-//import org.springframework.beans.factory.annotation.Autowired;
+import com.example.demo.repository.ReportRepository;
+import com.example.demo.model.RepairRequest;
+import com.example.demo.model.User;
+
 import org.springframework.stereotype.Service;
 
+//import java.time.LocalDateTime;
 import java.util.List;
-//import java.util.Optional;
 
 @Service
 public class ReportService {
@@ -16,19 +17,23 @@ public class ReportService {
         this.reportRepository = reportRepository;
     }
 
-    public Report createReport(Report report) {
+    // Create new report -> always starts as Pending
+    public RepairRequest createReport(RepairRequest report) {
         report.setStatus("Pending");
         return reportRepository.save(report);
     }
 
-    public List<Report> getAllReports() {
+    // Get all reports
+    public List<RepairRequest> getAllReports() {
         return reportRepository.findAll();
     }
 
-    public Report updateStatus(Long id, String status) {
-        Report report = reportRepository.findById(id)
+    public RepairRequest updateStatus(Long id, String status, User technician) {
+        RepairRequest report = reportRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Report not found"));
-        report.setStatus(status);
+        report.updateStatus(status, technician);
         return reportRepository.save(report);
     }
+
+
 }
