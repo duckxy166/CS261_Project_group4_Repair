@@ -94,7 +94,8 @@ a.card span {
 
 /* Hover effect */
 a.card:hover {
-  transform: translateY(-5px);
+  transform: translateY(-3px);
+  transition: transform 0.8s ease;
   background-color: #C30E2F;
   cursor: pointer;
 }
