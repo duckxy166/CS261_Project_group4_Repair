@@ -3,19 +3,49 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login</title>
-
+  <title>TU REPAIR | Login</title>
   <link rel="stylesheet" href="login.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600&display=swap">
+  <script src="https://kit.fontawesome.com/a2e0d6b16b.js" crossorigin="anonymous"></script>
 </head>
 <body>
-  <h2>เข้าสู่ระบบแจ้งซ่อม (Mock)</h2>
-  <form id="loginForm">
-    <input type="text" name="username" placeholder="รหัสนักศึกษา/บุคลากร" required><br><br>
-    <input type="password" name="password" placeholder="รหัสผ่าน" required><br><br>
-    <button type="submit">Login</button>
-  </form>
-  
+  <div class="login-container" id="loginBox">
+    <div class="logo">TU REPAIR</div>
+    <div class="subtext">ระบบแจ้งซ่อม มหาวิทยาลัยธรรมศาสตร์</div>
 
+    <form id="loginForm">
+      <label for="username">เลขทะเบียนนักศึกษา/รหัสผู้ใช้</label>
+      <div class="input-group">
+        <input type="text" id="username" placeholder="กรอกเลขทะเบียนนักศึกษา/รหัสผู้ใช้" required>
+      </div>
 
+      <label for="password">รหัสผ่าน</label>
+      <div class="input-group">
+        <input type="password" id="password" placeholder="กรอกรหัสผ่าน" required>
+        <i class="fa-regular fa-eye toggle-password" id="togglePassword"></i>
+      </div>
+
+      <p class="error hidden" id="errorMsg">
+        เลขทะเบียนนักศึกษา/รหัสผู้ใช้ หรือ รหัสผ่านไม่ถูกต้อง กรุณาลองอีกครั้ง !
+      </p>
+
+      <button type="submit" class="login-btn">เข้าสู่ระบบ</button>
+    </form>
+  </div>
+
+  <div class="success-container hidden" id="successBox">
+    <div class="logo">TU REPAIR</div>
+    <div class="subtext">ระบบแจ้งซ่อม มหาวิทยาลัยธรรมศาสตร์</div>
+
+    <div class="success-circle">
+      <div class="checkmark">✔</div>
+    </div>
+
+    <p class="success-text">เข้าสู่ระบบสำเร็จ</p>
+
+    <button id="goHomeBtn" class="home-btn">เข้าสู่หน้าหลัก</button>
+  </div>
+
+  <script src="login.js"></script>
 </body>
 </html>
