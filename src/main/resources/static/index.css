@@ -37,7 +37,7 @@ body {
   text-align: center;
   position: relative;
   top: -100px; /* moves everything up */
-  transform: scale(1.4); /* increase overall size */
+  transform: scale(1.3); /* increase overall size */
   transform-origin: center top; /* keeps it centered while scaling */
 }
 
@@ -47,6 +47,11 @@ body {
   color: #C30E2F;
   font-size: 2rem;
   margin-bottom: 0.2rem;
+  transition: opacity 0.3s ease; /* add smooth fade */
+}
+
+.title:hover {
+  opacity: 1; /* decrease opacity on hover */
 }
 
 .subtitle {
@@ -54,7 +59,7 @@ body {
   color: #666;
   font-size: 0.9rem;
   margin-top: -8px;         /* bring closer to TU REPAIR */
-  margin-bottom: 2.5rem;    /* add space before boxes */
+  margin-bottom: 3.9rem;    /* add space before boxes */
 }
 
 /* Flexbox layout for buttons */
@@ -79,7 +84,7 @@ a.card {
   font-size: 1rem;
   line-height: 1.6;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s ease, background-color 0.2s ease;
+  transition: transform 0.5s ease, background-color 0.3s ease; /* added smooth color fade */
   font-family: 'TUFont', 'Prompt', sans-serif;
 }
 
@@ -94,9 +99,8 @@ a.card span {
 
 /* Hover effect */
 a.card:hover {
-  transform: translateY(-3px);
-  transition: transform 0.8s ease;
-  background-color: #C30E2F;
+  transform: translateY(-2px);
+  background-color: #b31a36; /* lighter red */
   cursor: pointer;
 }
 
