@@ -5,3 +5,5 @@ Step3: เปิดโปรแกรม Docker
 Step4: เปิด cmd แล้ว cd เข้าถึง path ที่เก็บ local repository ของโปรเจค
 Step5: ใช้คำสั่ง docker-compose up --build
 Step6: ทดสอบเข้าโปรแกรม Sql server
+Step7: สร้าง database ชื่อ "dbo1"
+Step8: ลอง Run maven
