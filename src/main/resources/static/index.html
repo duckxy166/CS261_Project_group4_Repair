@@ -3,25 +3,28 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>เว็บแจ้งซ่อม - หน้าแรก</title>
-  
-  <link rel="stylesheet" href="lndex.css">
+  <title>TU Repair</title>
+  <link rel="stylesheet" href="index.css">
 </head>
 <body>
+  <div class="container">
+    <h1 class="title">TU REPAIR</h1>
+    <p class="subtitle">ระบบแจ้งซ่อม มหาวิทยาลัยธรรมศาสตร์</p>
 
-  <h1>ยินดีต้อนรับสู่ระบบแจ้งซ่อม</h1>
-  <p>เลือกเมนูด้านล่างเพื่อดำเนินการ</p>
+    <div class="button-container">
+      <a href="RepairRequest.html" class="card">
+      <p>แจ้งซ่อม<br><span>(Repair Request)</span></p>
+      </a>
 
-  <div>
-    <!-- ปุ่มไปยังหน้ากรอกข้อมูลแจ้งซ่อม -->
-    <a href="repairRequest.html" class="menu-button">กรอกข้อมูลแจ้งซ่อม</a>
+      <a href="trackRequest.html" class="card">
+      <p>ติดตามสถานะการซ่อม<br><span>(Track Request)</span></p>
+      </a>
 
-    <!-- ปุ่มไปยังหน้าล็อกอิน -->
-    <a href="login.html" class="menu-button">ล็อกอิน</a>
-
-    <!-- ปุ่มไปยังหน้าติดตามสถานะ -->
-    <a href="trachRequest.html" class="menu-button">ติดตามสถานะ</a>
+      <a href="history.html" class="card">
+      <p>ประวัติการแจ้งซ่อม<br><span>(Request History)</span></p>
+      </a>
+    </div>
   </div>
-
 </body>
 </html>
+
