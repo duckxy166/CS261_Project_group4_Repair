@@ -26,6 +26,7 @@ form.addEventListener('submit', async (e) => {
     });
     if (res.ok) {
       const data = await res.json();
+      // แสดง success แล้ว redirect ตาม role
       loginBox.classList.add('hidden');
       successBox.classList.remove('hidden');
       setTimeout(() => {
