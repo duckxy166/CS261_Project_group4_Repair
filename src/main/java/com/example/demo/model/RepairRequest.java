@@ -1,5 +1,6 @@
 package com.example.demo.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 //import lombok.Data;
@@ -14,13 +15,15 @@ public class RepairRequest {
 
     private String title;
     private String description;
-    private String status;
-    private String priotity;
+    private String status = "Pending";
+    private String priority;
     private String technician;
     
     @Column(updatable = false)
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdAt;
 
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private LocalDateTime updatedAt;
 
     
@@ -35,14 +38,19 @@ public class RepairRequest {
     public void setTitle(String x) {
     	this.title = x;
     }
-    
+    public User getReporter() {
+        return reporter;
+    }
+    public void setReporter(User reporter) {
+        this.reporter = reporter;
+    }
     public void setDescription(String x) {
     	this.description = x;
     }
     public void setStatus(String x) {
     	this.status = x;
     }
-    public String getLocation() {
+    public String getTitle() {
     	return title;
     }
     public String getDescription() {
@@ -52,12 +60,12 @@ public class RepairRequest {
     	return status;
     }
 
-	public String getPriotity() {
-		return priotity;
+	public String getPriority() {
+		return priority;
 	}
 
-	public void setPriotity(String priotity) {
-		this.priotity = priotity;
+	public void setPriority(String priority) {
+		this.priority = priority;
 	}
 	public String getTechnician() {
 		return technician;
@@ -81,14 +89,11 @@ public class RepairRequest {
 	    this.updatedAt = LocalDateTime.now();
 	}
 	
-	public void assignTo(User x) {
-		if(x.getRole()=="Technician") {
-			this.setTechnician(x.getFullName());
-		}else {
-			
-		}
-		
-	}
+	public void assignTo(User user) {
+        if (user != null && "Technician".equalsIgnoreCase(user.getRole())) {
+            this.technician = user.getFullName();
+        }
+    }
 	
 	public void updateStatus(String newStatus, User technicianUser) {
 	    // Only assign technician if current status is Pending and technician is provided

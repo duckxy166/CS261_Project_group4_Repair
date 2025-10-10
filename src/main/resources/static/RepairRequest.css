@@ -1,135 +1,373 @@
-/* ====== รีเซ็ตพื้นฐาน ====== */
+/* Base Reset */
 * {
+  margin: 0;
+  padding: 0;
   box-sizing: border-box;
-  font-family: "Prompt", sans-serif;
+  font-family: "Inter", sans-serif;
 }
 
 body {
-  margin: 0;
   background: #fff;
-  color: #222;
+  color: #333;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
 
-/* ====== โครงหลัก ====== */
-.container {
-  max-width: 900px;
-  margin: 40px auto;
-  padding: 0 16px;
+/* Header */
+header {
+  flex-shrink: 0;
+  background-color: #C30E2F;
+  color: #fff;
+  text-align: center;
+  padding: 1px 0;
+  z-index: 999;
 }
 
 header h1 {
-  color: #c4002b;
-  font-size: 32px;
-  margin-bottom: 4px;
+  font-family: "Noto Sans Thai", sans-serif;
+  font-size: 2.4rem;
+  font-weight: 500;
 }
 
-header .lead {
-  color: #555;
-  font-size: 15px;
-  margin-top: 0;
+header .sub {
+  font-size: 2.4rem;
+  font-weight: 500;
+  opacity: 0.9;
 }
 
-/* ====== กล่องฟอร์ม ====== */
-.card {
-  background: #e6e6e6;
-  border-radius: 8px;
-  padding: 20px 24px 28px;
-  margin-top: 18px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-}
-
-.muted {
-  color: #666;
-  font-size: 14px;
-}
-
-/* ====== จัดแถวฟอร์ม ====== */
-.form-row {
+/* Container fills the space between header & footer */
+.container {
+  flex: 1; /* takes remaining height between header and footer */
+  width: 100%;
+  max-width: 420px;
+  margin: 0 auto;
   display: flex;
-  gap: 20px;
-  flex-wrap: wrap;
-  margin-bottom: 12px;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 0.5px 1rem 0px;
+  overflow-y: auto;
 }
 
-.form-row > div {
-  flex: 1;
-  min-width: 240px;
+/* Card/Form */
+.card {
+  width: 100%;
+  background: #fff;
+  padding: 2rem 1.5rem;
 }
 
 label {
-  display: block;
   font-weight: 600;
-  margin-bottom: 4px;
+  display: block;
+  margin-bottom: 0.3rem;
+  font-family: "Noto Sans Thai", sans-serif;
 }
 
-input[type="text"],
-input[type="file"],
-select,
-textarea {
+input, select, textarea {
   width: 100%;
-  padding: 8px 10px;
-  border: 1px solid #aaa;
-  border-radius: 4px;
-  font-size: 14px;
+  padding: 0.7rem;
+  border: 1.5px solid #D9D9D9;
+  border-radius: 5px;
+  font-size: 1rem;
+  outline: none;
+  background: #D9D9D9;
 }
+
+input:focus, select:focus, textarea:focus {
+  border-color: #C30E2F;
+}
+
+/* File Upload */
+.file-upload {
+  position: relative;
+  width: 100%;
+  height: 120px;
+  border: 1.5px dashed #D9D9D9;
+  border-radius: 5px;
+  background: #D9D9D9;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden; /* important: prevents image overflow */
+  cursor: pointer;
+}
+
+.file-upload input[type="file"] {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.file-upload .pic-icon {
+  width: 40px;
+  height: 40px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.file-upload .img-preview {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 5px;
+  top: 0;
+  left: 0;
+  display: none; /* hidden until upload */
+}
+
 
 textarea {
   min-height: 100px;
   resize: vertical;
-  margin-top: 2px;
 }
 
-/* ====== ปุ่ม ====== */
+/* Buttons */
 .actions {
-  margin-top: 16px;
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-top: 1rem;
 }
 
-button {
-  background: #c4002b;
-  color: white;
-  border: none;
-  padding: 10px 22px;
-  border-radius: 8px;
-  font-size: 16px;
-  cursor: pointer;
-  transition: background 0.2s ease;
-}
-
-button:hover {
-  background: #a00024;
+button[type="submit"] {
+  background: #C30E2F;
+  color: #fff;
+  border-radius: 25px;
+  padding: 0.6rem 1.8rem;
 }
 
 button.ghost {
-  background: #d8bdbd;
-  color: #4a3030;
-  margin-left: 10px;
+  background: #e0e0e0;
+  border-radius: 25px;
+  padding: 0.6rem 1.8rem;
 }
 
-button.ghost:hover {
-  background: #cfa8a8;
+/* Footer band */
+.footer-band {
+  flex-shrink: 0;
+  width: 100%;
+  height: 50px;
+  background-color: #C30E2F;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  padding-left: 12px;
+  z-index: 998;
 }
 
-/* ====== พรีวิวรูป ====== */
-.img-preview {
-  display: block;
-  margin-top: 6px;
-  max-width: 150px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
+#menuButton {
+  width: 50px;
+  height: 50px;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+  background-color: #C30E2F;
 }
 
-/* ====== รายการคำขอล่าสุด ====== */
-.list {
-  background: #fff;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  padding: 10px;
+#menuButton img {
+  width: 60%;
+  height: 60%;
+}
+
+/* --- Description Textarea Smaller --- */
+#description {
   min-height: 40px;
+  max-height: 40px;
+  background-color: #D9D9D9;
+  border: 1.5px solid #D9D9D9;
+  border-radius: 5px;
+  padding: 0.7rem 0.8rem;
+  font-size: 1rem;
+  resize: none;
+  overflow: hidden;
 }
 
-/* ====== ข้อความใต้ปุ่ม ====== */
-.actions .muted {
-  margin-top: 10px;
-  font-size: 15px;
-  color: #666;
+/* --- Responsive --- */
+@media (max-width: 768px) {
+  header h1 { font-size: 1.6rem; }
+  .container { padding: 1rem; }
+  button { width: 100%; }
+}
+
+select, option {
+  font-family: "Noto Sans Thai", sans-serif;
+}
+
+select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-color: #D9D9D9;
+  border: 1.5px solid #D9D9D9;
+  border-radius: 5px;
+  padding: 0.7rem 2rem 0.7rem 0.7rem;
+  font-family: "Kanit", sans-serif;
+  color: #000;
+  outline: none;
+  box-shadow: none;
+  cursor: pointer;
+}
+
+select:focus {
+  border-color: #b20838;
+}
+
+/* optional custom arrow */
+select {
+  background-image: url("data:image/svg+xml;utf8,<svg fill='black' height='12' viewBox='0 0 24 24' width='12' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 12px;
+}
+
+
+/* ===== Sidebar Menu ===== */
+.side-menu {
+  position: fixed;
+  bottom: 52px; /* exactly above the footer band (footer height = 50px) */
+  left: 1px; /* aligns with footer band padding */
+  background-color: #F6C90E; /* yellow box */
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+  padding: 8px 0;
+  width: 160px;
+  transform: translateY(120%);
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  z-index: 1000;
+}
+
+/* when shown */
+.side-menu.show {
+  transform: translateY(0);
+  opacity: 1;
+  visibility: visible;
+}
+
+/* list items */
+.side-menu ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.side-menu li {
+  display: flex;
+  align-items: center;
+}
+
+.side-menu a {
+  display: block;             /* make the <a> fill the full width */
+  width: 100%;                /* ensures hover covers entire line */
+  text-decoration: none;
+  color: #000;
+  font-weight: 600;
+  padding: 10px 14px;
+  transition: background 0.2s ease;
+  border-radius: 6px;         /* optional, for smooth rounded hover */
+  box-sizing: border-box;
+}
+
+.side-menu a:hover {
+  background-color: #ffe680;  /* highlight full width */
+}
+
+
+.side-menu img {
+  width: 20px;
+  height: 20px;
+  margin-right: 8px;
+}
+
+.error-message {
+  color: #b20838;
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin-top: 8px;
+  text-align: left;      /* align text to left */
+  margin-left: 4px;      /* small offset to match input box start */
+}
+
+/* ===== Enhanced Success Message (Large but Thin) ===== */
+.success-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: 80px;
+  text-align: center;
+}
+
+/* Green checkmark (large diameter, thin stroke) */
+.checkmark {
+  width: 160px;          /* much larger */
+  height: 160px;
+  border-radius: 50%;
+  display: inline-block;
+  border: 2.5px solid #00994d; /* thin but crisp circle */
+  position: relative;
+  animation: scaleUp 0.5s ease-in-out;
+}
+
+.checkmark__circle {
+  stroke: #00994d;
+  stroke-width: 2.5;       /* thinner stroke */
+  stroke-miterlimit: 10;
+}
+
+.checkmark__check {
+  transform-origin: 50% 50%;
+  stroke: #00994d;
+  stroke-width: 3;         /* thin but still visible */
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-miterlimit: 10;
+  stroke-dasharray: 48;
+  stroke-dashoffset: 48;
+  animation: draw 0.8s ease forwards 0.3s;
+}
+
+@keyframes draw {
+  to { stroke-dashoffset: 0; }
+}
+
+@keyframes scaleUp {
+  0% { transform: scale(0.8); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* Text — proportionally larger but balanced */
+.success-text {
+  font-family: "Noto Sans Thai", sans-serif;
+  font-size: 1.8rem;       /* larger text */
+  margin-top: 18px;
+  font-weight: 600;
+  color: #222;
+}
+
+/* Button — slightly wider, retains rounded shape */
+.history-btn {
+  margin-top: 16px;
+  background-color: #C30E2F;
+  color: #fff;
+  border: none;
+  border-radius: 25px;
+  padding: 10px 26px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  font-family: "Noto Sans Thai", sans-serif;
+}
+
+.history-btn:hover {
+  background-color: #a30b25;
+  transform: scale(1.05);
 }

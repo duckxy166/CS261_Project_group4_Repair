@@ -49,3 +49,28 @@ repairList.forEach((r) => {
 function updateRepair(id) {
   alert(`บันทึกข้อมูลรายการแจ้งซ่อม ${id} เรียบร้อยแล้ว `);
 }
+
+// เมื่อคลิกที่แถวในตาราง ให้เปิดหน้า track.html พร้อมส่งข้อมูล
+const rows = document.querySelectorAll("tbody tr");
+
+rows.forEach(row => {
+  row.addEventListener("click", (e) => {
+    // ถ้าคลิกปุ่มลบ ให้ไม่เปิดหน้ารายละเอียด
+    if (e.target.closest(".delete-btn")) return;
+
+    const cells = row.querySelectorAll("td");
+    const requestData = {
+      date: cells[0].innerText,
+      name: cells[1].innerText,
+      type: cells[2].innerText,
+      detail: cells[3].innerText,
+      status: cells[4].innerText
+    };
+
+    // เก็บข้อมูลใน localStorage
+    localStorage.setItem("selectedRequest", JSON.stringify(requestData));
+
+    // เปิดหน้า track.html
+    window.location.href = "track.html";
+  });
+});
