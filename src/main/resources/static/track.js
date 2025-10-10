@@ -1,81 +1,97 @@
-// =========================
-// 🍔 SIDE MENU TOGGLE
-// =========================
-const menuButton = document.getElementById("menuButton");
-const sideMenu = document.getElementById("sideMenu");
+// ===== MENU TOGGLE =====
+const toggleBtn = document.getElementById("menu-toggle");
+const menuPopup = document.getElementById("menu-popup");
 
-menuButton.addEventListener("click", () => {
-  sideMenu.classList.toggle("show");
+toggleBtn.addEventListener("click", (e) => {
+  e.stopPropagation();
+  menuPopup.classList.toggle("show");
 });
 
-document.addEventListener("click", (e) => {
-  if (!sideMenu.contains(e.target) && !menuButton.contains(e.target)) {
-    sideMenu.classList.remove("show");
-  }
-});
-
-// =========================
-// 💾 Load stored data
-// =========================
-window.addEventListener("DOMContentLoaded", () => {
-  const data = JSON.parse(localStorage.getItem("selectedRequest"));
-  if (!data) return;
-
-  document.getElementById("req-date").textContent = data.date;
-  document.getElementById("req-name").textContent = data.name;
-  document.getElementById("req-type").textContent = data.type;
-  document.getElementById("req-detail").textContent = data.detail;
-  document.getElementById("req-status").textContent = data.status;
-});
-
-// ========== CANCEL REQUEST MODAL ==========
-const cancelBtn = document.querySelector(".main-cancel-btn");
-const modal = document.getElementById("cancelModal");
-const closeModal = document.getElementById("closeModal");
-const cancelClose = document.getElementById("cancelClose");
-const confirmCancel = document.getElementById("confirmCancel");
-
-// open modal
-cancelBtn.addEventListener("click", () => {
-  modal.style.display = "flex";
-});
-
-// close modal
-closeModal.addEventListener("click", () => {
-  modal.style.display = "none";
-});
-
-cancelClose.addEventListener("click", () => {
-  modal.style.display = "none";
-});
-
-// click outside to close
 window.addEventListener("click", (e) => {
-  if (e.target === modal) {
-    modal.style.display = "none";
+  if (!e.target.closest("#menu-popup") && !e.target.closest("#menu-toggle")) {
+    menuPopup.classList.remove("show");
   }
 });
 
-// ✅ confirm action (delete data + redirect)
-confirmCancel.addEventListener("click", () => {
-  const data = JSON.parse(localStorage.getItem("selectedRequest"));
+// ===== LOAD REPAIR LIST =====
+const repairList = document.getElementById("repairList");
 
-  // remove selected request
-  if (data) {
-    let history = JSON.parse(localStorage.getItem("repairHistory")) || [];
-    history = history.filter(
-      item =>
-        !(item.date === data.date && item.detail === data.detail && item.name === data.name)
-    );
-    localStorage.setItem("repairHistory", JSON.stringify(history));
+let repairs = JSON.parse(localStorage.getItem("repairs")) || [];
+
+function renderRepairs() {
+  repairList.innerHTML = "";
+
+  if (repairs.length === 0) {
+    repairList.innerHTML = `<tr><td colspan="6" style="text-align:center; color:#888;">ไม่มีข้อมูลการแจ้งซ่อม</td></tr>`;
+    return;
   }
 
-  // clear the selected one
-  localStorage.removeItem("selectedRequest");
+  repairs.forEach((r) => {
+    const tr = document.createElement("tr");
+    tr.classList.add("clickable-row");
+    tr.setAttribute("data-id", r.id);
+    tr.innerHTML = `
+      <td>${r.date}</td>
+      <td>${r.requester}</td>
+      <td>${r.technician}</td>
+      <td>${r.category}</td>
+      <td>${r.status}</td>
+      <td>
+        <button class="icon-btn view"><span class="material-icons">search</span></button>
+        <button class="icon-btn delete"><span class="material-icons">delete</span></button>
+      </td>
+    `;
+    repairList.appendChild(tr);
+  });
 
-  modal.style.display = "none";
-  alert("✅ ยกเลิกการแจ้งซ่อมสำเร็จ");
+  attachRowEvents();
+}
 
-  // go back to history
-  window.location.href = "history.html";
-});
+renderRepairs();
+
+// ===== ROW CLICK -> GO TO DETAIL PAGE =====
+function attachRowEvents() {
+  document.querySelectorAll(".clickable-row").forEach((row) => {
+    row.addEventListener("click", (e) => {
+      if (e.target.closest("button")) return;
+      const id = row.getAttribute("data-id");
+      localStorage.setItem("selectedRepairId", id);
+      window.location.href = "track_detail.html";
+    });
+  });
+
+    // Delete button with modal confirm
+  const modal = document.getElementById("confirmModal");
+  const closeModal = document.getElementById("closeModal");
+  const cancelModal = document.getElementById("cancelModal");
+  const confirmDelete = document.getElementById("confirmDelete");
+  let selectedId = null;
+
+  document.querySelectorAll(".icon-btn.delete").forEach((btn) => {
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const tr = e.target.closest("tr");
+      selectedId = parseInt(tr.getAttribute("data-id"));
+      modal.classList.add("show");
+    });
+  });
+
+  // Close modal actions
+  closeModal.onclick = () => modal.classList.remove("show");
+  cancelModal.onclick = () => modal.classList.remove("show");
+  window.onclick = (e) => {
+    if (e.target === modal) modal.classList.remove("show");
+  };
+
+  // Confirm delete
+  confirmDelete.addEventListener("click", () => {
+    if (selectedId) {
+      repairs = repairs.filter((r) => r.id !== selectedId);
+      localStorage.setItem("repairs", JSON.stringify(repairs));
+      renderRepairs();
+    }
+    modal.classList.remove("show");
+  });
+
+
+}

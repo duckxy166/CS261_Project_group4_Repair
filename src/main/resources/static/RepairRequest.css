@@ -15,24 +15,22 @@ body {
 }
 
 /* Header */
-header {
-  flex-shrink: 0;
-  background-color: #C30E2F;
-  color: #fff;
+.header {
+  background-color: #b1002e;
+  color: white;
   text-align: center;
-  padding: 1px 0;
-  z-index: 999;
+  padding: 25px 10px;
 }
 
-header h1 {
+.header h1 {
+  margin: 0;
+  font-size: 2rem;
+  line-height: 1.4;
   font-family: "Noto Sans Thai", sans-serif;
-  font-size: 2.4rem;
-  font-weight: 500;
 }
 
-header .sub {
-  font-size: 2.4rem;
-  font-weight: 500;
+.header span {
+  font-size: 1.2rem;
   opacity: 0.9;
 }
 
@@ -146,28 +144,30 @@ button.ghost {
   padding: 0.6rem 1.8rem;
 }
 
-/* Footer band */
-.footer-band {
-  flex-shrink: 0;
-  width: 100%;
-  height: 50px;
-  background-color: #C30E2F;
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  padding-left: 12px;
-  z-index: 998;
+/* Hover Effects */
+button[type="submit"]:hover {
+  background-color: rgb(162, 6, 51);   /* slightly darker red */
+  /* transform: scale(1.02);      gentle zoom */
+  transition: background-color 0.6s ease, transform 4s ease;
 }
 
-#menuButton {
-  width: 50px;
-  height: 50px;
-  cursor: pointer;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border-radius: 50%;
-  background-color: #C30E2F;
+button.ghost:hover {
+  background-color: #cdcdcd;   /* slightly darker gray */
+  /* transform: scale(1.02); */
+  transition: background-color 0.6s ease, transform 4s ease;
+}
+
+button {
+  border: none;               /* remove default border */
+  outline: none;              /* remove focus outline */
+  box-shadow: none;           /* remove any default shadow */
+}
+
+button:focus,
+button:active {
+  outline: none !important;
+  box-shadow: none !important;
+  border: none !important;
 }
 
 #menuButton img {
@@ -226,31 +226,6 @@ select {
   background-size: 12px;
 }
 
-
-/* ===== Sidebar Menu ===== */
-.side-menu {
-  position: fixed;
-  bottom: 52px; /* exactly above the footer band (footer height = 50px) */
-  left: 1px; /* aligns with footer band padding */
-  background-color: #F6C90E; /* yellow box */
-  border-radius: 8px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
-  padding: 8px 0;
-  width: 160px;
-  transform: translateY(120%);
-  opacity: 0;
-  visibility: hidden;
-  transition: all 0.3s ease;
-  z-index: 1000;
-}
-
-/* when shown */
-.side-menu.show {
-  transform: translateY(0);
-  opacity: 1;
-  visibility: visible;
-}
-
 /* list items */
 .side-menu ul {
   list-style: none;
@@ -290,9 +265,11 @@ select {
   color: #b20838;
   font-weight: 600;
   font-size: 0.9rem;
-  margin-top: 8px;
+  margin-top: -4px;
   text-align: left;      /* align text to left */
   margin-left: 4px;      /* small offset to match input box start */
+  position: absolute;
+  /* bottom: 0px; */
 }
 
 /* ===== Enhanced Success Message (Large but Thin) ===== */
@@ -368,6 +345,193 @@ select {
 }
 
 .history-btn:hover {
-  background-color: #a30b25;
-  transform: scale(1.05);
+  background-color: #b50d2c; /* slightly lighter shade */
+  transform: scale(1.015);  /* gentle 1.5% growth */
+  transition: background-color 0.25s ease, transform 0.25s ease;
 }
+
+/* === Footer Menu (same design as History Page) === */
+.bottom-bar {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  height: 55px;
+  background-color: #b1002e;
+  display: flex;
+  align-items: center;
+  padding: 0 15px;
+  box-sizing: border-box;
+  z-index: 999;
+}
+
+.menu-btn {
+  color: white;
+  font-size: 1.8rem;
+  cursor: pointer;
+}
+
+/* Popup menu */
+.menu-popup {
+  display: none;
+  flex-direction: column;
+  position: absolute;
+  bottom: 55px;
+  left: 0px;
+  background-color: #fcd94a;
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.25);
+  animation: fadeUp 0.25s ease forwards;
+}
+
+@keyframes fadeUp {
+  from { transform: translateY(10px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.menu-popup.show {
+  display: flex;
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  color: #000;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.menu-item.logout {
+  background-color: #fcd94a;
+}
+
+.menu-item:hover {
+  background-color: #ffe36e;
+}
+
+.menu-item.logout:hover {
+  background-color: #ffe36e;
+}
+
+.menu-item .material-icons {
+  font-size: 20px;
+}
+
+/* Prevent text cursor (caret) when clicking menu */
+.bottom-bar,
+.menu-btn,
+.menu-popup,
+.menu-item {
+  user-select: none;         /* disables text selection */
+  -webkit-user-select: none; /* Safari fix */
+  -moz-user-select: none;    /* Firefox fix */
+}
+
+.menu-btn,
+.menu-popup {
+  outline: none;             /* remove focus outline */
+}
+
+/* Prevent accidental focus */
+.menu-btn:focus,
+.menu-popup:focus,
+.menu-item:focus {
+  outline: none;
+}
+
+
+/* Prevent text caret or text selection in empty areas of form */
+form,
+.card,
+.container {
+  user-select: none;          /* disable text selection */
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  cursor: default;            /* default arrow cursor */
+}
+
+/* Allow normal typing & selection inside inputs, selects, textareas */
+/* === Input, Select, and Textarea Styling (Final — No Red Borders Ever) === */
+input,
+select,
+textarea {
+  width: 100%;
+  padding: 0.7rem;
+  border: 1.5px solid #D9D9D9;
+  border-radius: 5px;
+  font-size: 1rem;
+  outline: none;
+  background-color: #D9D9D9;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+  user-select: text !important;
+  cursor: text;
+  box-shadow: none !important;          /* 🚫 stop Chrome from adding red glow */
+}
+
+/* ✅ Focus: slightly brighter gray, clean red border */
+input:focus,
+select:focus,
+textarea:focus {
+  background-color: #E1E1E1;
+  border-color: #C30E2F;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+/* 🚫 Stop Chrome/Edge from marking required fields in red */
+input:required,
+select:required,
+textarea:required {
+  box-shadow: none !important;
+  outline: none !important;
+  border-color: #D9D9D9 !important;
+}
+
+/* 🚫 Stop invalid (empty) required inputs from going red */
+input:invalid,
+select:invalid,
+textarea:invalid {
+  box-shadow: none !important;
+  outline: none !important;
+  border-color: #D9D9D9 !important;
+}
+
+/* 💡 Remove autofill yellow/blue/red Chrome background */
+input:-webkit-autofill,
+input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 1000px #D9D9D9 inset !important;
+  -webkit-text-fill-color: #000 !important;
+  border: 1.5px solid #C30E2F !important;
+}
+
+/* 🧱 Prevent cursor showing outside inputs */
+form,
+.card,
+.container {
+  user-select: none;
+  cursor: default;
+}
+
+input,
+select,
+textarea {
+  user-select: text !important;
+  cursor: text;
+}
+
+header, 
+.header {
+  user-select: none;          /* stop selecting text */
+  -webkit-user-select: none;  /* Safari */
+  -moz-user-select: none;     /* Firefox */
+  -ms-user-select: none;      /* Edge/IE */
+  cursor: default;            /* show arrow cursor instead of text I-beam */
+}
+
+
+
+
