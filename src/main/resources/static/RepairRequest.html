@@ -28,7 +28,7 @@
   <div class="container">
     <section class="card">
 
-      <form id="requestForm" novalidate>
+      <form th:action="@{/submit-repair}" method="post" enctype="multipart/form-data" id="requestForm" novalidate>
         <div class="form-row">
           <div>
             <label for="reporterName">ชื่อผู้แจ้ง</label>
