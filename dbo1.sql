@@ -18,9 +18,9 @@ GO
 
 -- 4. สร้างตาราง users
 CREATE TABLE dbo.users (
-    id INT IDENTITY(1,1) PRIMARY KEY,
-    username NVARCHAR(50) NOT NULL UNIQUE,
-    password NVARCHAR(255) NULL,         -- ✅ แก้เป็น NULL ได้ กัน error เวลา insert
+    id BIGINT IDENTITY(1,1) PRIMARY KEY, 
+    username NVARCHAR(255) NOT NULL UNIQUE, 
+    password NVARCHAR(255) NULL,
     role NVARCHAR(20) NOT NULL,
     email NVARCHAR(100),
     full_name NVARCHAR(100)
