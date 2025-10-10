@@ -4,21 +4,58 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ติดตามสถานะการแจ้งซ่อม</title>
-  <link rel="stylesheet" href="ststus.css">
+  <link rel="stylesheet" href="style.css">
+  <!--ฝากปรับตามFigmaได้หมายย
+  <style>
+    table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+    th, td { padding: 10px; border: 1px solid #ddd; text-align: left; }
+    th { background-color: #f2f2f2; }
+    button {
+      padding: 5px 10px;
+      margin: 2px;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+    }
+    .edit-btn { background-color: #ffc107; color: white; }
+    .delete-btn { background-color: #dc3545; color: white; }
+    #homeBtn {
+      display: inline-block;
+      padding: 10px 20px;
+      background-color: #007bff;
+      color: white;
+      text-decoration: none;
+      border-radius: 5px;
+      font-weight: bold;
+      margin-top: 10px;
+    }
+    #homeBtn:hover { background-color: #0056b3; }
+  </style>-->
 </head>
 <body>
+  <h1>สถานะการแจ้งซ่อมของคุณ</h1>
+  <table id="reportsTable">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Title</th>
+        <th>Description</th>
+        <th>Status</th>
+        <th>Priority</th>
+        <th>Technician</th>
+        <th>Created At</th>
+        <th>Updated At</th>
+        <th>Attachment</th>
+        <th>Edit</th>
+        <th>Delete</th>
+      </tr>
+    </thead>
+    <tbody>
+      
+    </tbody>
+  </table>
 
-  <div class="container">
-    <h1>สถานะการแจ้งซ่อมของคุณ</h1>
-
-    <!-- รายการแจ้งซ่อม -->
-    <ul id="repairList" style="text-align:left; margin-top:20px;"></ul>
-
-    <a href="lndex.html" class="menu-button">กลับหน้าหลัก</a>
-  </div>
-
-  <script src="status.js"></script>
+  <a href="index.html" id="homeBtn">กลับหน้าหลัก</a>
+  <script src="trackrequest.js"></script>
 </body>
 </html>
-
-

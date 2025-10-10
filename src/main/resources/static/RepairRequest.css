@@ -1,0 +1,135 @@
+/* ====== รีเซ็ตพื้นฐาน ====== */
+* {
+  box-sizing: border-box;
+  font-family: "Prompt", sans-serif;
+}
+
+body {
+  margin: 0;
+  background: #fff;
+  color: #222;
+}
+
+/* ====== โครงหลัก ====== */
+.container {
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 0 16px;
+}
+
+header h1 {
+  color: #c4002b;
+  font-size: 32px;
+  margin-bottom: 4px;
+}
+
+header .lead {
+  color: #555;
+  font-size: 15px;
+  margin-top: 0;
+}
+
+/* ====== กล่องฟอร์ม ====== */
+.card {
+  background: #e6e6e6;
+  border-radius: 8px;
+  padding: 20px 24px 28px;
+  margin-top: 18px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.muted {
+  color: #666;
+  font-size: 14px;
+}
+
+/* ====== จัดแถวฟอร์ม ====== */
+.form-row {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.form-row > div {
+  flex: 1;
+  min-width: 240px;
+}
+
+label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+input[type="text"],
+input[type="file"],
+select,
+textarea {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid #aaa;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+textarea {
+  min-height: 100px;
+  resize: vertical;
+  margin-top: 2px;
+}
+
+/* ====== ปุ่ม ====== */
+.actions {
+  margin-top: 16px;
+}
+
+button {
+  background: #c4002b;
+  color: white;
+  border: none;
+  padding: 10px 22px;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+button:hover {
+  background: #a00024;
+}
+
+button.ghost {
+  background: #d8bdbd;
+  color: #4a3030;
+  margin-left: 10px;
+}
+
+button.ghost:hover {
+  background: #cfa8a8;
+}
+
+/* ====== พรีวิวรูป ====== */
+.img-preview {
+  display: block;
+  margin-top: 6px;
+  max-width: 150px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+/* ====== รายการคำขอล่าสุด ====== */
+.list {
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 10px;
+  min-height: 40px;
+}
+
+/* ====== ข้อความใต้ปุ่ม ====== */
+.actions .muted {
+  margin-top: 10px;
+  font-size: 15px;
+  color: #666;
+}
