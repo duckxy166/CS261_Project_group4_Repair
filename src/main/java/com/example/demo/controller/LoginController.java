@@ -20,8 +20,8 @@ import jakarta.servlet.http.HttpSession;
 @RestController
 public class LoginController {
 
-    @Autowired
     private UserRepository userRepository;
+    private final RestTemplate restTemplate;
 
     @Value("${tu.api.url:https://restapi.tu.ac.th/api/v1/auth/Ad/verify2}")
     private String tuApiUrl;
@@ -29,7 +29,12 @@ public class LoginController {
     @Value("${tu.api.key}")
     private String applicationKey;
 
-    private final RestTemplate restTemplate = new RestTemplate();
+ // แก้ไข Constructor ให้รับ RestTemplate
+    @Autowired
+    public LoginController(UserRepository userRepository, RestTemplate restTemplate) {
+        this.userRepository = userRepository;
+        this.restTemplate = restTemplate; 
+    }
 
     @PostMapping("/api/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest, HttpSession session) {
