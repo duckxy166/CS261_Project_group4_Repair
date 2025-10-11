@@ -1,57 +1,14 @@
 // =========================
-// 🟥 HEADER + FOOTER BEHAVIOR
-// =========================
-const header = document.querySelector('header');
-const footer = document.querySelector('.footer-band');
-
-let lastScroll = 0;
-
-window.addEventListener('scroll', () => {
-  const currentScroll = window.scrollY;
-
-  if (currentScroll > lastScroll && currentScroll > 50) {
-    // scroll down → hide header
-    header.classList.add('hide');
-    footer.classList.add('show');
-  } else {
-    // scroll up → show header
-    header.classList.remove('hide');
-    footer.classList.remove('show');
-  }
-
-  lastScroll = currentScroll;
-});
-
-
-// =========================
-// 🍔 SIDE MENU TOGGLE
-// =========================
-const menuButton = document.getElementById("menuButton");
-const sideMenu = document.getElementById("sideMenu");
-
-menuButton.addEventListener("click", () => {
-  sideMenu.classList.toggle("show");
-});
-
-// Hide menu when clicking outside
-document.addEventListener("click", (e) => {
-  if (!sideMenu.contains(e.target) && !menuButton.contains(e.target)) {
-    sideMenu.classList.remove("show");
-  }
-});
-
-
-// =========================
-// 📝 FORM VALIDATION + SUCCESS MESSAGE
+// 📝 FORM VALIDATION + SAVE + SUCCESS
 // =========================
 const form = document.getElementById("requestForm");
 const errorMsg = document.getElementById("errorMsg");
 const successMessage = document.getElementById("successMessage");
 
 form.addEventListener("submit", function (e) {
-  e.preventDefault(); // stop normal submit
+  e.preventDefault(); // prevent page reload
 
-  // Get form field values
+  // Collect form values
   const reporterName = document.getElementById("reporterName").value.trim();
   const location = document.getElementById("location").value.trim();
   const category = document.getElementById("category").value.trim();
@@ -62,25 +19,81 @@ form.addEventListener("submit", function (e) {
     errorMsg.style.display = "block";
     errorMsg.textContent = "กรุณากรอกข้อมูลให้ครบถ้วน";
 
-    // highlight empty fields
+    // Highlight empty fields
     [reporterName, location, category, description].forEach((val, i) => {
-      const input = [ 
+      const input = [
         document.getElementById("reporterName"),
         document.getElementById("location"),
         document.getElementById("category"),
-        document.getElementById("description")
+        document.getElementById("description"),
       ][i];
       input.style.borderColor = val ? "#D9D9D9" : "#b20838";
     });
     return;
   }
 
-  // Hide error and form, show success message
+  // Hide error message
   errorMsg.style.display = "none";
+
+  // ✅ Save to localStorage for Track page
+  const repairs = JSON.parse(localStorage.getItem("repairs")) || [];
+    // Read image if uploaded
+  let imageData = "";
+  if (imageInput && imageInput.files[0]) {
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      imageData = e.target.result;
+
+      const newRepair = {
+        id: Date.now(),
+        date: new Date().toLocaleDateString("th-TH"),
+        requester: reporterName,
+        technician: "ยังไม่ระบุ",
+        category: category,
+        status: "กำลังดำเนินการ",
+        location: location,
+        description: description,
+        image: imageData, // ✅ store image base64
+      };
+
+      repairs.push(newRepair);
+      localStorage.setItem("repairs", JSON.stringify(repairs));
+
+      // ✅ Show success message
+      form.style.display = "none";
+      successMessage.style.display = "flex";
+    };
+    reader.readAsDataURL(imageInput.files[0]);
+    return; // prevent running code below until image is read
+  }
+
+  // ✅ if no image uploaded
+  const newRepair = {
+    id: Date.now(),
+    date: new Date().toLocaleDateString("th-TH"),
+    requester: reporterName,
+    technician: "ยังไม่ระบุ",
+    category: category,
+    status: "กำลังดำเนินการ",
+    location: location,
+    description: description,
+    image: "", // empty
+  };
+
+  repairs.push(newRepair);
+  localStorage.setItem("repairs", JSON.stringify(repairs));
+
+  form.style.display = "none";
+  successMessage.style.display = "flex";
+
+
+  repairs.push(newRepair);
+  localStorage.setItem("repairs", JSON.stringify(repairs));
+
+  // ✅ Show success animation
   form.style.display = "none";
   successMessage.style.display = "flex";
 });
-
 
 // =========================
 // 🧹 CLEAR FORM BUTTON
@@ -92,9 +105,8 @@ clearBtn.addEventListener("click", () => {
 
   // reset input borders
   const inputs = form.querySelectorAll("input, select, textarea");
-  inputs.forEach(i => i.style.borderColor = "#D9D9D9");
+  inputs.forEach((i) => (i.style.borderColor = "#D9D9D9"));
 });
-
 
 // =========================
 // 🖼️ IMAGE PREVIEW
@@ -111,13 +123,39 @@ if (imageInput) {
       reader.onload = (e) => {
         imgPreview.src = e.target.result;
         imgPreview.style.display = "block";
-        defaultIcon.style.display = "none"; // hide the placeholder icon
+        defaultIcon.style.display = "none"; // hide placeholder icon
       };
       reader.readAsDataURL(file);
     } else {
       imgPreview.style.display = "none";
-      defaultIcon.style.display = "block"; // show icon again if no file
+      defaultIcon.style.display = "block"; // show icon again if cleared
     }
   });
 }
 
+// =========================
+// 🍔 FOOTER POPUP MENU
+// =========================
+const toggleBtn = document.getElementById("menu-toggle");
+const menuPopup = document.getElementById("menu-popup");
+
+toggleBtn.addEventListener("click", (e) => {
+  e.stopPropagation();
+  menuPopup.classList.toggle("show");
+});
+
+window.addEventListener("click", (e) => {
+  if (!e.target.closest("#menu-popup") && !e.target.closest("#menu-toggle")) {
+    menuPopup.classList.remove("show");
+  }
+});
+
+// =========================
+// 🚀 GO TO TRACK PAGE BUTTON (Manual click only)
+// =========================
+const goTrackBtn = document.getElementById("goTrackBtn");
+if (goTrackBtn) {
+  goTrackBtn.addEventListener("click", () => {
+    window.location.href = "track.html";
+  });
+}

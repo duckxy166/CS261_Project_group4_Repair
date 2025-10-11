@@ -4,27 +4,26 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>แจ้งซ่อม</title>
+  <title>แจ้งซ่อม (Repair Request)</title>
 
+  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Monoton&family=Noto+Sans+Thai:wght@100..900&display=swap"
-    rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
-  <link
-    href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Monoton&display=swap"
-    rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+  <!-- CSS -->
   <link rel="stylesheet" href="RepairRequest.css">
 </head>
 
 <body>
 
-  <header>
-    <h1>แจ้งซ่อม<br><span class="sub">(Repair Request)</span></h1>
+  <!-- Header -->
+  <header class="header">
+    <h1>แจ้งซ่อม<br><span>(Repair Request)</span></h1>
   </header>
 
+  <!-- Main Form -->
   <div class="container">
     <section class="card">
 
@@ -51,18 +50,15 @@
               <option>เฟอร์นิเจอร์</option>
               <option>อื่น ๆ</option>
             </select>
-
           </div>
         </div>
 
         <div>
-          <div>
-            <label for="image">แนบรูป (ถ้ามี)</label>
-            <div class="file-upload">
-              <img src="image/picIcon.png" alt="Pic Icon" class="pic-icon" id="defaultIcon" />
-              <input id="image" type="file" accept="image/*" />
-              <img id="imgPreview" class="img-preview" alt="preview" style="display:none" />
-            </div>
+          <label for="image">แนบรูป (ถ้ามี)</label>
+          <div class="file-upload">
+            <img src="image/picIcon.png" alt="Pic Icon" class="pic-icon" id="defaultIcon" />
+            <input id="image" type="file" accept="image/*" />
+            <img id="imgPreview" class="img-preview" alt="preview" style="display:none" />
           </div>
         </div>
 
@@ -71,9 +67,7 @@
           <textarea id="description" placeholder="อธิบายสิ่งที่พบ เช่น ไฟไม่ติด บริเวณโคม X" required></textarea>
         </div>
 
-        <p id="errorMsg" class="error-message" style="display:none;">
-          กรุณากรอกข้อมูลให้ครบถ้วน
-        </p>
+        <p id="errorMsg" class="error-message" style="display:none;">กรุณากรอกข้อมูลให้ครบถ้วน</p>
 
         <div class="actions">
           <button type="submit">ส่งคำขอ</button>
@@ -81,8 +75,8 @@
         </div>
       </form>
 
-      <!-- Success Message Section -->
-      <div id="successMessage" class="success-message" style="display: none;">
+      <!-- Success message -->
+      <div id="successMessage" class="success-message" style="display:none;">
         <div class="checkmark">
           <svg viewBox="0 0 52 52">
             <circle class="checkmark__circle" cx="26" cy="26" r="25" fill="none" />
@@ -90,39 +84,34 @@
           </svg>
         </div>
         <p class="success-text">ส่งคำขอสำเร็จ</p>
-        <button class="history-btn" onclick="window.location.href='history.html'">ประวัติการแจ้งซ่อม</button>
+        <button type="button" class="history-btn" id="goTrackBtn">ติดตามสถานะการซ่อม</button>
       </div>
-
-
     </section>
   </div>
+
   
 
-  <!-- Footer band with menu and menu options inside -->
-  <div class="footer-band">
-    <div id="menuButton">
-      <img src="image/icons8-menu-50.png" alt="Menu" />
+  <!-- 🔻 Footer Menu (New Design Like History Page) -->
+  <div class="bottom-bar">
+    <div class="menu-btn" id="menu-toggle" tabindex="-1">
+      <span class="material-icons">menu</span>
     </div>
+
   
-    <nav id="sideMenu" class="side-menu">
-      <ul>
-        <li>
-          <a href="index.html" class="menu-item">
-            <img src="image/Home.png" alt="home">หน้าหลัก
-          </a>
-        </li>
-        <li>
-          <a href="login.html" class="menu-item">
-            <img src="image/Log out.png" alt="logout">ออกจากระบบ
-          </a>
-        </li>
-      </ul>
-    </nav>
-
+    <!-- Yellow popup -->
+    <div class="menu-popup" id="menu-popup">
+      <a href="index.html" class="menu-item">
+        <span class="material-icons">home</span> หน้าหลัก
+      </a>
+      <a href="login.html" class="menu-item logout">
+        <span class="material-icons">logout</span> ออกจากระบบ
+      </a>
+    </div>
   </div>
-
 
   <script src="RepairRequest.js"></script>
 </body>
 
 </html>
+
+

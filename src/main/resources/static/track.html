@@ -1,85 +1,90 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="th">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ติดตามสถานะการซ่อม (Track Request)</title>
-
-  <!-- Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Noto+Sans+Thai:wght@400;600;700&display=swap"
-    rel="stylesheet">
-
-  <!-- CSS -->
   <link rel="stylesheet" href="track.css">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
 
 <body>
-
-  <!-- Header -->
-  <header>
-    <h1>ติดตามสถานะการซ่อม<br><span class="sub">(Track Request)</span></h1>
+  <!-- 🔺 Header -->
+  <header class="header">
+    <h1>ติดตามสถานะการซ่อม<br><span>(Track Request)</span></h1>
   </header>
 
-  <!-- Yellow bar -->
-  <div class="sub-header">รายละเอียดของงานซ่อม</div>
+  <!-- 🧾 Table -->
+  <main class="container">
+    <table>
+      <thead>
+        <tr>
+          <th>วันที่แจ้งซ่อม</th>
+          <th>ชื่อผู้แจ้ง</th>
+          <th>ผู้รับผิดชอบ</th>
+          <th>ประเภทงาน</th>
+          <th>สถานะการซ่อม</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="repairList">
+        <tr class="clickable-row" data-id="1">
+          <td>DD/MM/YYYY</td>
+          <td>สมชาย</td>
+          <td>ช่างเอกชัย</td>
+          <td>ไฟฟ้า</td>
+          <td>กำลังดำเนินการ</td>
+          <td>
+            <button class="icon-btn view"><span class="material-icons">search</span></button>
+            <button class="icon-btn delete"><span class="material-icons">delete</span></button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </main>
 
-  <!-- Content -->
-  <div class="container">
-    <section class="card">
-      <p>วันที่แจ้งซ่อม : <span id="req-date">DD/MM/YYYY</span></p>
-      <p>ชื่อผู้แจ้ง : <span id="req-name">สมชาย</span></p>
-      <p>ผู้รับผิดชอบ : <span id="req-responsible">ช่างเอกชัย</span></p>
-      <p>ประเภทของงาน : <span id="req-type">ไฟฟ้า</span></p>
-      <p>สถานที่ : <span id="req-location">อาคารบรรยายรวม X</span></p>
-      <p>รายละเอียดงาน : <span id="req-detail">ไฟไม่ติดที่บริเวณอาคารบรรยายรวม X</span></p>
-      <p>สถานะการซ่อม : <span id="req-status">รอการประเมิน <span class="dot"></span></span></p>
-
-      <div class="actions">
-        <button class="main-cancel-btn">ยกเลิกการแจ้งซ่อม</button>
-        <button class="ghost" onclick="history.back()">ย้อนกลับ</button>
-      </div>
-    </section>
-  </div>
-
-  <!-- Footer band (same as RepairRequest) -->
-  <div class="footer-band">
-    <div id="menuButton">
-      <img src="image/icons8-menu-50.png" alt="Menu" />
+  <!-- 🔻 Footer Bar -->
+  <div class="bottom-bar">
+    <div class="menu-btn" id="menu-toggle">
+      <span class="material-icons">menu</span>
     </div>
-  
-    <nav id="sideMenu" class="side-menu">
-      <ul>
-        <li>
-          <a href="index.html" class="menu-item">
-            <img src="image/Home.png" alt="home">หน้าหลัก
-          </a>
-        </li>
-        <li>
-          <a href="login.html" class="menu-item">
-            <img src="image/Log out.png" alt="logout">ออกจากระบบ
-          </a>
-        </li>
-      </ul>
-    </nav>
+
+    <!-- Popup Menu -->
+    <div class="menu-popup" id="menu-popup">
+      <a href="index.html" class="menu-item">
+        <span class="material-icons">home</span> หน้าหลัก
+      </a>
+      <a href="login.html" class="menu-item logout">
+        <span class="material-icons">logout</span> ออกจากระบบ
+      </a>
+    </div>
   </div>
 
-  <!-- ✅ Move modal ABOVE the script -->
-  <div class="modal" id="cancelModal">
+  <!-- 🗑 Confirm Delete Modal -->
+  <div class="modal" id="confirmModal">
     <div class="modal-content">
-      <span class="close" id="closeModal">&times;</span>
+      <button class="close-btn" id="closeModal">×</button>
       <p>คุณต้องการจะยกเลิกการแจ้งซ่อมนี้หรือไม่</p>
       <div class="modal-actions">
-        <button class="confirm-btn" id="confirmCancel">ยืนยัน</button>
-        <button class="cancel-btn" id="cancelClose">ยกเลิก</button>
+        <button class="confirm-btn" id="confirmDelete">ยืนยัน</button>
+        <button class="cancel-btn" id="cancelModal">ยกเลิก</button>
       </div>
     </div>
   </div>
 
-  <!-- Script should always come last -->
-  <script src="track.js"></script>
+<!-- 🗑 Confirm Delete Modal -->
+<div class="modal" id="confirmModal">
+    <div class="modal-content">
+        <button class="close-btn" id="closeModal">×</button>
+        <p>คุณต้องการจะลบรายการนี้หรือไม่?</p>
+        <div class="modal-actions">
+            <button class="confirm-btn" id="confirmDelete">ยืนยัน</button>
+            <button class="cancel-btn" id="cancelModal">ยกเลิก</button>
+        </div>
+    </div>
+</div>
 
+  <script src="track.js"></script>
 </body>
 </html>
