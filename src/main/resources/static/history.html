@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ประวัติการแจ้งซ่อม (Request History)</title>
+  <link rel="stylesheet" href="history.css">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+  <!-- Header -->
+  <header class="header">
+    <h1>ประวัติการแจ้งซ่อม<br><span>(Request History)</span></h1>
+  </header>
+
+  <!-- Table -->
+  <main class="container">
+    <table>
+      <thead>
+        <tr>
+          <th>วันที่แจ้งซ่อม</th>
+          <th>ชื่อผู้แจ้ง</th>
+          <th>ประเภทงาน</th>
+          <th>รายละเอียดปัญหา</th>
+          <th>สถานะการซ่อม</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>DD/MM/YYYY</td>
+          <td>สมชาย</td>
+          <td>ประเภทงาน</td>
+          <td>รายละเอียดปัญหา</td>
+          <td>กำลังดำเนินการ</td>
+          <td><button class="delete-btn"><span class="material-icons">delete</span></button></td>
+        </tr>
+        <tr>
+          <td>DD/MM/YYYY</td>
+          <td>ใจดี</td>
+          <td>ประเภทงาน</td>
+          <td>รายละเอียดปัญหา</td>
+          <td>กำลังดำเนินการ</td>
+          <td><button class="delete-btn"><span class="material-icons">delete</span></button></td>
+        </tr>
+      </tbody>
+    </table>
+  </main>
+
+  <!-- Bottom Bar -->
+  <div class="bottom-bar">
+    <div class="menu-btn" id="menu-toggle">
+      <span class="material-icons">menu</span>
+    </div>
+
+    <!-- Hidden menu -->
+    <div class="menu-popup" id="menu-popup">
+      <a href="index.html" class="menu-item">
+        <span class="material-icons">home</span> หน้าหลัก
+      </a>
+      <a href="login.html" class="menu-item logout">
+        <span class="material-icons">logout</span> ออกจากระบบ
+      </a>
+    </div>
+  </div>
+
+  <!-- ✅ Confirmation Modal -->
+  <div class="modal" id="confirmModal">
+    <div class="modal-content">
+      <button class="close-btn" id="closeModal">×</button>
+      <p>คุณต้องการลบประวัติการแจ้งซ่อมนี้หรือไม่</p>
+      <div class="modal-actions">
+        <button class="confirm-btn" id="confirmDelete">ยืนยัน</button>
+        <button class="cancel-btn" id="cancelModal">ยกเลิก</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="history.js"></script>
+</body>
+</html>

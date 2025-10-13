@@ -1,0 +1,330 @@
+body {
+  font-family: "Noto Sans Thai", sans-serif;
+  margin: 0;
+  background: #fff;
+  color: #000;
+}
+
+/* Header */
+.header {
+  background-color: #b1002e;
+  color: white;
+  text-align: center;
+  padding: 25px 10px;
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 2rem;
+  line-height: 1.4;
+}
+
+.header span {
+  font-size: 1.2rem;
+  opacity: 0.9;
+}
+
+/* Yellow Sub-header */
+.sub-header {
+  background-color: #fcd94a;
+  color: #000;
+  text-align: center;
+  font-weight: 700;
+  padding: 10px;
+  font-size: 1.1rem;
+}
+
+/* 🧾 Centered section, but text left-aligned inside */
+.container {
+  padding: 35px 30px 50px;  /* already reduced bottom space */
+  line-height: 1.8;
+  font-size: 1.05rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;  /* centers the whole block */
+}
+
+.container p {
+  width: 100%;
+  max-width: 420px;     /* keeps nice readable width */
+  text-align: left;     /* all text starts from same left edge */
+  margin: 4px 0;
+}
+
+
+.dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  background-color: #b1002e;
+  border-radius: 50%;
+  margin-left: 5px;
+}
+
+/* 🖼️ Medium image box aligned with text column and centered icon */
+.image-box {
+  background-color: #d9d9d9;
+  display: flex;
+  justify-content: center;   /* center icon or image */
+  align-items: center;
+  margin: 18px 0;
+  border-radius: 6px;
+  overflow: hidden;
+  width: 100%;
+  max-width: 420px;          /* align with text width */
+  height: 160px;
+}
+
+
+
+/* Placeholder icon — proportional and centered */
+.image-box img.placeholder {
+  width: 70px;
+  height: 70px;
+  opacity: 0.6;
+}
+
+/* Real image fills box naturally without stretch */
+.image-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 6px;
+}
+
+
+/* Buttons */
+.actions {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.actions button {
+  border: none;
+  border-radius: 25px;
+  padding: 12px 22px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: "Noto Sans Thai", sans-serif;
+}
+
+.actions .cancel {
+  background-color: #b1002e;
+  color: white;
+}
+
+.actions .cancel:hover {
+  background-color: #a6002c;
+}
+
+.actions .back {
+  background-color: #e0e0e0;
+}
+
+/* 🎨 Slightly darker hover for the 'ย้อนกลับ' button */
+.actions .back:hover {
+  background-color: #d6d6d6;  /* slightly darker gray */
+  transition: background-color 0.3s ease;
+}
+
+/* Footer Menu */
+/* 🔻 Footer bar stays at bottom of page (not fixed to viewport) */
+.bottom-bar {
+  position: relative;       /* no longer fixed */
+  width: 100%;
+  height: 55px;
+  background-color: #b1002e;
+  display: flex;
+  align-items: center;
+  padding: 0 15px;
+  box-sizing: border-box;
+  margin-top: 0px;         /* spacing from content above */
+}
+
+
+.menu-btn {
+  color: white;
+  font-size: 1.8rem;
+  cursor: pointer;
+}
+
+.menu-popup {
+  display: none;
+  flex-direction: column;
+  position: absolute;
+  bottom: 55px;
+  left: 0;
+  background-color: #fcd94a;
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.25);
+}
+
+.menu-popup.show {
+  display: flex;
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  color: #000;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.menu-item:hover {
+  background-color: #ffe36e;
+}
+
+/* ===== Modal Popup ===== */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.3);
+  justify-content: center;
+  align-items: center;
+}
+
+.modal.show {
+  display: flex;
+}
+
+.modal-content {
+  background: #e3e3e3;
+  padding: 20px 25px;
+  border-radius: 6px;
+  text-align: center;
+  position: relative;
+  width: 320px;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.25);
+  animation: fadeIn 0.25s ease;
+}
+
+.modal-content p {
+  margin-bottom: 16px;
+  font-weight: 600;
+}
+
+.close-btn {
+  position: absolute;
+  top: 6px;
+  right: 10px;
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  color: #000;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.confirm-btn,
+.cancel-btn {
+  padding: 6px 14px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.confirm-btn {
+  background-color: #b1002e;
+  color: #fff;
+}
+
+.cancel-btn {
+  background-color: #ccc;
+}
+
+.confirm-btn:hover {
+  background-color: #a4002c;
+}
+
+.cancel-btn:hover {
+  background-color: #b3b3b3;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* 🚫 Prevent text selection or text cursor on header */
+header,
+.header {
+  user-select: none;          /* disable text selection */
+  -webkit-user-select: none;  /* Safari fix */
+  -moz-user-select: none;     /* Firefox fix */
+  -ms-user-select: none;      /* Edge/IE fix */
+  cursor: default;            /* show normal arrow cursor */
+}
+
+/* 🚫 Prevent text selection or caret on header and sub-header */
+header,
+.header,
+.sub-header {
+  user-select: none;          /* disable text selection */
+  -webkit-user-select: none;  /* Safari fix */
+  -moz-user-select: none;     /* Firefox fix */
+  -ms-user-select: none;      /* Edge/IE fix */
+  cursor: default;            /* normal arrow cursor */
+}
+
+/* 🚫 Prevent text cursor or selection in detail text */
+.container p {
+  user-select: none;          /* disable text selection */
+  -webkit-user-select: none;  /* Safari */
+  -moz-user-select: none;     /* Firefox */
+  -ms-user-select: none;      /* Edge */
+  cursor: default;            /* normal arrow cursor */
+}
+
+/* 🚫 Prevent text cursor or selection on the image box */
+.image-box,
+.image-box img {
+  user-select: none;          /* disable text selection */
+  -webkit-user-select: none;  /* Safari */
+  -moz-user-select: none;     /* Firefox */
+  -ms-user-select: none;      /* Edge */
+  cursor: default;            /* normal arrow cursor */
+}
+
+/* 🚫 Prevent text cursor or selection on action buttons */
+.actions button {
+  user-select: none;          /* disable text selection */
+  -webkit-user-select: none;  /* Safari */
+  -moz-user-select: none;     /* Firefox */
+  -ms-user-select: none;      /* Edge */
+  cursor: pointer;            /* show hand icon when hovering */
+}
+
+/* 🚫 Prevent text cursor or selection on bottom menu icon */
+.menu-btn,
+.menu-btn span {
+  user-select: none;          /* disable text selection */
+  -webkit-user-select: none;  /* Safari */
+  -moz-user-select: none;     /* Firefox */
+  -ms-user-select: none;      /* Edge */
+  cursor: pointer;            /* show hand cursor */
+}
+
+/* 🚫 Prevent text cursor or text selection on popup menu items */
+.menu-item {
+  user-select: none;          /* disable text selection */
+  -webkit-user-select: none;  /* Safari */
+  -moz-user-select: none;     /* Firefox */
+  -ms-user-select: none;      /* Edge */
+  cursor: pointer;            /* show hand cursor */
+}

@@ -1,0 +1,537 @@
+/* Base Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Inter", sans-serif;
+}
+
+body {
+  background: #fff;
+  color: #333;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* Header */
+.header {
+  background-color: #b1002e;
+  color: white;
+  text-align: center;
+  padding: 25px 10px;
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 2rem;
+  line-height: 1.4;
+  font-family: "Noto Sans Thai", sans-serif;
+}
+
+.header span {
+  font-size: 1.2rem;
+  opacity: 0.9;
+}
+
+/* Container fills the space between header & footer */
+.container {
+  flex: 1; /* takes remaining height between header and footer */
+  width: 100%;
+  max-width: 420px;
+  margin: 0 auto;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 0.5px 1rem 0px;
+  overflow-y: auto;
+}
+
+/* Card/Form */
+.card {
+  width: 100%;
+  background: #fff;
+  padding: 2rem 1.5rem;
+}
+
+label {
+  font-weight: 600;
+  display: block;
+  margin-bottom: 0.3rem;
+  font-family: "Noto Sans Thai", sans-serif;
+}
+
+input, select, textarea {
+  width: 100%;
+  padding: 0.7rem;
+  border: 1.5px solid #D9D9D9;
+  border-radius: 5px;
+  font-size: 1rem;
+  outline: none;
+  background: #D9D9D9;
+}
+
+input:focus, select:focus, textarea:focus {
+  border-color: #C30E2F;
+}
+
+/* File Upload */
+.file-upload {
+  position: relative;
+  width: 100%;
+  height: 120px;
+  border: 1.5px dashed #D9D9D9;
+  border-radius: 5px;
+  background: #D9D9D9;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden; /* important: prevents image overflow */
+  cursor: pointer;
+}
+
+.file-upload input[type="file"] {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.file-upload .pic-icon {
+  width: 40px;
+  height: 40px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.file-upload .img-preview {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 5px;
+  top: 0;
+  left: 0;
+  display: none; /* hidden until upload */
+}
+
+
+textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+/* Buttons */
+.actions {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-top: 1rem;
+}
+
+button[type="submit"] {
+  background: #C30E2F;
+  color: #fff;
+  border-radius: 25px;
+  padding: 0.6rem 1.8rem;
+}
+
+button.ghost {
+  background: #e0e0e0;
+  border-radius: 25px;
+  padding: 0.6rem 1.8rem;
+}
+
+/* Hover Effects */
+button[type="submit"]:hover {
+  background-color: rgb(162, 6, 51);   /* slightly darker red */
+  /* transform: scale(1.02);      gentle zoom */
+  transition: background-color 0.6s ease, transform 4s ease;
+}
+
+button.ghost:hover {
+  background-color: #cdcdcd;   /* slightly darker gray */
+  /* transform: scale(1.02); */
+  transition: background-color 0.6s ease, transform 4s ease;
+}
+
+button {
+  border: none;               /* remove default border */
+  outline: none;              /* remove focus outline */
+  box-shadow: none;           /* remove any default shadow */
+}
+
+button:focus,
+button:active {
+  outline: none !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+#menuButton img {
+  width: 60%;
+  height: 60%;
+}
+
+/* --- Description Textarea Smaller --- */
+#description {
+  min-height: 40px;
+  max-height: 40px;
+  background-color: #D9D9D9;
+  border: 1.5px solid #D9D9D9;
+  border-radius: 5px;
+  padding: 0.7rem 0.8rem;
+  font-size: 1rem;
+  resize: none;
+  overflow: hidden;
+}
+
+/* --- Responsive --- */
+@media (max-width: 768px) {
+  header h1 { font-size: 1.6rem; }
+  .container { padding: 1rem; }
+  button { width: 100%; }
+}
+
+select, option {
+  font-family: "Noto Sans Thai", sans-serif;
+}
+
+select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-color: #D9D9D9;
+  border: 1.5px solid #D9D9D9;
+  border-radius: 5px;
+  padding: 0.7rem 2rem 0.7rem 0.7rem;
+  font-family: "Kanit", sans-serif;
+  color: #000;
+  outline: none;
+  box-shadow: none;
+  cursor: pointer;
+}
+
+select:focus {
+  border-color: #b20838;
+}
+
+/* optional custom arrow */
+select {
+  background-image: url("data:image/svg+xml;utf8,<svg fill='black' height='12' viewBox='0 0 24 24' width='12' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 12px;
+}
+
+/* list items */
+.side-menu ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.side-menu li {
+  display: flex;
+  align-items: center;
+}
+
+.side-menu a {
+  display: block;             /* make the <a> fill the full width */
+  width: 100%;                /* ensures hover covers entire line */
+  text-decoration: none;
+  color: #000;
+  font-weight: 600;
+  padding: 10px 14px;
+  transition: background 0.2s ease;
+  border-radius: 6px;         /* optional, for smooth rounded hover */
+  box-sizing: border-box;
+}
+
+.side-menu a:hover {
+  background-color: #ffe680;  /* highlight full width */
+}
+
+
+.side-menu img {
+  width: 20px;
+  height: 20px;
+  margin-right: 8px;
+}
+
+.error-message {
+  color: #b20838;
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin-top: -4px;
+  text-align: left;      /* align text to left */
+  margin-left: 4px;      /* small offset to match input box start */
+  position: absolute;
+  /* bottom: 0px; */
+}
+
+/* ===== Enhanced Success Message (Large but Thin) ===== */
+.success-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: 80px;
+  text-align: center;
+}
+
+/* Green checkmark (large diameter, thin stroke) */
+.checkmark {
+  width: 160px;          /* much larger */
+  height: 160px;
+  border-radius: 50%;
+  display: inline-block;
+  border: 2.5px solid #00994d; /* thin but crisp circle */
+  position: relative;
+  animation: scaleUp 0.5s ease-in-out;
+}
+
+.checkmark__circle {
+  stroke: #00994d;
+  stroke-width: 2.5;       /* thinner stroke */
+  stroke-miterlimit: 10;
+}
+
+.checkmark__check {
+  transform-origin: 50% 50%;
+  stroke: #00994d;
+  stroke-width: 3;         /* thin but still visible */
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-miterlimit: 10;
+  stroke-dasharray: 48;
+  stroke-dashoffset: 48;
+  animation: draw 0.8s ease forwards 0.3s;
+}
+
+@keyframes draw {
+  to { stroke-dashoffset: 0; }
+}
+
+@keyframes scaleUp {
+  0% { transform: scale(0.8); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* Text — proportionally larger but balanced */
+.success-text {
+  font-family: "Noto Sans Thai", sans-serif;
+  font-size: 1.8rem;       /* larger text */
+  margin-top: 18px;
+  font-weight: 600;
+  color: #222;
+}
+
+/* Button — slightly wider, retains rounded shape */
+.history-btn {
+  margin-top: 16px;
+  background-color: #C30E2F;
+  color: #fff;
+  border: none;
+  border-radius: 25px;
+  padding: 10px 26px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  font-family: "Noto Sans Thai", sans-serif;
+}
+
+.history-btn:hover {
+  background-color: #b50d2c; /* slightly lighter shade */
+  transform: scale(1.015);  /* gentle 1.5% growth */
+  transition: background-color 0.25s ease, transform 0.25s ease;
+}
+
+/* === Footer Menu (same design as History Page) === */
+.bottom-bar {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  height: 55px;
+  background-color: #b1002e;
+  display: flex;
+  align-items: center;
+  padding: 0 15px;
+  box-sizing: border-box;
+  z-index: 999;
+}
+
+.menu-btn {
+  color: white;
+  font-size: 1.8rem;
+  cursor: pointer;
+}
+
+/* Popup menu */
+.menu-popup {
+  display: none;
+  flex-direction: column;
+  position: absolute;
+  bottom: 55px;
+  left: 0px;
+  background-color: #fcd94a;
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.25);
+  animation: fadeUp 0.25s ease forwards;
+}
+
+@keyframes fadeUp {
+  from { transform: translateY(10px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.menu-popup.show {
+  display: flex;
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  color: #000;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.menu-item.logout {
+  background-color: #fcd94a;
+}
+
+.menu-item:hover {
+  background-color: #ffe36e;
+}
+
+.menu-item.logout:hover {
+  background-color: #ffe36e;
+}
+
+.menu-item .material-icons {
+  font-size: 20px;
+}
+
+/* Prevent text cursor (caret) when clicking menu */
+.bottom-bar,
+.menu-btn,
+.menu-popup,
+.menu-item {
+  user-select: none;         /* disables text selection */
+  -webkit-user-select: none; /* Safari fix */
+  -moz-user-select: none;    /* Firefox fix */
+}
+
+.menu-btn,
+.menu-popup {
+  outline: none;             /* remove focus outline */
+}
+
+/* Prevent accidental focus */
+.menu-btn:focus,
+.menu-popup:focus,
+.menu-item:focus {
+  outline: none;
+}
+
+
+/* Prevent text caret or text selection in empty areas of form */
+form,
+.card,
+.container {
+  user-select: none;          /* disable text selection */
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  cursor: default;            /* default arrow cursor */
+}
+
+/* Allow normal typing & selection inside inputs, selects, textareas */
+/* === Input, Select, and Textarea Styling (Final — No Red Borders Ever) === */
+input,
+select,
+textarea {
+  width: 100%;
+  padding: 0.7rem;
+  border: 1.5px solid #D9D9D9;
+  border-radius: 5px;
+  font-size: 1rem;
+  outline: none;
+  background-color: #D9D9D9;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+  user-select: text !important;
+  cursor: text;
+  box-shadow: none !important;          /* 🚫 stop Chrome from adding red glow */
+}
+
+/* ✅ Focus: slightly brighter gray, clean red border */
+input:focus,
+select:focus,
+textarea:focus {
+  background-color: #E1E1E1;
+  border-color: #C30E2F;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+/* 🚫 Stop Chrome/Edge from marking required fields in red */
+input:required,
+select:required,
+textarea:required {
+  box-shadow: none !important;
+  outline: none !important;
+  border-color: #D9D9D9 !important;
+}
+
+/* 🚫 Stop invalid (empty) required inputs from going red */
+input:invalid,
+select:invalid,
+textarea:invalid {
+  box-shadow: none !important;
+  outline: none !important;
+  border-color: #D9D9D9 !important;
+}
+
+/* 💡 Remove autofill yellow/blue/red Chrome background */
+input:-webkit-autofill,
+input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 1000px #D9D9D9 inset !important;
+  -webkit-text-fill-color: #000 !important;
+  border: 1.5px solid #C30E2F !important;
+}
+
+/* 🧱 Prevent cursor showing outside inputs */
+form,
+.card,
+.container {
+  user-select: none;
+  cursor: default;
+}
+
+input,
+select,
+textarea {
+  user-select: text !important;
+  cursor: text;
+}
+
+header, 
+.header {
+  user-select: none;          /* stop selecting text */
+  -webkit-user-select: none;  /* Safari */
+  -moz-user-select: none;     /* Firefox */
+  -ms-user-select: none;      /* Edge/IE */
+  cursor: default;            /* show arrow cursor instead of text I-beam */
+}
+
+
+
+
