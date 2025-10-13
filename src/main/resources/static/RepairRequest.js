@@ -1,4 +1,32 @@
 // =========================
+// 🚀 FETCH CURRENT USER ON PAGE LOAD
+// =========================
+document.addEventListener("DOMContentLoaded", async () => {
+  const reporterNameInput = document.getElementById("reporterName");
+
+  try {
+    // 1. เรียก API ที่เราสร้างขึ้นใน Backend
+    const response = await fetch("/api/users/current");
+
+    // 2. ตรวจสอบว่าการเรียกสำเร็จหรือไม่
+    if (response.ok) {
+      const user = await response.json(); // แปลงข้อมูล JSON เป็น object
+      // 3. นำชื่อเต็ม (fullName) ของผู้ใช้ไปใส่ในช่อง input
+      reporterNameInput.value = user.fullName;
+    } else {
+      // ถ้าไม่สำเร็จ (เช่น session หมดอายุ หรือยังไม่ได้ login)
+      console.error("User not authenticated");
+      // อาจจะ redirect ไปหน้า login
+      alert("กรุณาเข้าสู่ระบบก่อนทำการแจ้งซ่อม");
+      window.location.href = "login.html"; // เปลี่ยนเป็นหน้า login ของคุณ
+    }
+  } catch (error) {
+    console.error("Error fetching user data:", error);
+    reporterNameInput.value = "ไม่สามารถโหลดข้อมูลผู้ใช้ได้";
+  }
+});
+
+// =========================
 // 📝 FORM VALIDATION + SAVE + SUCCESS
 // =========================
 const form = document.getElementById("requestForm");
