@@ -9,6 +9,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManagerFactory;
@@ -18,8 +20,11 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 
 @Configuration
-public class RestTemplateConfig {
-
+public class RestTemplateConfig implements WebMvcConfigurer {
+    @Override
+    public void addViewControllers(ViewControllerRegistry registry) {
+        registry.addViewController("/").setViewName("forward:/login.html");
+    }
     @Bean
     public RestTemplate restTemplate(RestTemplateBuilder builder) throws Exception {
         // โหลดไฟล์ Certificate จากโฟลเดอร์ resources/certs
@@ -34,7 +39,7 @@ public class RestTemplateConfig {
         KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
         keyStore.load(null, null);
         keyStore.setCertificateEntry("tu-api", certificate);
-
+        
         // สร้าง TrustManager ที่จะเชื่อถือ Keystore ของเรา
         TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
         tmf.init(keyStore);
