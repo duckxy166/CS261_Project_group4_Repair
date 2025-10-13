@@ -10,3 +10,4 @@ Step8: ลอง Run maven <br>
 <br>
 note: test login user: tuuser password: 1234 <br>
 login admin: admin password: admin1234
+login tech: tech password: tech1234
