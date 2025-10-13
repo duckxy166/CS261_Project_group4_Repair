@@ -5,14 +5,17 @@ const form = document.getElementById("requestForm");
 const errorMsg = document.getElementById("errorMsg");
 const successMessage = document.getElementById("successMessage");
 
-form.addEventListener("submit", function (e) {
+form.addEventListener("submit", async function (e) {
   e.preventDefault(); // prevent page reload
 
   // Collect form values
+  const title = document.getElementById("category").value.trim() + " - " + document.getElementById("location").value.trim();
+  const description = document.getElementById("description").value.trim();
+  const priority = "Normal";
   const reporterName = document.getElementById("reporterName").value.trim();
   const location = document.getElementById("location").value.trim();
   const category = document.getElementById("category").value.trim();
-  const description = document.getElementById("description").value.trim();
+  
 
   // Validate required fields
   if (!reporterName || !location || !category || !description) {
@@ -37,11 +40,12 @@ form.addEventListener("submit", function (e) {
 
   // ✅ Save to localStorage for Track page
   const repairs = JSON.parse(localStorage.getItem("repairs")) || [];
-    // Read image if uploaded
+  
+   // Read image if uploaded
   let imageData = "";
   if (imageInput && imageInput.files[0]) {
     const reader = new FileReader();
-    reader.onload = function (e) {
+    reader.onload = async function (e) {
       imageData = e.target.result;
 
       const newRepair = {
@@ -62,6 +66,39 @@ form.addEventListener("submit", function (e) {
       // ✅ Show success message
       form.style.display = "none";
       successMessage.style.display = "flex";
+	  
+	  // 🌐 ส่งข้อมูลไปยัง Backend
+	       const repairData = {
+	         title: category,
+	         description: description,
+	         priority: "normal" // ปรับได้ตามต้องการ
+	       };
+
+	       try {
+	         const response = await fetch('/api/requests', {
+	           method: 'POST',
+	           headers: {
+	             'Content-Type': 'application/json'
+	           },
+	           body: JSON.stringify(repairData)
+	         });
+
+	         if (response.ok) {
+	           // ✅ Show success message
+	           form.style.display = "none";
+	           successMessage.style.display = "flex";
+	         } else {
+	           // กรณี Server ตอบกลับมาว่ามีปัญหา
+	           const errorData = await response.json();
+	           errorMsg.textContent = "เกิดข้อผิดพลาด: " + (errorData.message || "ไม่สามารถส่งคำขอได้");
+	           errorMsg.style.display = "block";
+	         }
+	       } catch (error) {
+	         // กรณี Network Error
+	         console.error("Fetch Error:", error);
+	         errorMsg.textContent = "ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้";
+	         errorMsg.style.display = "block";
+	       }
     };
     reader.readAsDataURL(imageInput.files[0]);
     return; // prevent running code below until image is read
@@ -83,16 +120,42 @@ form.addEventListener("submit", function (e) {
   repairs.push(newRepair);
   localStorage.setItem("repairs", JSON.stringify(repairs));
 
-  form.style.display = "none";
-  successMessage.style.display = "flex";
-
-
-  repairs.push(newRepair);
-  localStorage.setItem("repairs", JSON.stringify(repairs));
-
   // ✅ Show success animation
   form.style.display = "none";
   successMessage.style.display = "flex";
+  
+  // 🌐 ส่งข้อมูลไปยัง Backend (no image)
+    const repairData = {
+      title: category,
+      description: description,
+      priority: "normal"
+    };
+
+    try {
+      const response = await fetch('/api/requests', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(repairData)
+      });
+
+      if (response.ok) {
+        // ✅ Show success message
+        form.style.display = "none";
+        successMessage.style.display = "flex";
+      } else {
+        // กรณี Server ตอบกลับมาว่ามีปัญหา
+        const errorData = await response.json();
+        errorMsg.textContent = "เกิดข้อผิดพลาด: " + (errorData.message || "ไม่สามารถส่งคำขอได้");
+        errorMsg.style.display = "block";
+      }
+    } catch (error) {
+      // กรณี Network Error
+      console.error("Fetch Error:", error);
+      errorMsg.textContent = "ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้";
+      errorMsg.style.display = "block";
+    }
 });
 
 // =========================
