@@ -31,3 +31,7 @@ GO
 INSERT INTO dbo.users (username, password, role, email, full_name)
 VALUES ('admin', 'admin1234', 'admin', 'admin1@email.com', 'Admin One');
 GO
+
+INSERT INTO dbo.users (username, password, role, email, full_name)
+VALUES ('tech', 'tech1234', 'tech', 'technician@email.com', 'Technician One');
+GO
