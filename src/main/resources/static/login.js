@@ -29,11 +29,13 @@ form.addEventListener('submit', async (e) => {
       loginBox.classList.add('hidden');
       successBox.classList.remove('hidden');
       setTimeout(() => {
-        if (data.role === 'admin') {
-          window.location.href = 'dashboard.html';
-        } else {
-          window.location.href = 'index.html';
-        }
+		if (data.role === 'admin') {
+		    window.location.href = 'dashboard.html';
+		} else if (data.role === 'tech') {
+		    window.location.href = 'dashboard.html'; // รอแก้ //
+		} else {
+		    window.location.href = 'index.html';
+		}
       }, 1200);
     } else {
       errorMsg.classList.remove('hidden');
