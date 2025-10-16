@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>รายงานการซ่อม (Repair Report)</title>
+  <link rel="stylesheet" href="history.css">
+   <link rel="stylesheet" href="RepairReportCRS.css">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome สำหรับไอคอน -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+
+<body>
+  <!-- Header -->
+  <header class="header">
+    <h1>รายงานการซ่อม<br><span>(Repair Report)</span></h1>
+  </header>
+
+
+  <main class="container" id="card">
+    <form id="reportForm" onsubmit="return false" autocomplete="off">
+      <label for="techName">ชื่อช่างผู้รับผิดชอบ</label>
+      <input id="techName" name="techName" type="text" placeholder="ระบุชื่อช่าง...">
+
+      <label for="details">รายละเอียดการซ่อม</label>
+      <textarea id="details" name="details" placeholder="กรอกอธิบายการซ่อม..."></textarea>
+
+      <label>แนบรูป/วิดีโอของงานซ่อม</label>
+      <div class="uploader" id="uploader">
+  <div class="placeholder" id="placeholder">
+    <div class="icon-row">
+      <!-- ไอคอนรูปภาพ -->
+      <svg viewBox="0 0 24 24" fill="none" class="icon">
+        <rect x="3" y="3" width="18" height="18" rx="2" ry="2" stroke="#666" stroke-width="1.6"/>
+        <circle cx="8.5" cy="8.5" r="1.5" fill="#666"/>
+        <path d="M21 15l-4-4-3 3-4-4-4 4" stroke="#666" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+
+      <!-- ไอคอนวิดีโอ -->
+      <svg viewBox="0 0 24 24" fill="none" class="icon">
+        <rect x="3" y="5" width="15" height="14" rx="2" ry="2" stroke="#666" stroke-width="1.6"/>
+        <path d="M18 8l4 3v2l-4 3V8z" fill="#666"/>
+      </svg>
+    </div>
+    <p class="placeholder-text">คลิกเพื่อเลือกรูปภาพหรือวิดีโอ</p>
+  </div>
+  <div class="preview" id="preview" style="display:none"></div>
+  <input id="fileInput" type="file" accept="image/*,video/*">
+</div>
+
+      <div class="status-row">
+        <label for="statusSelect">สถานะการซ่อม</label>
+        <select id="statusSelect" class="status-select">
+          <option value="">-- เลือกสถานะการซ่อม --</option>
+          <option value="pending">กำลังดำเนินการ</option> 
+          <option value="done">เสร็จสมบูรณ์</option> 
+        </select>
+
+      <div class="actions">
+        <button class="btn report" id="btnReport" type="button">รายงาน</button>
+        <button class="btn cancel" id="btnCancel" type="button">ยกเลิก</button>
+      </div>
+    </form>
+
+    <div id="success" class="success-screen" style="display:none;">
+      <div class="success-inner">
+        <svg viewBox="0 0 120 120" width="120" height="120">
+          <circle cx="60" cy="60" r="50" fill="none" stroke="#12a852" stroke-width="6"/>
+          <path d="M40 62l10 10 28-28" fill="none" stroke="#12a852" stroke-width="6" stroke-linecap="round"/>
+        </svg>
+        <p>รายงานการซ่อมสำเร็จ</p>
+      </div>
+    </div>
+  </main>
+
+
+
+
+  <!-- Bottom Bar -->
+  <div class="bottom-bar">
+    <div class="menu-btn" id="menu-toggle">
+      <span class="material-icons">menu</span>
+    </div>
+
+    <!-- Hidden menu -->
+    <div class="menu-popup" id="menu-popup">
+      <a href="index.html" class="menu-item">
+        <span class="material-icons">home</span> หน้าหลัก
+      </a>
+      <a href="login.html" class="menu-item logout">
+        <span class="material-icons">logout</span> ออกจากระบบ
+      </a>
+    </div>
+  </div>
+
+
+  <script src="history.js"></script>
+  <script src="RepairReportCRS.js"></script>
+</body>
+</html>
+
+
