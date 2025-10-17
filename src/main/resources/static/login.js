@@ -32,7 +32,7 @@ form.addEventListener('submit', async (e) => {
 		if (data.role === 'admin') {
 		    window.location.href = 'dashboard.html';
 		} else if (data.role === 'tech') {
-		    window.location.href = 'dashboard.html'; // รอแก้ //
+		    window.location.href = 'RepairList.html';
 		} else {
 		    window.location.href = 'index.html';
 		}
