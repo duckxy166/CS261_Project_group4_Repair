@@ -12,12 +12,17 @@ public class RepairRequest {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
+    @Column(name = "title", columnDefinition = "NVARCHAR(255)")//for read Thai text
     private String title;
+    @Column(name = "description", columnDefinition = "NVARCHAR(255)")
     private String description;
+    @Column(name = "status", columnDefinition = "NVARCHAR(100)")
     private String status = "Pending";
-    private String priority;
+    @Column(name = "technician", columnDefinition = "NVARCHAR(255)")
     private String technician;
+    @Column(name = "priority", columnDefinition = "NVARCHAR(100)")
+    private String priority;
+    
     
     @Column(updatable = false)
     @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")

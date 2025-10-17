@@ -76,4 +76,21 @@ public class ReportController {
                 updated.getTechnician()
         );
     }
+    @DeleteMapping("/{id}")
+    public void deleteReport(@PathVariable Long id, HttpSession session) {
+        User user = (User) session.getAttribute("user");
+        if (user == null) {
+            throw new RuntimeException("Not logged in");
+        }
+
+        RepairRequest report = reportRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Report not found"));
+
+        // Optional: only allow reporter to delete their own report
+        if (!report.getReporter().getId().equals(user.getId())) {
+            throw new RuntimeException("Cannot delete others' reports");
+        }
+
+        reportRepository.delete(report);
+    }
 }
