@@ -64,10 +64,12 @@ public class ReportController {
                     .orElseThrow(() -> new RuntimeException("Technician not found"));
         }
 
+        // include request.getPriority()
         RepairRequest updated = reportService.updateStatus(
                 request.getId(),
                 request.getStatus(),
-                technician
+                technician,
+                request.getPriority() // ✅ new parameter
         );
 
         return new ReportResponse(
@@ -76,6 +78,7 @@ public class ReportController {
                 updated.getTechnician()
         );
     }
+
     @DeleteMapping("/{id}")
     public void deleteReport(@PathVariable Long id, HttpSession session) {
         User user = (User) session.getAttribute("user");
