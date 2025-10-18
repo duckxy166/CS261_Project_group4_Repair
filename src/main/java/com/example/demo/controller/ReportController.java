@@ -2,6 +2,7 @@ package com.example.demo.controller;
 
 import com.example.demo.dto.ReportRequest;
 import com.example.demo.dto.ReportResponse;
+import com.example.demo.dto.RequestFormDTO;
 import com.example.demo.model.RepairRequest;
 import com.example.demo.model.User;
 import com.example.demo.repository.ReportRepository;
@@ -29,13 +30,20 @@ public class ReportController {
 
     // ---------------- Create report ----------------
     @PostMapping
-    public RepairRequest createReport(@RequestBody RepairRequest report, HttpSession session) {
+    public RepairRequest createReport(@RequestBody RequestFormDTO dto, HttpSession session) {
         User user = (User) session.getAttribute("user");
         if (user == null) {
             throw new RuntimeException("Not logged in");
         }
 
-        report.setReporter(user);
+        // Map DTO -> Entity
+        RepairRequest report = new RepairRequest();
+        report.setTitle(dto.getTitle());
+        report.setDescription(dto.getDescription());
+        report.setPriority(dto.getPriority());
+        report.setLocation(dto.getLocation()); // 🔹 now supported
+        report.setReporter(user); // set current user
+
         return reportService.createReport(report);
     }
 
@@ -45,7 +53,7 @@ public class ReportController {
         return reportService.getAllReports();
     }
 
-    // ---------------- Fetch user reports for frontend ----------------
+    // ---------------- Fetch user reports for history.js ----------------
     @GetMapping("/user-reports")
     public List<RepairRequest> getUserReports(HttpSession session) {
         User user = (User) session.getAttribute("user");
@@ -69,7 +77,7 @@ public class ReportController {
                 request.getId(),
                 request.getStatus(),
                 technician,
-                request.getPriority() // ✅ new parameter
+                request.getPriority()
         );
 
         return new ReportResponse(
@@ -78,7 +86,18 @@ public class ReportController {
                 updated.getTechnician()
         );
     }
+    
+    //---------------- Fetch user track reports ----------------
+    @GetMapping("/user-trackreports")
+    public List<ReportResponse> getTrackReports(HttpSession session) {
+        User user = (User) session.getAttribute("user");
+        if (user == null) return List.of();
 
+        // delegate to service
+        return reportService.getUserTrackReports(user);
+    }
+
+    // ---------------- Delete report ----------------
     @DeleteMapping("/{id}")
     public void deleteReport(@PathVariable Long id, HttpSession session) {
         User user = (User) session.getAttribute("user");
@@ -86,14 +105,17 @@ public class ReportController {
             throw new RuntimeException("Not logged in");
         }
 
-        RepairRequest report = reportRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Report not found"));
-
-        // Optional: only allow reporter to delete their own report
-        if (!report.getReporter().getId().equals(user.getId())) {
-            throw new RuntimeException("Cannot delete others' reports");
-        }
-
-        reportRepository.delete(report);
+        reportService.deleteReport(id, user);
     }
+
+    //getrequestbyId
+    @GetMapping("/{id}")
+    public ReportResponse getReportDetail(@PathVariable Long id, HttpSession session) {
+        User user = (User) session.getAttribute("user");
+        if (user == null) {
+            throw new RuntimeException("Not logged in");
+        }
+        return reportService.getReportDetail(id, user);
+    }
+
 }

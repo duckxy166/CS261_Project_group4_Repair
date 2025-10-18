@@ -85,11 +85,15 @@ public class RepairRequest {
 	}
 	
 	public void setLocation(String location) {
-		this.technician = location;
+		this.location = location;
 	}
 	public String getLocation() {
 	    return location;
 	}
+	public LocalDateTime getCreatedAt() {
+		return createdAt;
+	}
+	
 	@PrePersist
 	protected void onCreate() {
 	    this.createdAt = LocalDateTime.now();
@@ -117,5 +121,6 @@ public class RepairRequest {
 	    this.status = newStatus;
 	    this.updatedAt = LocalDateTime.now();
 	}
+	
 	
 }
