@@ -39,8 +39,7 @@ public class AttachmentController {
                                                  @PathVariable Long attachmentId) throws IOException {
         Attachment att = storage.listByRequest(requestId).stream()
                 .filter(a -> a.getId().equals(attachmentId))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Attachment not found"));
+                .findFirst().orElseThrow(() -> new IllegalArgumentException("Attachment not found"));
 
         var path = storage.resolvePath(att);
         var resource = new PathResource(path);
