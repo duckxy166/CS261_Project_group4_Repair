@@ -112,15 +112,18 @@ public class RepairRequest {
     }
 	
 	public void updateStatus(String newStatus, User technicianUser) {
-	    // Only assign technician if current status is Pending and technician is provided
-	    if ("Pending".equalsIgnoreCase(this.status) && technicianUser != null && "Technician".equalsIgnoreCase(technicianUser.getRole())) {
+	    // Assign technician only if technicianUser provided and has role "Technician"
+	    if (technicianUser != null 
+	            && "Technician".equalsIgnoreCase(technicianUser.getRole())
+	            && "กำลังดำเนินการ".equals(this.status)
+	            && "กำลังซ่อม".equals(newStatus)) {
 	        this.technician = technicianUser.getFullName();
 	    }
-	    
-	    // Always update status and timestamp
+
 	    this.status = newStatus;
 	    this.updatedAt = LocalDateTime.now();
 	}
+
 	
 	
 }

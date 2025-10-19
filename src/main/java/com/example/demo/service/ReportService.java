@@ -13,9 +13,9 @@ import java.util.List;
 public class ReportService {
 
     private final ReportRepository reportRepository;
-    private final FileStorageService fileStorageService; // ✅ final and injected
+    private final FileStorageService fileStorageService; 
 
-    // Constructor injection for both dependencies
+    // Constructor
     public ReportService(ReportRepository reportRepository, FileStorageService fileStorageService) {
         this.reportRepository = reportRepository;
         this.fileStorageService = fileStorageService;
@@ -33,11 +33,11 @@ public class ReportService {
     }
 
     // ---------------- Update status + technician + priority ----------------
+    @Transactional
     public RepairRequest updateStatus(Long id, String status, User technician, String priority) {
         RepairRequest report = reportRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Report not found"));
 
-        // Update status and assign technician if needed
         report.updateStatus(status, technician);
 
         if (priority != null && !priority.isEmpty()) {
@@ -47,10 +47,11 @@ public class ReportService {
         return reportRepository.save(report);
     }
 
+
     // ---------------- Fetch user reports except ซ่อมเสร็จ ----------------
     public List<ReportResponse> getUserTrackReports(User user) {
         return reportRepository.findByReporter(user).stream()
-                .filter(r -> !"ซ่อมเสร็จ".equals(r.getStatus()))
+                .filter(r -> !("ซ่อมเสร็จ".equals(r.getStatus()) || "เสร็จ".equals(r.getStatus())))
                 .map(r -> new ReportResponse(
                         r.getId(),
                         r.getStatus(),
@@ -63,6 +64,7 @@ public class ReportService {
                 ))
                 .toList();
     }
+
 
     // ---------------- Delete report ----------------
     @Transactional
@@ -93,9 +95,9 @@ public class ReportService {
         RepairRequest report = reportRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Report not found"));
 
-        if (!report.getReporter().getId().equals(currentUser.getId())) {
-            throw new RuntimeException("Cannot access others' reports");
-        }
+        //if (!report.getReporter().getId().equals(currentUser.getId())) {
+        //    throw new RuntimeException("Cannot access others' reports");
+        //}
 
         return new ReportResponse(
                 report.getId(),
@@ -108,4 +110,5 @@ public class ReportService {
                 report.getCreatedAt()
         );
     }
+    
 }

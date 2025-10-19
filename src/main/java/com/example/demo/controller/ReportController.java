@@ -2,6 +2,7 @@ package com.example.demo.controller;
 
 import com.example.demo.dto.ReportRequest;
 import com.example.demo.dto.ReportResponse;
+import com.example.demo.dto.ReportUpdateRequest;
 import com.example.demo.dto.RequestFormDTO;
 import com.example.demo.model.RepairRequest;
 import com.example.demo.model.User;
@@ -9,6 +10,8 @@ import com.example.demo.repository.ReportRepository;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.service.ReportService;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import jakarta.servlet.http.HttpSession;
 
@@ -116,6 +119,37 @@ public class ReportController {
             throw new RuntimeException("Not logged in");
         }
         return reportService.getReportDetail(id, user);
+    }
+    //update Status by Technician
+    @PostMapping("/{id}/update-status")
+    public ResponseEntity<ReportResponse> updateStatus(
+            @PathVariable Long id,
+            @RequestBody ReportUpdateRequest req,
+            HttpSession session) {
+
+        User currentUser = (User) session.getAttribute("user");
+        if (currentUser == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        User technician = null;
+        if ("self".equals(req.getTechnician())) {
+            technician = currentUser;
+        }
+
+        RepairRequest updated = reportService.updateStatus(id, req.getStatus(), technician, req.getPriority());
+        ReportResponse response = new ReportResponse(
+                updated.getId(),
+                updated.getStatus(),
+                updated.getTechnician(),
+                updated.getTitle(),
+                updated.getLocation(),
+                updated.getDescription(),
+                updated.getReporter().getFullName(),
+                updated.getCreatedAt()
+        );
+
+        return ResponseEntity.ok(response);
     }
 
 }
