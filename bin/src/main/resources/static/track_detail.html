@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>รายละเอียดงานซ่อม (Track Detail)</title>
+  <link rel="stylesheet" href="track_detail.css">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+  <!-- Header -->
+  <header class="header">
+    <h1>ติดตามสถานะการซ่อม<br><span>(Track Request)</span></h1>
+  </header>
+
+  <div class="sub-header">รายละเอียดของงานซ่อม</div>
+
+  <!-- Detail Info -->
+  <main class="container">
+    <p>วันที่แจ้งซ่อม : DD/MM/YYYY</p>
+    <p>ชื่อผู้แจ้ง : สมชาย</p>
+    <p>ผู้รับผิดชอบ : ช่างเอกชัย</p>
+    <p>ประเภทของงาน : ไฟฟ้า</p>
+    <p>สถานที่ : อาคารบรรยายรวม X</p>
+    <p>รายละเอียดงาน : ไฟไม่ติดที่บริเวณอาคารบรรยายรวม X</p>
+    <p>สถานะการซ่อม : รอการประเมิน <span class="dot"></span></p>
+
+    <div class="image-box">
+      <img src="image/picIcon.png" alt="Pic" class="placeholder">
+    </div>
+
+    <div class="actions">
+      <button class="cancel" id="cancelRequest">ยกเลิกการแจ้งซ่อม</button>
+      <button class="back" onclick="window.history.back()">ย้อนกลับ</button>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <div class="bottom-bar">
+    <div class="menu-btn" id="menu-toggle">
+      <span class="material-icons">menu</span>
+    </div>
+
+    <div class="menu-popup" id="menu-popup">
+      <a href="index.html" class="menu-item">
+        <span class="material-icons">home</span> หน้าหลัก
+      </a>
+      <a href="login.html" class="menu-item logout">
+        <span class="material-icons">logout</span> ออกจากระบบ
+      </a>
+    </div>
+  </div>
+
+  <!-- 🗑 Confirm Cancel Modal -->
+  <div class="modal" id="confirmModal">
+    <div class="modal-content">
+      <button class="close-btn" id="closeModal">×</button>
+      <p>คุณต้องการจะยกเลิกการแจ้งซ่อมนี้หรือไม่</p>
+      <div class="modal-actions">
+        <button class="confirm-btn" id="confirmDelete">ยืนยัน</button>
+        <button class="cancel-btn" id="cancelModal">ยกเลิก</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="track_detail.js"></script>
+</body>
+</html>

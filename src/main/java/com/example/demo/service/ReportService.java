@@ -4,9 +4,10 @@ import com.example.demo.repository.ReportRepository;
 import com.example.demo.dto.ReportResponse;
 import com.example.demo.model.*;
 import org.springframework.stereotype.Service;
-
 import jakarta.transaction.Transactional;
+
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -21,7 +22,7 @@ public class ReportService {
         this.fileStorageService = fileStorageService;
     }
 
-    // ---------------- Create new report (always starts as Pending) ----------------
+    // ---------------- Create new report ----------------
     public RepairRequest createReport(RepairRequest report) {
         report.setStatus("รอดำเนินการ");
         return reportRepository.save(report);
@@ -47,6 +48,15 @@ public class ReportService {
         return reportRepository.save(report);
     }
 
+
+    // ---------------- Mark report as completed ----------------
+    public RepairRequest markAsCompleted(Long id) {
+        RepairRequest report = reportRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Report not found"));
+        report.setStatus("Completed");
+        report.setUpdatedAt(LocalDateTime.now());
+        return reportRepository.save(report);
+    }=
 
     // ---------------- Fetch user reports except ซ่อมเสร็จ ----------------
     public List<ReportResponse> getUserTrackReports(User user) {
@@ -76,7 +86,6 @@ public class ReportService {
             throw new RuntimeException("Cannot delete others' reports");
         }
 
-        //  Delete attachments 
         List<Attachment> attachments = fileStorageService.listByRequest(id);
         for (Attachment att : attachments) {
             try {
@@ -86,7 +95,6 @@ public class ReportService {
             }
         }
 
-        // Delete the report
         reportRepository.delete(report);
     }
 

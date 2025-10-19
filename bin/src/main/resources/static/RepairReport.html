@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>รายการซ่อม (Repair List)</title>
+  <link rel="stylesheet" href="history.css">
+  <link rel="stylesheet" href="RepairReport.css">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;600;700&display=swap" rel="stylesheet">
+  <!-- ลิงก์สำหรับใช้ไอคอน (Font Awesome) -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+
+<body>
+  <!-- Header -->
+  <header class="header">
+    <h1>รายการซ่อม<br><span>(Repair List)</span></h1>
+  </header>
+
+  <div class="sub-header">รายละเอียดของงานซ่อม</div>
+
+ <div class="repair-details">
+  <p><strong>วันที่แจ้งซ่อม :</strong> DD/MM/YYYY</p>
+  <p><strong>ชื่อผู้แจ้ง :</strong> สมชาย</p>
+  <p><strong>ผู้รับผิดชอบ :</strong> ช่างเอกชัย</p>
+  <p><strong>ประเภทของงาน :</strong> ไฟฟ้า</p>
+  <p><strong>สถานที่ :</strong> อาคารบรรยายรวม X</p>
+  <p><strong>รายละเอียดงาน :</strong> ไฟไม่ติดที่บริเวณอาคารบรรยายรวม X</p>
+  <p><strong>สถานะการซ่อม :</strong> รอการประเมิน 
+    <span class="status-dot"></span>
+  </p>
+
+  <div class="repair-image">
+    <i class="fa-regular fa-image"></i>
+  </div>
+
+  <div class="button-group">
+    <a href="RepairReportCRS.html" class="card">
+    <button class="btn-report">รายงานการซ่อม</button> 
+    <a href="RepairList.html" class="card">
+    <button class="btn-back">ย้อนกลับ</button>
+  </div>
+</div>
+
+
+
+       
+  <!-- Bottom Bar -->
+  <div class="bottom-bar">
+    <div class="menu-btn" id="menu-toggle">
+      <span class="material-icons">menu</span>
+    </div>
+
+    <!-- Hidden menu -->
+    <div class="menu-popup" id="menu-popup">
+      <a href="index.html" class="menu-item">
+        <span class="material-icons">home</span> หน้าหลัก
+      </a>
+      <a href="login.html" class="menu-item logout">
+        <span class="material-icons">logout</span> ออกจากระบบ
+      </a>
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div class="modal" id="confirmModal">
+    <div class="modal-content">
+      <button class="close-btn" id="closeModal">×</button>
+      <p>คุณต้องการลบรายการซ่อมนี้หรือไม่</p>
+      <div class="modal-actions">
+        <button class="confirm-btn" id="confirmDelete">ยืนยัน</button>
+        <button class="cancel-btn" id="cancelModal">ยกเลิก</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="history.js"></script>
+</body>
+</html>

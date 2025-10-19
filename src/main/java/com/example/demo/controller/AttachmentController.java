@@ -29,8 +29,9 @@ public class AttachmentController {
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public Attachment upload(@PathVariable Long requestId,
-                             @RequestPart("file") MultipartFile file) throws IOException {
-        return storage.store(requestId, file);
+                             @RequestPart("file") MultipartFile file,
+                             @RequestParam("description") String description) throws IOException {
+        return storage.store(requestId, file, description);
     }
 
     @GetMapping("/{attachmentId}/download")
