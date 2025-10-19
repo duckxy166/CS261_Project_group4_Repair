@@ -31,6 +31,10 @@ public class Attachment {
     @Column(nullable = false)
     private String relativePath;
 
+    // คำอธิบายจากช่าง
+    @Column(length = 500)
+    private String description;
+    
     @Column(nullable = false, updatable = false)
     private Instant createdAt = Instant.now();
 
@@ -88,7 +92,15 @@ public class Attachment {
     public void setRelativePath(String relativePath) {
         this.relativePath = relativePath;
     }
+    
+    public String getDescription() {
+        return description;
+    }
 
+    public void setDescription(String description) {
+        this.description = description;
+    }
+    
     public Instant getCreatedAt() {
         return createdAt;
     }

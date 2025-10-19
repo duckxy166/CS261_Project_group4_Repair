@@ -1,0 +1,29 @@
+
+
+/* ✅ ปรับ “รายละเอียดปัญหา” ไม่มีเส้น ไม่มีกรอบ */
+.detail-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  color: #000; /* สีดำเรียบ */
+  text-decoration: none; /* ไม่มีขีดเส้นใต้ */
+  font-weight: 500;
+  background: none; /* ไม่มีพื้นหลัง */
+  border: none; /* ไม่มีกรอบ */
+  cursor: pointer;
+}
+
+.detail-link:hover .material-icons {
+  color: #b10c2a; /* hover สีแดง TU */
+}
+
+.detail-link .material-icons {
+  font-size: 18px;
+  color: #000;
+  vertical-align: middle;
+}
+
+
+
+

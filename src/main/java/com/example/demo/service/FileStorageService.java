@@ -36,8 +36,9 @@ public class FileStorageService {
         return attachmentRepo.findByRepairRequestId(requestId);
     }
 
-    public Attachment store(Long requestId, MultipartFile file) throws IOException {
-        if (file == null || file.isEmpty()) throw new IllegalArgumentException("Empty file");
+    public Attachment store(Long requestId, MultipartFile file, String description) throws IOException {
+        if (file == null || file.isEmpty()) 
+        	throw new IllegalArgumentException("Empty file");
 
         RepairRequest req = repairRepo.findById(requestId)
                 .orElseThrow(() -> new IllegalArgumentException("RepairRequest not found: " + requestId));
@@ -64,6 +65,8 @@ public class FileStorageService {
         att.setRelativePath(rel.toString().replace('\\', '/'));
         att.setRepairRequest(req);
         att.setCreatedAt(Instant.now());
+        
+        att.setDescription(description);
 
         return attachmentRepo.save(att);
     }
@@ -75,8 +78,12 @@ public class FileStorageService {
     public void delete(Long attachmentId) throws IOException {
         Attachment att = attachmentRepo.findById(attachmentId)
                 .orElseThrow(() -> new IllegalArgumentException("Attachment not found: " + attachmentId));
+        
         Path p = resolvePath(att);
         attachmentRepo.delete(att);
-        try { Files.deleteIfExists(p); } catch (Exception ignored) {}
+        
+        try { 
+        	Files.deleteIfExists(p); 
+        } catch (Exception ignored) {}
     }
 }

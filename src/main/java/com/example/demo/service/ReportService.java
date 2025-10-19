@@ -6,7 +6,7 @@ import com.example.demo.model.User;
 
 import org.springframework.stereotype.Service;
 
-//import java.time.LocalDateTime;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -35,5 +35,12 @@ public class ReportService {
         return reportRepository.save(report);
     }
 
+    public RepairRequest markAsCompleted(Long id) {
+        RepairRequest report = reportRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Report not found"));
+        report.setStatus("Completed");
+        report.setUpdatedAt(LocalDateTime.now());
+        return reportRepository.save(report);
+    }
 
 }

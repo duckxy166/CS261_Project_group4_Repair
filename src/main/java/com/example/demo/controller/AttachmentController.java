@@ -29,8 +29,9 @@ public class AttachmentController {
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public Attachment upload(@PathVariable Long requestId,
-                             @RequestPart("file") MultipartFile file) throws IOException {
-        return storage.store(requestId, file);
+                             @RequestPart("file") MultipartFile file,
+                             @RequestParam("description") String description) throws IOException {
+        return storage.store(requestId, file, description);
     }
 
     @GetMapping("/{attachmentId}/download")
@@ -38,7 +39,8 @@ public class AttachmentController {
                                                  @PathVariable Long attachmentId) throws IOException {
         Attachment att = storage.listByRequest(requestId).stream()
                 .filter(a -> a.getId().equals(attachmentId))
-                .findFirst().orElseThrow(() -> new IllegalArgumentException("Attachment not found"));
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Attachment not found"));
 
         var path = storage.resolvePath(att);
         var resource = new PathResource(path);
