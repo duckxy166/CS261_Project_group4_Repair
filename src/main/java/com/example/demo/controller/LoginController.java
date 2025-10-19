@@ -15,11 +15,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import jakarta.servlet.http.HttpSession;
+
 @RestController
 public class LoginController {
 
-    @Autowired
     private UserRepository userRepository;
+    private final RestTemplate restTemplate;
 
     @Value("${tu.api.url:https://restapi.tu.ac.th/api/v1/auth/Ad/verify2}")
     private String tuApiUrl;
@@ -27,10 +29,15 @@ public class LoginController {
     @Value("${tu.api.key}")
     private String applicationKey;
 
-    private final RestTemplate restTemplate = new RestTemplate();
+ // แก้ไข Constructor ให้รับ RestTemplate
+    @Autowired
+    public LoginController(UserRepository userRepository, RestTemplate restTemplate) {
+        this.userRepository = userRepository;
+        this.restTemplate = restTemplate; 
+    }
 
     @PostMapping("/api/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest, HttpSession session) {
         System.out.println("Login attempt - username: " + loginRequest.getUsername());
         
         // ตรวจสอบ Local Admin/Test Users ก่อน
@@ -39,6 +46,7 @@ public class LoginController {
             User user = localUser.get();
             if (user.getPassword().equals(loginRequest.getPassword())) {
                 System.out.println("Local login successful for: " + user.getUsername());
+                session.setAttribute("user", user);
                 Map<String, Object> response = new HashMap<>();
                 response.put("success", true);
                 response.put("message", "Login successful");
@@ -61,6 +69,7 @@ public class LoginController {
             if (tuResponse != null && tuResponse.isStatus()) {
                 // Login สำเร็จ - บันทึกหรืออัพเดทข้อมูลผู้ใช้ในฐานข้อมูล
                 User user = saveOrUpdateUser(tuResponse);
+                session.setAttribute("user", user);
                 
                 // ส่งข้อมูลกลับไปยัง Frontend
                 Map<String, Object> response = new HashMap<>();
@@ -91,6 +100,23 @@ public class LoginController {
         }
     }
 
+    
+    
+    @GetMapping("/api/profile")
+    public ResponseEntity<?> getProfile(HttpSession session) {
+        User user = (User) session.getAttribute("user");
+        if (user == null) {
+            return ResponseEntity.status(401).body(Map.of("success", false, "message", "Not logged in"));
+        }
+        
+        return ResponseEntity.ok(Map.of(
+            "username", user.getUsername(),
+            "fullName", user.getFullName(),
+            "email", user.getEmail(),
+            "role", user.getRole()
+        ));
+    }
+    
     /**
      * เรียก TU REST API เพื่อตรวจสอบข้อมูลผู้ใช้
      */
@@ -199,5 +225,10 @@ public class LoginController {
         response.put("message", "Webhook endpoint is ready");
         
         return ResponseEntity.ok(response);
+    }
+    @GetMapping("/logout")
+    public String logout(HttpSession session) {
+        session.invalidate();
+        return "redirect:/login";
     }
 }

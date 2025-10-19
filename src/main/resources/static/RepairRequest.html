@@ -1,47 +1,49 @@
 <!doctype html>
 <html lang="th">
+
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>แจ้งซ่อม</title>
+  <title>แจ้งซ่อม (Repair Request)</title>
 
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+  <!-- CSS -->
   <link rel="stylesheet" href="RepairRequest.css">
 </head>
+
 <body>
 
-  <div class="container" role="main">
-    <header>
-      <h1>ระบบแจ้งซ่อม (เว็บแอป)</h1>
-      <p class="lead">แจ้งซ่อม ติดตามสถานะ และอัปเดตงานผ่านเว็บ — สำหรับนักศึกษา บุคลากร และทีมซ่อม</p>
-      
-    </header>
+  <!-- Header -->
+  <header class="header">
+    <h1>แจ้งซ่อม<br><span>(Repair Request)</span></h1>
+  </header>
 
-    <!-- ฟอร์มแจ้งซ่อม -->
+  <!-- Main Form -->
+  <div class="container">
     <section class="card">
-      <h2 style="margin-top:0;font-size:16px">แจ้งซ่อมใหม่</h2>
-      <p class="muted">กรอกข้อมูลแล้วกด "ส่งคำขอ" </p>
 
       <form th:action="@{/submit-repair}" method="post" enctype="multipart/form-data" id="requestForm" novalidate>
         <div class="form-row">
           <div>
             <label for="reporterName">ชื่อผู้แจ้ง</label>
-            <input id="reporterName" type="text" placeholder="เช่น สมชาย ใจดี" required />
-          </div>
-          <div>
-            <label for="reporterContact">อีเมล / เบอร์</label>
-            <input id="reporterContact" type="text" placeholder="อีเมลหรือเบอร์โทร" required />
+            <input id="reporterName" type="text" required />
           </div>
         </div>
 
         <div class="form-row">
           <div>
             <label for="location">สถานที่ (อาคาร/ห้อง)</label>
-            <input id="location" type="text" placeholder="เช่น อาคาร A ห้อง 101" required />
+            <input id="location" type="text" required />
           </div>
           <div>
             <label for="category">ประเภทงาน</label>
             <select id="category" required>
-              <option value="">-- เลือกประเภท --</option>
+              <option value="" disabled selected hidden>-- เลือกประเภท --</option>
               <option>ไฟฟ้า</option>
               <option>ประปา</option>
               <option>ประตู/ล็อก</option>
@@ -51,17 +53,10 @@
           </div>
         </div>
 
-        <div class="form-row">
-          <div>
-            <label for="urgency">ความเร่งด่วน</label>
-            <select id="urgency" required>
-              <option value="normal">ปกติ</option>
-              <option value="low">ต่ำ</option>
-              <option value="high">สูง</option>
-            </select>
-          </div>
-          <div>
-            <label for="image">แนบรูป (ถ้ามี)</label>
+        <div>
+          <label for="image">แนบรูป (ถ้ามี)</label>
+          <div class="file-upload">
+            <img src="image/picIcon.png" alt="Pic Icon" class="pic-icon" id="defaultIcon" />
             <input id="image" type="file" accept="image/*" />
             <img id="imgPreview" class="img-preview" alt="preview" style="display:none" />
           </div>
@@ -72,24 +67,51 @@
           <textarea id="description" placeholder="อธิบายสิ่งที่พบ เช่น ไฟไม่ติด บริเวณโคม X" required></textarea>
         </div>
 
+        <p id="errorMsg" class="error-message" style="display:none;">กรุณากรอกข้อมูลให้ครบถ้วน</p>
+
         <div class="actions">
           <button type="submit">ส่งคำขอ</button>
           <button type="button" class="ghost" id="clearBtn">ล้างแบบฟอร์ม</button>
-          <div class="muted">คำขอจะมีสถานะเริ่มต้นเป็น <strong>รอการประเมิน</strong></div>
         </div>
       </form>
 
-      <!-- แสดงคำขอล่าสุด -->
-      <section style="margin-top:18px">
-        <h3 style="margin:0 0 8px 0">คำขอล่าสุด</h3>
-        <div id="requestsList" class="list" aria-live="polite"></div>
-      </section>
+      <!-- Success message -->
+      <div id="successMessage" class="success-message" style="display:none;">
+        <div class="checkmark">
+          <svg viewBox="0 0 52 52">
+            <circle class="checkmark__circle" cx="26" cy="26" r="25" fill="none" />
+            <path class="checkmark__check" fill="none" d="M14 27l7 7 16-16" />
+          </svg>
+        </div>
+        <p class="success-text">ส่งคำขอสำเร็จ</p>
+        <button type="button" class="history-btn" id="goTrackBtn">ติดตามสถานะการซ่อม</button>
+      </div>
     </section>
   </div>
 
- 
+  
 
-  <script src="script.js" defer></script>
+  <!-- 🔻 Footer Menu (New Design Like History Page) -->
+  <div class="bottom-bar">
+    <div class="menu-btn" id="menu-toggle" tabindex="-1">
+      <span class="material-icons">menu</span>
+    </div>
 
+  
+    <!-- Yellow popup -->
+    <div class="menu-popup" id="menu-popup">
+      <a href="index.html" class="menu-item">
+        <span class="material-icons">home</span> หน้าหลัก
+      </a>
+      <a href="#" id="logoutBtn" class="menu-item logout">
+        <span class="material-icons">logout</span> ออกจากระบบ
+      </a>
+    </div>
+  </div>
+
+  <script src="RepairRequest.js"></script>
 </body>
+
 </html>
+
+

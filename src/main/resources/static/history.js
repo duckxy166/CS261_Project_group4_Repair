@@ -1,35 +1,74 @@
-// แสดง/ซ่อนเมนูเบอร์เกอร์
-const toggleBtn = document.getElementById('menu-toggle');
-const menu = document.getElementById('menu-content');
-toggleBtn.addEventListener('click', () => menu.classList.toggle('show'));
+//menu
+const toggleBtn = document.getElementById("menu-toggle");
+const menuPopup = document.getElementById("menu-popup");
 
-// Modal การยืนยัน
-const deleteButtons = document.querySelectorAll('.delete-btn');
-const modal = document.getElementById('confirmModal');
-const closeModal = document.getElementById('closeModal');
-const cancelModal = document.getElementById('cancelModal');
-const confirmDelete = document.getElementById('confirmDelete');
-let selectedRow = null;
+toggleBtn.addEventListener("click", (e) => {
+  e.stopPropagation();
+  menuPopup.classList.toggle("show");
+});
 
-deleteButtons.forEach(btn => {
-  btn.addEventListener('click', (e) => {
-    selectedRow = e.target.closest('tr');
-    modal.style.display = 'flex';
+window.addEventListener("click", (e) => {
+  if (!e.target.closest("#menu-popup") && !e.target.closest("#menu-toggle")) {
+    menuPopup.classList.remove("show");
+  }
+});
+
+//fetch user report
+async function loadUserReports() {
+  const tbody = document.querySelector("table tbody");
+  try {
+    const response = await fetch("/api/requests/user-reports", {
+      method: "GET",
+      credentials: "include", // include session cookie
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const reports = await response.json();
+    tbody.innerHTML = "";//clear row
+
+    if (reports.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;">ไม่มีประวัติการแจ้งซ่อม</td></tr>`;
+      return;
+    }
+
+    reports.forEach((r) => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${r.createdAt ? new Date(r.createdAt).toLocaleDateString("th-TH") : "-"}</td>
+        <td>${r.reporter?.fullName || "-"}</td>
+        <td>${r.title || "-"}</td>
+        <td>${r.description || "-"}</td>
+        <td>${r.status || "กำลังดำเนินการ"}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+  } catch (err) {
+    console.error("Error loading reports:", err);
+    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:red;">เกิดข้อผิดพลาดในการโหลดข้อมูล</td></tr>`;
+  }
+}
+
+//init
+loadUserReports();
+
+//logout
+const logoutBtn = document.getElementById("logoutBtn");
+if (logoutBtn) {
+  logoutBtn.addEventListener("click", async (e) => {
+    e.preventDefault();
+    try {
+      const response = await fetch("/logout", { method: "GET" });
+      if (response.ok) {
+        window.location.href = "login.html"; 
+      } else {
+        alert("ไม่สามารถออกจากระบบได้");
+      }
+    } catch (err) {
+      console.error("Logout error:", err);
+      alert("เกิดข้อผิดพลาดในการออกจากระบบ");
+    }
   });
-});
-
-const close = () => {
-  modal.style.display = 'none';
-  selectedRow = null;
-};
-
-closeModal.onclick = close;
-cancelModal.onclick = close;
-window.onclick = (e) => {
-  if (e.target === modal) close();
-};
-
-confirmDelete.addEventListener('click', () => {
-  if (selectedRow) selectedRow.remove();
-  close();
-});
+}

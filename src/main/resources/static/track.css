@@ -5,7 +5,7 @@ body {
   color: #000;
 }
 
-/* Header */
+/* 🔺 Header */
 .header {
   background-color: #b1002e;
   color: white;
@@ -21,9 +21,10 @@ body {
 
 .header span {
   font-size: 1.2rem;
+  opacity: 0.9;
 }
 
-/* Table */
+/* 🧾 Table */
 .container {
   padding: 0;
 }
@@ -52,30 +53,37 @@ tbody tr:nth-child(odd) {
   background-color: #ece6e6;
 }
 
-/* Slight color change on hover for table rows */
+/* Row hover effect */
 tbody tr {
   transition: background-color 0.2s ease;
 }
-
 tbody tr:hover {
-  background-color: #ddd7d7; /* slightly darker gray */
-  cursor: pointer;          /* shows it's clickable */
+  background-color: #ddd7d7;
 }
 
-
-/* Delete button */
-.delete-btn {
+/* 🔍🗑 Icon buttons */
+.icon-btn {
   background: none;
   border: none;
-  color: #b1002e;
   cursor: pointer;
+  color: #333;
+  margin: 0 4px;
+  transition: color 0.2s ease;
 }
 
-.delete-btn:hover {
-  color: #7a001f;
+.icon-btn.view:hover {
+  color: #007bff;
 }
 
-/* Bottom bar */
+.icon-btn.delete {
+  color: #b1002e;
+}
+
+.icon-btn.delete:hover {
+  color: #a5002c;
+}
+
+/* 🔻 Footer Bar */
 .bottom-bar {
   position: fixed;
   bottom: 0;
@@ -86,6 +94,7 @@ tbody tr:hover {
   align-items: center;
   padding: 0 15px;
   box-sizing: border-box;
+  z-index: 999;
 }
 
 .menu-btn {
@@ -130,56 +139,12 @@ tbody tr:hover {
   background-color: #ffe36e;
 }
 
-.menu-item.logout:hover {
-  background-color: #ffe36e;
-}
-
-.menu-item .material-icons {
-  font-size: 20px;
-}
-
-/* Prevent text cursor (caret) when clicking menu */
-.bottom-bar,
-.menu-btn,
-.menu-popup,
-.menu-item {
-  user-select: none;         /* disables text selection */
-  -webkit-user-select: none; /* Safari fix */
-  -moz-user-select: none;    /* Firefox fix */
-}
-
-.menu-btn,
-.menu-popup {
-  outline: none;             /* remove focus outline */
-}
-
-/* Prevent accidental focus */
-.menu-btn:focus,
-.menu-popup:focus,
-.menu-item:focus {
-  outline: none;
-}
-
-/* 🧱 Prevent text cursor (caret) anywhere except form fields */
-body, 
-table, 
-td, 
-th, 
-.container, 
-.bottom-bar, 
-.menu-popup, 
-.menu-item {
-  user-select: none;            /* disables text selection */
-  -webkit-user-select: none;    /* Safari fix */
-  -moz-user-select: none;       /* Firefox fix */
-  cursor: default;              /* normal arrow cursor */
-}
-
-/* If you ever add form inputs later, keep them editable */
-input, 
-textarea {
-  user-select: text !important;
-  cursor: text !important;
+/* 🚫 Prevent text caret */
+body, table, td, th, .bottom-bar, .menu-popup, .menu-item {
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  cursor: default;
 }
 
 /* ===== Modal Popup ===== */
@@ -251,11 +216,11 @@ textarea {
 }
 
 .confirm-btn:hover {
-  background-color: #8a0023;
+  background-color: #a6002d;
 }
 
 .cancel-btn:hover {
-  background-color: #b3b3b3;
+  background-color: #c4c4c4;
 }
 
 @keyframes fadeIn {

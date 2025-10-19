@@ -33,7 +33,7 @@ services:
     ports:
       - "8080:8080"
     environment:
-      SPRING_DATASOURCE_URL: "jdbc:sqlserver://sqlserver:1433;databaseName=productdb;encrypt=true;trustServerCertificate=true"
+      SPRING_DATASOURCE_URL: "jdbc:sqlserver://sqlserver:1433;databaseName=dbo1;encrypt=true;trustServerCertificate=true"
       SPRING_DATASOURCE_USERNAME: "sa"
       SPRING_DATASOURCE_PASSWORD: "YourStrong@Passw0rd"
     depends_on:
