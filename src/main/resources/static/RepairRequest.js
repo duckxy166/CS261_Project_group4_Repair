@@ -79,7 +79,8 @@ form.addEventListener("submit", async function (e) {
     if (imageInput && imageInput.files.length > 0) {
       const formData = new FormData();
       formData.append("file", imageInput.files[0]); // Add file to FormData
-
+	  formData.append("description", " ")
+	  
       const fileResp = await fetch(`/api/files/${requestId}`, {
         method: "POST",
         body: formData

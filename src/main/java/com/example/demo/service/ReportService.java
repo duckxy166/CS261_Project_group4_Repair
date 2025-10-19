@@ -56,7 +56,7 @@ public class ReportService {
         report.setStatus("Completed");
         report.setUpdatedAt(LocalDateTime.now());
         return reportRepository.save(report);
-    }=
+    }
 
     // ---------------- Fetch user reports except ซ่อมเสร็จ ----------------
     public List<ReportResponse> getUserTrackReports(User user) {
