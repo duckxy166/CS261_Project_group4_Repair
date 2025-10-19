@@ -13,7 +13,7 @@ window.addEventListener("click", (e) => {
   }
 });
 
-//fetch user report
+//fetch /api/requests/user-reports
 async function loadUserReports() {
   const tbody = document.querySelector("table tbody");
   try {
@@ -22,36 +22,39 @@ async function loadUserReports() {
       credentials: "include", // include session cookie
     });
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
     const reports = await response.json();
-    tbody.innerHTML = "";//clear row
 
-    if (reports.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;">ไม่มีประวัติการแจ้งซ่อม</td></tr>`;
+    // Filter
+    const finishedReports = reports.filter(r => r.status === "ซ่อมเสร็จ");
+
+    tbody.innerHTML = "";
+
+    if (finishedReports.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;">ไม่มีประวัติการซ่อมเสร็จ</td></tr>`;
       return;
     }
 
-    reports.forEach((r) => {
+    finishedReports.forEach((r) => {
       const tr = document.createElement("tr");
       tr.innerHTML = `
         <td>${r.createdAt ? new Date(r.createdAt).toLocaleDateString("th-TH") : "-"}</td>
         <td>${r.reporter?.fullName || "-"}</td>
         <td>${r.title || "-"}</td>
         <td>${r.description || "-"}</td>
-        <td>${r.status || "กำลังดำเนินการ"}</td>
+        <td>${r.status}</td>
       `;
       tbody.appendChild(tr);
     });
+
   } catch (err) {
     console.error("Error loading reports:", err);
     tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:red;">เกิดข้อผิดพลาดในการโหลดข้อมูล</td></tr>`;
   }
 }
 
-//init
+// init
 loadUserReports();
 
 //logout
