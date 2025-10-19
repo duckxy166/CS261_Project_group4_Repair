@@ -2,9 +2,11 @@ package com.example.demo.model;
 
 import jakarta.persistence.*;
 import java.time.Instant;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
 @Table(name = "attachments")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Attachment {
 
     @Id
@@ -41,6 +43,7 @@ public class Attachment {
     // ความสัมพันธ์กับคำขอซ่อม
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "repair_request_id")
+    @JsonIgnoreProperties({"attachments", "reporter", "hibernateLazyInitializer", "handler"})
     private RepairRequest repairRequest;
 
     // ===== Getter & Setter =====

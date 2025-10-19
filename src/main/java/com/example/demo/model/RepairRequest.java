@@ -17,12 +17,13 @@ public class RepairRequest {
     @Column(name = "description", columnDefinition = "NVARCHAR(255)")
     private String description;
     @Column(name = "status", columnDefinition = "NVARCHAR(100)")
-    private String status = "Pending";
+    private String status = "รอดำเนินการ";
     @Column(name = "technician", columnDefinition = "NVARCHAR(255)")
     private String technician;
     @Column(name = "priority", columnDefinition = "NVARCHAR(100)")
     private String priority;
-    
+    @Column(name = "location", columnDefinition = "NVARCHAR(100)")
+    private String location;
     
     @Column(updatable = false)
     @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
@@ -83,6 +84,16 @@ public class RepairRequest {
 	    this.updatedAt = updatedAt;
 	}
 	
+	public void setLocation(String location) {
+		this.location = location;
+	}
+	public String getLocation() {
+	    return location;
+	}
+	public LocalDateTime getCreatedAt() {
+		return createdAt;
+	}
+	
 	@PrePersist
 	protected void onCreate() {
 	    this.createdAt = LocalDateTime.now();
@@ -110,5 +121,6 @@ public class RepairRequest {
 	    this.status = newStatus;
 	    this.updatedAt = LocalDateTime.now();
 	}
+	
 	
 }
