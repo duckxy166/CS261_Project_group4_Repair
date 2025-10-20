@@ -1,13 +1,18 @@
 package com.example.demo.service;
 
 import com.example.demo.repository.ReportRepository;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.example.demo.dto.ReportResponse;
 import com.example.demo.model.*;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
 import jakarta.transaction.Transactional;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -15,6 +20,7 @@ public class ReportService {
 
     private final ReportRepository reportRepository;
     private final FileStorageService fileStorageService; 
+    private final ObjectMapper mapper = new ObjectMapper();
 
     // Constructor
     public ReportService(ReportRepository reportRepository, FileStorageService fileStorageService) {
@@ -119,4 +125,52 @@ public class ReportService {
         );
     }
     
+    //for edit
+    public RepairRequest updateRequest(
+            Long id,
+            String title,
+            String location,
+            String description,
+            String existingAttachmentsJson,
+            List<MultipartFile> newAttachments,
+            String removedAttachmentsJson
+    ) {
+        RepairRequest report = reportRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Report not found"));
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        // 1️⃣ Remove deleted attachments
+        if (removedAttachmentsJson != null && !removedAttachmentsJson.isBlank()) {
+            try {
+                List<Long> removedIds = mapper.readValue(
+                        removedAttachmentsJson, new TypeReference<List<Long>>() {});
+                for (Long removeId : removedIds) {
+                    try {
+                        fileStorageService.delete(removeId);
+                    } catch (IOException e) {
+                        // Handle or log failed deletion but continue
+                        System.err.println("Failed to delete attachment " + removeId + ": " + e.getMessage());
+                    }
+                }
+            } catch (Exception e) {
+                throw new RuntimeException("Failed to parse removed attachments list", e);
+            }
+        }
+
+        // 2️⃣ Update report info
+        report.setTitle(title);
+        report.setLocation(location);
+        report.setDescription(description);
+
+        // 3️⃣ Add new attachments
+        if (newAttachments != null) {
+            for (MultipartFile f : newAttachments) {
+                fileStorageService.saveAttachment(f, report);
+            }
+        }
+
+        return reportRepository.save(report);
+    }
+
 }
