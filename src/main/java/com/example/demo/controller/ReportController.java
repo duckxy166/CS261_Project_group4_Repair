@@ -8,13 +8,13 @@ import com.example.demo.model.RepairRequest;
 import com.example.demo.model.User;
 import com.example.demo.repository.ReportRepository;
 import com.example.demo.repository.UserRepository;
+import com.example.demo.service.FileStorageService;
 import com.example.demo.service.ReportService;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import jakarta.servlet.http.HttpSession;
-
 import java.util.List;
 
 @RestController
@@ -24,13 +24,19 @@ public class ReportController {
     private final ReportRepository reportRepository;
     private final ReportService reportService;
     private final UserRepository userRepository;
-
-    public ReportController(ReportRepository reportRepository, ReportService reportService, UserRepository userRepository) {
+    private final FileStorageService fileStorageService;
+    
+    public ReportController(
+            ReportRepository reportRepository,
+            ReportService reportService,
+            UserRepository userRepository,
+            FileStorageService fileStorageService
+    ) {
         this.reportRepository = reportRepository;
         this.reportService = reportService;
         this.userRepository = userRepository;
+        this.fileStorageService = fileStorageService;
     }
-
     // ---------------- Create report ----------------
     @PostMapping
     public RepairRequest createReport(@RequestBody RequestFormDTO dto, HttpSession session) {
@@ -39,13 +45,12 @@ public class ReportController {
             throw new RuntimeException("Not logged in");
         }
 
-        // Map DTO -> Entity
         RepairRequest report = new RepairRequest();
         report.setTitle(dto.getTitle());
         report.setDescription(dto.getDescription());
         report.setPriority(dto.getPriority());
-        report.setLocation(dto.getLocation()); // 🔹 now supported
-        report.setReporter(user); // set current user
+        report.setLocation(dto.getLocation());
+        report.setReporter(user);
 
         return reportService.createReport(report);
     }
@@ -61,7 +66,7 @@ public class ReportController {
     public List<RepairRequest> getUserReports(HttpSession session) {
         User user = (User) session.getAttribute("user");
         if (user == null) {
-            return List.of(); // empty if not logged in
+            return List.of();
         }
         return reportRepository.findByReporter(user);
     }
@@ -75,7 +80,6 @@ public class ReportController {
                     .orElseThrow(() -> new RuntimeException("Technician not found"));
         }
 
-        // include request.getPriority()
         RepairRequest updated = reportService.updateStatus(
                 request.getId(),
                 request.getStatus(),
@@ -89,14 +93,12 @@ public class ReportController {
                 updated.getTechnician()
         );
     }
-    
+
     //---------------- Fetch user track reports ----------------
     @GetMapping("/user-trackreports")
     public List<ReportResponse> getTrackReports(HttpSession session) {
         User user = (User) session.getAttribute("user");
         if (user == null) return List.of();
-
-        // delegate to service
         return reportService.getUserTrackReports(user);
     }
 
@@ -107,11 +109,10 @@ public class ReportController {
         if (user == null) {
             throw new RuntimeException("Not logged in");
         }
-
         reportService.deleteReport(id, user);
     }
 
-    //getrequestbyId
+    // ---------------- Get report detail ----------------
     @GetMapping("/{id}")
     public ReportResponse getReportDetail(@PathVariable Long id, HttpSession session) {
         User user = (User) session.getAttribute("user");
@@ -120,7 +121,8 @@ public class ReportController {
         }
         return reportService.getReportDetail(id, user);
     }
-    //update Status by Technician
+
+    // ---------------- Update status by technician ----------------
     @PostMapping("/{id}/update-status")
     public ResponseEntity<ReportResponse> updateStatus(
             @PathVariable Long id,
@@ -152,4 +154,33 @@ public class ReportController {
         return ResponseEntity.ok(response);
     }
 
+    // ---------------- Update (title, location, description, attachments) ----------------
+    @PutMapping("/{id}")
+    public ResponseEntity<RepairRequest> updateRequest(
+            @PathVariable Long id,
+            @RequestParam("title") String title,
+            @RequestParam("location") String location,
+            @RequestParam("description") String description,
+            @RequestParam("existingAttachments") String existingAttachmentsJson,
+            @RequestParam(value = "newAttachments", required = false) List<MultipartFile> newAttachments,
+            @RequestParam(value = "removedAttachments", required = false) String removedAttachmentsJson
+    ) {
+    	try {
+        // Optional: parse existingAttachments if needed (or just pass as JSON string if your service ignores it)
+        RepairRequest updated = reportService.updateRequest(
+                id,
+                title,
+                location,
+                description,
+                existingAttachmentsJson,
+                newAttachments,
+                removedAttachmentsJson
+        );
+        return ResponseEntity.ok(updated);
+
+	    }catch (Exception e) {
+	        e.printStackTrace();
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+	    }
+    }
 }
