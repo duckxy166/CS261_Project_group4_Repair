@@ -44,3 +44,17 @@ form.addEventListener('submit', async (e) => {
     errorMsg.classList.remove('hidden');
   }
 });
+document.addEventListener("DOMContentLoaded", () => {
+    const accessDeniedMsg = document.getElementById('accessDeniedMsg');
+    const unauthenticatedMsg = document.getElementById('unauthenticatedMsg');
+
+    const params = new URLSearchParams(window.location.search);
+
+    if (params.has('access_denied')) {
+        accessDeniedMsg.classList.remove('hidden');
+    }
+
+    if (params.has('unauthenticated')) {
+        unauthenticatedMsg.classList.remove('hidden');
+    }
+});
