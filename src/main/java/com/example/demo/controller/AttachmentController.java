@@ -58,8 +58,6 @@ public class AttachmentController {
                 .orElseThrow(() -> new IllegalArgumentException("Attachment not found"));
 
         Path filePath = storage.resolvePath(att); // ✅ Use service
-        Resource resource = storage.resolvePath(att).toUri().toURL().openStream() != null ?
-                new org.springframework.core.io.PathResource(filePath) : null;
 
         if (!Files.exists(filePath)) {
             return ResponseEntity.notFound().build();
@@ -68,13 +66,15 @@ public class AttachmentController {
         String contentType = Files.probeContentType(filePath);
         if (contentType == null) contentType = att.getContentType();
 
+        Resource resource = new org.springframework.core.io.PathResource(filePath);
+        
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType(contentType))
                 .header(HttpHeaders.CONTENT_DISPOSITION,
                         ContentDisposition.attachment()
                                 .filename(att.getOriginalFilename())
                                 .build().toString())
-                .body(new org.springframework.core.io.PathResource(filePath));
+                .body(resource);
     }
 
     // ---------------- Delete attachment ----------------

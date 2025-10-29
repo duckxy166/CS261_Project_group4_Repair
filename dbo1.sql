@@ -35,3 +35,21 @@ GO
 INSERT INTO dbo.users (username, password, role, email, full_name)
 VALUES ('tech', 'tech1234', 'tech', 'technician@email.com', 'Technician One');
 GO
+
+-- ตัวอย่างสร้างตาราง repair_requests
+IF OBJECT_ID('dbo.repair_requests', 'U') IS NOT NULL
+    DROP TABLE dbo.repair_requests;
+GO
+
+CREATE TABLE dbo.repair_requests (
+    id BIGINT IDENTITY(1,1) PRIMARY KEY,
+    tech_name NVARCHAR(100),
+    description NVARCHAR(MAX),
+    status NVARCHAR(20)
+);
+GO
+
+-- เพิ่มตัวอย่างงานซ่อม id=1
+INSERT INTO dbo.repair_requests (tech_name, description, status)
+VALUES ('Technician One', 'งานซ่อมเริ่มต้น', 'pending');
+GO

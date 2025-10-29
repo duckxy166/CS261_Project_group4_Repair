@@ -1,16 +1,12 @@
+const form = document.querySelector("form");
+const card = document.getElementById("card");
 const fileInput = document.getElementById("fileInput");
 const preview = document.getElementById("preview");
 const placeholder = document.getElementById("placeholder");
 const statusSelect = document.getElementById("statusSelect");
-const statusOptions = document.getElementById("statusOptions");
 const btnReport = document.getElementById("btnReport");
 const btnCancel = document.getElementById("btnCancel");
 const success = document.getElementById("success");
-
-// แสดงตัวเลือกสถานะเพิ่มเติม
-statusSelect.addEventListener("change", (e) => {
-  statusOptions.style.display = e.target.value ? "block" : "none";
-});
 
 // อัปโหลดรูป/วิดีโอ
 fileInput.addEventListener("change", (event) => {
@@ -33,9 +29,31 @@ fileInput.addEventListener("change", (event) => {
   }
 });
 
-// ปุ่มรายงาน
-btnReport.addEventListener("click", () => {
-  success.style.display = "flex";
+// ส่งฟอร์มไป backend
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const formData = new FormData(form);
+  const actionUrl = form.action; // เช่น /api/files/7
+
+  try {
+    const res = await fetch(actionUrl, {
+      method: "POST",
+      body: formData,
+    });
+
+    if (res.ok) {
+      // ✅ แสดงหน้าสำเร็จ
+      card.style.display = "none";
+      success.style.display = "flex";
+    } else {
+      const errText = await res.text();
+      alert("❌ การอัปโหลดล้มเหลว: " + errText);
+    }
+  } catch (error) {
+    console.error("Upload error:", error);
+    alert("⚠️ เกิดข้อผิดพลาดในการเชื่อมต่อกับเซิร์ฟเวอร์");
+  }
 });
 
 // ปุ่มยกเลิก
@@ -46,4 +64,14 @@ btnCancel.addEventListener("click", () => {
   placeholder.style.display = "block";
   statusOptions.style.display = "none";
   success.style.display = "none";
+});
+
+// =========================
+// 📱 เมนูด้านล่าง (Toggle)
+// =========================
+const menuToggle = document.getElementById("menu-toggle");
+const menuPopup = document.getElementById("menu-popup");
+
+menuToggle.addEventListener("click", () => {
+  menuPopup.classList.toggle("show");
 });
