@@ -90,13 +90,14 @@ public class SecurityConfig {
                                 "/login.js",
                                 "/api/login",    
                                 "/api/webhook",  
-                                "/error"        
+                                "/error",
+                                "/history.css"        
                         ).permitAll()
                         
                         .requestMatchers("/dashboard.html", "/dashboard.css", "/dashboard.js").hasAuthority("admin")
 
-                        .requestMatchers("/RepairList.html", "/RepairList.css", "/RepairList.js", "/RepairReportCRS.html", "/RepairReportCRS.css", "/RepairReportCRS.js", "/history.css",
-                                "/history.js").hasAuthority("tech")
+                        .requestMatchers("/RepairList.html", "/RepairList.css", "/RepairList.js", "/RepairReportCRS.html", "/RepairReportCRS.css", "/RepairReportCRS.js"
+                                ).hasAuthority("tech")
                         
                         .requestMatchers(
                                 "/index.html", 
@@ -108,7 +109,6 @@ public class SecurityConfig {
                                 "/track.css", 
                                 "/track.js", 
                                 "/history.html",
-                                "/history.css",
                                 "/history.js"
                         ).hasAnyAuthority("Student", "Staff")
 
