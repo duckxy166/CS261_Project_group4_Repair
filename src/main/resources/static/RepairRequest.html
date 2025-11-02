@@ -53,14 +53,14 @@
           </div>
         </div>
 
-        <div>
-          <label for="image">แนบรูป (ถ้ามี)</label>
-          <div class="file-upload">
-            <img src="image/picIcon.png" alt="Pic Icon" class="pic-icon" id="defaultIcon" />
-            <input id="image" type="file" accept="image/*" />
-            <img id="imgPreview" class="img-preview" alt="preview" style="display:none" />
-          </div>
-        </div>
+		<div>
+		  <label for="image">แนบรูป (ถ้ามี)</label>
+		  <div class="file-upload" id="fileUploadContainer">
+		    <img src="image/picIcon.png" alt="Pic Icon" class="pic-icon" id="defaultIcon" />
+		    <input id="image" type="file" accept="image/*" multiple />
+		    <div id="previewContainer" class="preview-container"></div>
+		  </div>
+		</div>
 
         <div>
           <label for="description">รายละเอียดปัญหา</label>

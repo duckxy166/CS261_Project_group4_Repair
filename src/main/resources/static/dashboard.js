@@ -69,7 +69,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (!response.ok) throw new Error("Failed to update report");
 
       const updated = await response.json();
-      alert(`✅ อัปเดตรายการ ${updated.id} สำเร็จ!`);
+      alert(`✅ อัปเดตรายการที่ ${updated.id} สำเร็จ!`);
       await fetchReports();
     } catch (err) {
       console.error("Update failed:", err);

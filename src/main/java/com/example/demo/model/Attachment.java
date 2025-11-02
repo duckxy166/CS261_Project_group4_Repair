@@ -45,7 +45,12 @@ public class Attachment {
     @JoinColumn(name = "repair_request_id")
     @JsonIgnoreProperties({"attachments", "reporter", "hibernateLazyInitializer", "handler"})
     private RepairRequest repairRequest;
-
+    
+ // ความสัมพันธ์กับรายงานซ่อม (สามารถเป็น NULL ได้)
+    @ManyToOne(fetch = FetchType.LAZY, optional = true)
+    @JoinColumn(name = "repair_report_id", nullable = true)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    private RepairReport repairReport;
     // ===== Getter & Setter =====
 
     public Long getId() {
@@ -118,5 +123,12 @@ public class Attachment {
 
     public void setRepairRequest(RepairRequest repairRequest) {
         this.repairRequest = repairRequest;
+    }
+    public RepairReport getRepairReport() {
+        return repairReport;
+    }
+
+    public void setRepairReport(RepairReport repairReport) {
+        this.repairReport = repairReport;
     }
 }

@@ -76,18 +76,18 @@ form.addEventListener("submit", async function (e) {
     // =========================
     // 2️⃣ Upload image (attachment) if provided
     // =========================
-    if (imageInput && imageInput.files.length > 0) {
-      const formData = new FormData();
-      formData.append("file", imageInput.files[0]); // Add file to FormData
-	  formData.append("description", " ")
-	  
-      const fileResp = await fetch(`/api/files/${requestId}`, {
-        method: "POST",
-        body: formData
-      });
-
-      if (!fileResp.ok) throw new Error("Failed to upload attachment");
-    }
+	if (selectedFiles.length > 0) {
+	  for (const file of selectedFiles) {
+	    const formData = new FormData();
+	    formData.append("file", file);
+	    formData.append("description", " ");
+	    const fileResp = await fetch(`/api/files/${requestId}`, {
+	      method: "POST",
+	      body: formData
+	    });
+	    if (!fileResp.ok) throw new Error("Failed to upload attachment");
+	  }
+	}
 
     // =========================
     // 3️⃣ Show success message
@@ -103,34 +103,74 @@ form.addEventListener("submit", async function (e) {
 });
 
 // Image Preview
-const imgPreview = document.getElementById("imgPreview");
+const imgInput = document.getElementById("image");
+const previewContainer = document.getElementById("previewContainer");
 const defaultIcon = document.getElementById("defaultIcon");
 
-if (imageInput) {
-  imageInput.addEventListener("change", (event) => {
-    const file = event.target.files[0];
-    if (file) {
+let selectedFiles = []; 
+
+// Image Preview + Delete Functionality
+if (imgInput) {
+  imgInput.addEventListener("change", (event) => {
+    const files = Array.from(event.target.files);
+
+    // Add new files to list
+    selectedFiles = selectedFiles.concat(files);
+
+    previewContainer.innerHTML = "";
+
+    selectedFiles.forEach((file, index) => {
       const reader = new FileReader();
       reader.onload = (e) => {
-        imgPreview.src = e.target.result;
-        imgPreview.style.display = "block";
-        defaultIcon.style.display = "none"; // hide placeholder icon
+        const previewItem = document.createElement("div");
+        previewItem.classList.add("preview-item");
+        previewItem.innerHTML = `
+          <img src="${e.target.result}" alt="preview" />
+          <button type="button" class="delete-btn" data-index="${index}">×</button>
+        `;
+        previewContainer.appendChild(previewItem);
       };
       reader.readAsDataURL(file);
-    } else {
-      imgPreview.style.display = "none";
-      defaultIcon.style.display = "block"; // show icon again if cleared
-    }
+    });
+
+    defaultIcon.style.display = selectedFiles.length > 0 ? "none" : "block";
   });
+}
+
+previewContainer.addEventListener("click", (event) => {
+  if (event.target.classList.contains("delete-btn")) {
+    const index = parseInt(event.target.dataset.index, 10);
+    selectedFiles.splice(index, 1); // remove that file
+    updatePreviews();
+  }
+});
+
+function updatePreviews() {
+  previewContainer.innerHTML = "";
+  selectedFiles.forEach((file, index) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const previewItem = document.createElement("div");
+      previewItem.classList.add("preview-item");
+      previewItem.innerHTML = `
+        <img src="${e.target.result}" alt="preview" />
+        <button type="button" class="delete-btn" data-index="${index}">×</button>
+      `;
+      previewContainer.appendChild(previewItem);
+    };
+    reader.readAsDataURL(file);
+  });
+  defaultIcon.style.display = selectedFiles.length > 0 ? "none" : "block";
 }
 
 // Clear Form Button
 const clearBtn = document.getElementById("clearBtn");
 clearBtn.addEventListener("click", () => {
   form.reset();
+  selectedFiles = [];
+  previewContainer.innerHTML = "";
+  defaultIcon.style.display = "block";
   errorMsg.style.display = "none";
-  const inputs = form.querySelectorAll("input, select, textarea");
-  inputs.forEach((i) => (i.style.borderColor = "#D9D9D9"));
 });
 
 //  Footer Popup Menu

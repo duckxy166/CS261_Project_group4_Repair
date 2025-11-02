@@ -114,7 +114,7 @@ public class RepairRequest {
 	public void updateStatus(String newStatus, User technicianUser) {
 	    // Assign technician only if technicianUser provided and has role "Technician"
 	    if (technicianUser != null 
-	            && "Technician".equalsIgnoreCase(technicianUser.getRole())
+	            && "tech".equalsIgnoreCase(technicianUser.getRole())
 	            && "กำลังดำเนินการ".equals(this.status)
 	            && "กำลังซ่อม".equals(newStatus)) {
 	        this.technician = technicianUser.getFullName();
