@@ -20,12 +20,12 @@
 
 
   <main class="container" id="card">
-    <form id="reportForm" onsubmit="return false" autocomplete="off">
+    <form id="reportForm" action="/api/files/1" method="post" enctype="multipart/form-data">
       <label for="techName">ชื่อช่างผู้รับผิดชอบ</label>
-      <input id="techName" name="techName" type="text" placeholder="ระบุชื่อช่าง...">
+      <input id="techName" name="techName" type="text" placeholder="ระบุชื่อช่าง..." required>
 
       <label for="details">รายละเอียดการซ่อม</label>
-      <textarea id="details" name="details" placeholder="กรอกอธิบายการซ่อม..."></textarea>
+      <textarea id="details" name="details" placeholder="กรอกอธิบายการซ่อม..." required></textarea>
 
       <label>แนบรูป/วิดีโอของงานซ่อม</label>
       <div class="uploader" id="uploader">
@@ -52,15 +52,15 @@
 
       <div class="status-row">
         <label for="statusSelect">สถานะการซ่อม</label>
-        <select id="statusSelect" class="status-select">
+        <select id="statusSelect" class="status-select" required>
           <option value="">-- เลือกสถานะการซ่อม --</option>
           <option value="pending">กำลังดำเนินการ</option> 
           <option value="done">เสร็จสมบูรณ์</option> 
         </select>
 
       <div class="actions">
-        <button class="btn report" id="btnReport" type="button">รายงาน</button>
-        <button class="btn cancel" id="btnCancel" type="button">ยกเลิก</button>
+        <button class="btn report" id="btnReport" type="submit">รายงาน</button>
+        <button class="btn cancel" id="btnCancel" type="reset">ยกเลิก</button>
       </div>
     </form>
 
