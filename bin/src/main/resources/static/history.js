@@ -1,4 +1,8 @@
+<<<<<<< HEAD
+//menu
+=======
 // ===== MENU TOGGLE =====
+>>>>>>> main
 const toggleBtn = document.getElementById("menu-toggle");
 const menuPopup = document.getElementById("menu-popup");
 
@@ -13,7 +17,11 @@ window.addEventListener("click", (e) => {
   }
 });
 
+<<<<<<< HEAD
+//fetch /api/requests/user-reports
+=======
 // ===== FETCH USER REPORTS =====
+>>>>>>> main
 async function loadUserReports() {
   const tbody = document.querySelector("table tbody");
   try {
@@ -22,6 +30,23 @@ async function loadUserReports() {
       credentials: "include", // include session cookie
     });
 
+<<<<<<< HEAD
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
+    const reports = await response.json();
+
+    // Filter
+    const finishedReports = reports.filter(r => r.status === "ซ่อมเสร็จ");
+
+    tbody.innerHTML = "";
+
+    if (finishedReports.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;">ไม่มีประวัติการซ่อมเสร็จ</td></tr>`;
+      return;
+    }
+
+    finishedReports.forEach((r) => {
+=======
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
@@ -35,22 +60,56 @@ async function loadUserReports() {
     }
 
     reports.forEach((r) => {
+>>>>>>> main
       const tr = document.createElement("tr");
       tr.innerHTML = `
         <td>${r.createdAt ? new Date(r.createdAt).toLocaleDateString("th-TH") : "-"}</td>
         <td>${r.reporter?.fullName || "-"}</td>
         <td>${r.title || "-"}</td>
         <td>${r.description || "-"}</td>
+<<<<<<< HEAD
+        <td>${r.status}</td>
+=======
         <td>${r.status || "กำลังดำเนินการ"}</td>
         <td>
           <button class="delete-btn" data-id="${r.id}">
             <span class="material-icons">delete</span>
           </button>
         </td>
+>>>>>>> main
       `;
       tbody.appendChild(tr);
     });
 
+<<<<<<< HEAD
+  } catch (err) {
+    console.error("Error loading reports:", err);
+    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:red;">เกิดข้อผิดพลาดในการโหลดข้อมูล</td></tr>`;
+  }
+}
+
+// init
+loadUserReports();
+
+//logout
+const logoutBtn = document.getElementById("logoutBtn");
+if (logoutBtn) {
+  logoutBtn.addEventListener("click", async (e) => {
+    e.preventDefault();
+    try {
+      const response = await fetch("/logout", { method: "GET" });
+      if (response.ok) {
+        window.location.href = "login.html"; 
+      } else {
+        alert("ไม่สามารถออกจากระบบได้");
+      }
+    } catch (err) {
+      console.error("Logout error:", err);
+      alert("เกิดข้อผิดพลาดในการออกจากระบบ");
+    }
+  });
+}
+=======
     attachDeleteEvents(); // bind delete buttons
   } catch (err) {
     console.error("Error loading reports:", err);
@@ -105,3 +164,4 @@ confirmDelete.addEventListener("click", async () => {
 
 // ===== INIT =====
 loadUserReports();
+>>>>>>> main

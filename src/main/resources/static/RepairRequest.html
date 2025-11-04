@@ -1,117 +1,166 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="th">
-
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>แจ้งซ่อม (Repair Request)</title>
-
-  <!-- Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;600;700&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-
-  <!-- CSS -->
-  <link rel="stylesheet" href="RepairRequest.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TU REPAIR - ระบบแจ้งซ่อม</title>
+    <link rel="stylesheet" href="RepairRequest.css">
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
-
 <body>
-
-  <!-- Header -->
-  <header class="header">
-    <h1>แจ้งซ่อม<br><span>(Repair Request)</span></h1>
-  </header>
-
-  <!-- Main Form -->
-  <div class="container">
-    <section class="card">
-
-      <form th:action="@{/submit-repair}" method="post" enctype="multipart/form-data" id="requestForm" novalidate>
-        <div class="form-row">
-          <div>
-            <label for="reporterName">ชื่อผู้แจ้ง</label>
-            <input id="reporterName" type="text" required />
-          </div>
+    <!-- โครงสร้างไฟล์: ส่วนหัว, บล็อกขั้นตอน, แบบฟอร์ม, ส่วนสำเร็จ, มอดอล -->
+    <!-- หน้านี้เป็น Single Page สำหรับแจ้งซ่อมและแสดงผลสำเร็จในหน้าเดียว -->
+    <header>
+        <div class="logo">TU REPAIR</div>
+        <nav>
+            <ul>
+                <li class="active"><a href="#">แจ้งซ่อม<br>( Repair Request )</a></li>
+                <li><a href="#">ติดตามสถานะ<br>( Track Request )</a></li>
+                <li><a href="#">ประวัติการแจ้งซ่อม<br>( Request History )</a></li>
+            </ul>
+        </nav>
+        <div class="user-profile">
+            <div class="profile-pic">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+            </div>
+            <div class="user-name">Saharat Udomwatthawi</div>
+            <div class="logout-icon" aria-label="ออกจากระบบ">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+            </div>
         </div>
+    </header>
 
-        <div class="form-row">
-          <div>
-            <label for="location">สถานที่ (อาคาร/ห้อง)</label>
-            <input id="location" type="text" required />
-          </div>
-          <div>
-            <label for="category">ประเภทงาน</label>
-            <select id="category" required>
-              <option value="" disabled selected hidden>-- เลือกประเภท --</option>
-              <option>ไฟฟ้า</option>
-              <option>ประปา</option>
-              <option>ประตู/ล็อก</option>
-              <option>เฟอร์นิเจอร์</option>
-              <option>อื่น ๆ</option>
-            </select>
-          </div>
+    <main>
+        <div class="container">
+            <!-- แสดงขั้นตอนการกรอก 1–4 -->
+            <div class="steps">
+                <div class="step active">
+                    <div class="step-number">1</div>
+                    <div class="step-text">เลือกสถานที่</div>
+                </div>
+                <div class="step-line"></div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-text">เลือกประเภทงาน</div>
+                </div>
+                <div class="step-line"></div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-text">อธิบายรายละเอียด</div>
+                </div>
+                <div class="step-line"></div>
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <div class="step-text">ส่งคำขอ</div>
+                </div>
+            </div>
+
+            <!-- แบบฟอร์มแจ้งซ่อม: เก็บข้อมูลชื่อผู้แจ้ง, สถานที่, ประเภทงาน, รูป, รายละเอียด -->
+            <form id="repairForm" th:action="@{/submit-repair}" method="post" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="title">ชื่อผู้แจ้ง</label>
+                    <input type="text" id="title" name="title" class="form-control" placeholder="">
+                    <div id="titleError" class="error-msg hidden">กรุณากรอกชื่อผู้แจ้ง</div>
+                </div>
+
+                <div class="form-group">
+                    <!-- ฟิลด์เลือกสถานที่และ dropdown -->
+                    <label for="location">สถานที่(อาคาร/ห้อง)</label>
+                    <div class="dropdown">
+                        <input type="text" id="location" name="location" class="form-control" placeholder="เลือกสถานที่" readonly>
+                        <div class="dropdown-content" id="locationDropdown">
+                            <a href="#" data-value="อาคาร SC">อาคาร SC</a>
+                            <a href="#" data-value="อาคาร SC3">อาคาร SC3</a>
+                            <a href="#" data-value="อาคาร บร.1">อาคาร บร.1</a>
+                            <a href="#" data-value="อาคาร บร.2">อาคาร บร.2</a>
+                            <a href="#" data-value="อาคาร บร.3">อาคาร บร.3</a>
+                        </div>
+                    </div>
+                    <div id="locationError" class="error-msg hidden">กรุณาเลือกสถานที่</div>
+                </div>
+                <div class="form-group hidden" id="locationExtra">
+                    <label for="locationDetail">รายละเอียดสถานที่เพิ่มเติม</label>
+                    <textarea id="locationDetail" name="locationDetail" class="form-control" rows="3" placeholder="กรอกรายละเอียดสถานที่เกิดเหตุ"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <!-- ฟิลด์เลือกประเภทงานและ dropdown -->
+                    <label for="type">ประเภทงาน</label>
+                    <div class="dropdown">
+                        <input type="text" id="type" name="type" class="form-control" placeholder="เลือกประเภทงาน" readonly>
+                        <div class="dropdown-content" id="typeDropdown">
+                            <a href="#" data-value="ไฟฟ้า">ไฟฟ้า</a>
+                            <a href="#" data-value="ประปา">ประปา</a>
+                             <a href="#" data-value="ประตู/ล็อก">ประตู/ล็อก</a>
+                            <a href="#" data-value="เฟอร์นิเจอร์">เฟอร์นิเจอร์</a>
+                            <a href="#" data-value="อื่นๆ">อื่นๆ</a>
+                        </div>
+                    </div>
+                    <div id="typeError" class="error-msg hidden">กรุณาเลือกประเภทงาน</div>
+                </div>
+
+                <div class="form-group hidden" id="typeOtherExtra">
+                    <label for="typeOtherDetail">โปรดระบุประเภทงาน</label>
+                    <textarea id="typeOtherDetail" name="typeOtherDetail" class="form-control" rows="3" placeholder="กรอกรายละเอียดเพิ่มเติม"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <!-- พื้นที่อัปโหลดรูปและพรีวิว -->
+                    <label for="image">แนบรูป (ถ้ามี)</label>
+                    <div class="image-upload-area">
+                        <div class="image-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                        </div>
+                        <button type="button" id="uploadBtn" class="upload-btn">เพิ่มรูป</button>
+                        <input type="file" id="image" name="image" accept="image/*" hidden>
+                        <div class="upload-info">PNG,JPEG ขนาดไม่เกิน 5 MB</div>
+                        <div id="imagePreview" class="image-preview hidden" aria-label="พรีวิวรูปที่อัปโหลด">
+                            <img id="previewImg" alt="ตัวอย่างรูป" />
+                            <span id="previewName" class="preview-name"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <!-- รายละเอียดปัญหา -->
+                    <label for="details">รายละเอียดปัญหา</label>
+                    <textarea id="details" name="details" class="form-control" rows="5" placeholder="อธิบายสิ่งที่พบ เช่น ไฟไม่ติดที่บริเวณอาคาร X"></textarea>
+                    <div id="detailsError" class="error-msg hidden">กรุณากรอกรายละเอียดปัญหา</div>
+                </div>
+
+                <div class="form-actions">
+                    <!-- ปุ่มยืนยันและลิงก์ล้างแบบฟอร์ม -->
+                    <button type="submit" class="btn btn-primary">ยืนยัน</button>
+                    <a href="#" id="clearForm" class="clear-link" aria-label="ล้างแบบฟอร์ม">ล้างแบบฟอร์ม</a>
+                </div>
+            </form>
+
+            <!-- ส่วนแสดงผลสำเร็จบนหน้าเดียว (ซ่อนข้อความขั้นตอนตามคำขอ) -->
+            <div id="successSection" class="hidden" style="text-align:center; padding:60px 20px;">
+                <div class="success-hero">
+                    <div class="success-mark" aria-hidden="true">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+                            <circle cx="60" cy="60" r="45" fill="none" stroke="#0FA968" stroke-width="4" />
+                            <polyline points="40,62 54,76 82,48" fill="none" stroke="#0FA968" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                    </div>
+                    <h1 class="success-title">ส่งคำขอสำเร็จ</h1>
+                    <div class="success-actions">
+                        <a class="btn btn-primary" href="#">ติดตามสถานะการซ่อม</a>
+                    </div>
+                </div>
+            </div>
         </div>
+    </main>
 
-        <div>
-          <label for="image">แนบรูป (ถ้ามี)</label>
-          <div class="file-upload">
-            <img src="image/picIcon.png" alt="Pic Icon" class="pic-icon" id="defaultIcon" />
-            <input id="image" type="file" accept="image/*" />
-            <img id="imgPreview" class="img-preview" alt="preview" style="display:none" />
-          </div>
+    <!-- Modal ดูรูปเต็มจอ -->
+    <div id="imageModal" class="modal hidden" role="dialog" aria-modal="true" aria-label="ดูรูปเต็มจอ">
+        <div class="modal-content">
+            <img id="modalImg" alt="รูปแบบเต็มจอ" />
+            <button type="button" id="closeModal" class="btn btn-primary modal-close">ย้อนกลับ</button>
         </div>
-
-        <div>
-          <label for="description">รายละเอียดปัญหา</label>
-          <textarea id="description" placeholder="อธิบายสิ่งที่พบ เช่น ไฟไม่ติด บริเวณโคม X" required></textarea>
-        </div>
-
-        <p id="errorMsg" class="error-message" style="display:none;">กรุณากรอกข้อมูลให้ครบถ้วน</p>
-
-        <div class="actions">
-          <button type="submit">ส่งคำขอ</button>
-          <button type="button" class="ghost" id="clearBtn">ล้างแบบฟอร์ม</button>
-        </div>
-      </form>
-
-      <!-- Success message -->
-      <div id="successMessage" class="success-message" style="display:none;">
-        <div class="checkmark">
-          <svg viewBox="0 0 52 52">
-            <circle class="checkmark__circle" cx="26" cy="26" r="25" fill="none" />
-            <path class="checkmark__check" fill="none" d="M14 27l7 7 16-16" />
-          </svg>
-        </div>
-        <p class="success-text">ส่งคำขอสำเร็จ</p>
-        <button type="button" class="history-btn" id="goTrackBtn">ติดตามสถานะการซ่อม</button>
-      </div>
-    </section>
-  </div>
-
-  
-
-  <!-- 🔻 Footer Menu (New Design Like History Page) -->
-  <div class="bottom-bar">
-    <div class="menu-btn" id="menu-toggle" tabindex="-1">
-      <span class="material-icons">menu</span>
     </div>
-
-  
-    <!-- Yellow popup -->
-    <div class="menu-popup" id="menu-popup">
-      <a href="index.html" class="menu-item">
-        <span class="material-icons">home</span> หน้าหลัก
-      </a>
-      <a href="#" id="logoutBtn" class="menu-item logout">
-        <span class="material-icons">logout</span> ออกจากระบบ
-      </a>
-    </div>
-  </div>
 
   <script src="RepairRequest.js"></script>
 </body>
-
 </html>
-
-
