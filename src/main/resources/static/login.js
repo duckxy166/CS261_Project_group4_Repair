@@ -32,7 +32,11 @@ form.addEventListener('submit', async (e) => {
 		if (data.role === 'admin') {
 		    window.location.href = 'dashboard.html';
 		} else if (data.role === 'tech') {
+<<<<<<< HEAD
+		    window.location.href = 'RepairReportCRS.html';
+=======
 		    window.location.href = 'RepairList.html';
+>>>>>>> main
 		} else {
 		    window.location.href = 'index.html';
 		}
