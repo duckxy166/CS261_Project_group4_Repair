@@ -17,12 +17,13 @@ public class RepairRequest {
     @Column(name = "description", columnDefinition = "NVARCHAR(255)")
     private String description;
     @Column(name = "status", columnDefinition = "NVARCHAR(100)")
-    private String status = "Pending";
+    private String status = "รอดำเนินการ";
     @Column(name = "technician", columnDefinition = "NVARCHAR(255)")
     private String technician;
     @Column(name = "priority", columnDefinition = "NVARCHAR(100)")
     private String priority;
-    
+    @Column(name = "location", columnDefinition = "NVARCHAR(100)")
+    private String location;
     
     @Column(updatable = false)
     @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
@@ -83,6 +84,16 @@ public class RepairRequest {
 	    this.updatedAt = updatedAt;
 	}
 	
+	public void setLocation(String location) {
+		this.location = location;
+	}
+	public String getLocation() {
+	    return location;
+	}
+	public LocalDateTime getCreatedAt() {
+		return createdAt;
+	}
+	
 	@PrePersist
 	protected void onCreate() {
 	    this.createdAt = LocalDateTime.now();
@@ -101,14 +112,18 @@ public class RepairRequest {
     }
 	
 	public void updateStatus(String newStatus, User technicianUser) {
-	    // Only assign technician if current status is Pending and technician is provided
-	    if ("Pending".equalsIgnoreCase(this.status) && technicianUser != null && "Technician".equalsIgnoreCase(technicianUser.getRole())) {
+	    // Assign technician only if technicianUser provided and has role "Technician"
+	    if (technicianUser != null 
+	            && "Technician".equalsIgnoreCase(technicianUser.getRole())
+	            && "กำลังดำเนินการ".equals(this.status)
+	            && "กำลังซ่อม".equals(newStatus)) {
 	        this.technician = technicianUser.getFullName();
 	    }
-	    
-	    // Always update status and timestamp
+
 	    this.status = newStatus;
 	    this.updatedAt = LocalDateTime.now();
 	}
+
+	
 	
 }

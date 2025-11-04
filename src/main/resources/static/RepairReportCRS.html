@@ -20,17 +20,17 @@
 
 
   <main class="container" id="card">
-    <form id="reportForm" onsubmit="return false" autocomplete="off">
-      <label for="techName">ชื่อช่างผู้รับผิดชอบ</label>
-      <input id="techName" name="techName" type="text" placeholder="ระบุชื่อช่าง...">
+	<form id="reportForm" action="/api/files/1" method="post" enctype="multipart/form-data">
+	  <label for="techName">ชื่อช่างผู้รับผิดชอบ</label>
+	  <input id="techName" name="techName" type="text" placeholder="ระบุชื่อช่าง..." required>
 
-      <label for="details">รายละเอียดการซ่อม</label>
-      <textarea id="details" name="details" placeholder="กรอกอธิบายการซ่อม..."></textarea>
+	  <label for="details">รายละเอียดการซ่อม</label>
+	  <textarea id="details" name="description" placeholder="กรอกอธิบายการซ่อม..." required></textarea>
 
-      <label>แนบรูป/วิดีโอของงานซ่อม</label>
-      <div class="uploader" id="uploader">
-  <div class="placeholder" id="placeholder">
-    <div class="icon-row">
+	  <label>แนบรูป/วิดีโอของงานซ่อม</label>
+	  <div class="uploader" id="uploader">
+	    <div class="placeholder" id="placeholder">
+	      <div class="icon-row">
       <!-- ไอคอนรูปภาพ -->
       <svg viewBox="0 0 24 24" fill="none" class="icon">
         <rect x="3" y="3" width="18" height="18" rx="2" ry="2" stroke="#666" stroke-width="1.6"/>
@@ -43,26 +43,27 @@
         <rect x="3" y="5" width="15" height="14" rx="2" ry="2" stroke="#666" stroke-width="1.6"/>
         <path d="M18 8l4 3v2l-4 3V8z" fill="#666"/>
       </svg>
-    </div>
-    <p class="placeholder-text">คลิกเพื่อเลือกรูปภาพหรือวิดีโอ</p>
-  </div>
-  <div class="preview" id="preview" style="display:none"></div>
-  <input id="fileInput" type="file" accept="image/*,video/*">
-</div>
+	  </div>
+	        <p class="placeholder-text">คลิกเพื่อเลือกรูปภาพหรือวิดีโอ</p>
+	      </div>
+	      <div class="preview" id="preview" style="display:none"></div>
+		  <input id="fileInput" name="file" type="file" accept="image/*,video/*" required>
+		    </div>
 
-      <div class="status-row">
-        <label for="statusSelect">สถานะการซ่อม</label>
-        <select id="statusSelect" class="status-select">
-          <option value="">-- เลือกสถานะการซ่อม --</option>
-          <option value="pending">กำลังดำเนินการ</option> 
-          <option value="done">เสร็จสมบูรณ์</option> 
-        </select>
+		    <div class="status-row">
+		      <label for="statusSelect">สถานะการซ่อม</label>
+		      <select id="statusSelect" class="status-select" required>
+		        <option value="">-- เลือกสถานะการซ่อม --</option>
+		        <option value="pending">กำลังดำเนินการ</option>
+		        <option value="done">เสร็จสมบูรณ์</option>
+		      </select>
+		    </div>
 
-      <div class="actions">
-        <button class="btn report" id="btnReport" type="button">รายงาน</button>
-        <button class="btn cancel" id="btnCancel" type="button">ยกเลิก</button>
-      </div>
-    </form>
+		    <div class="actions">
+		      <button class="btn report" id="btnReport" type="submit">รายงาน</button>
+		      <button class="btn cancel" id="btnCancel" type="reset">ยกเลิก</button>
+		    </div>
+		  </form>
 
     <div id="success" class="success-screen" style="display:none;">
       <div class="success-inner">
