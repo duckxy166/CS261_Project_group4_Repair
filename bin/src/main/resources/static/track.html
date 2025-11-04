@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ติดตามสถานะการซ่อม (Track Request)</title>
+  <link rel="stylesheet" href="track.css">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+  <!-- 🔺 Header -->
+  <header class="header">
+    <h1>ติดตามสถานะการซ่อม<br><span>(Track Request)</span></h1>
+  </header>
+
+  <!-- Table -->
+  <main class="container">
+    <table>
+      <thead>
+        <tr>
+          <th>วันที่แจ้งซ่อม</th>
+          <th>ชื่อผู้แจ้ง</th>
+          <th>ผู้รับผิดชอบ</th>
+          <th>ประเภทงาน</th>
+          <th>สถานะการซ่อม</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="repairList">
+        <tr class="clickable-row" data-id="1">
+          <td>DD/MM/YYYY</td>
+          <td>สมชาย</td>
+          <td>ช่างเอกชัย</td>
+          <td>ไฟฟ้า</td>
+          <td>กำลังดำเนินการ</td>
+          <td>
+            <button class="icon-btn view"><span class="material-icons">search</span></button><!-- go to trackdetail.html -->
+            <button class="icon-btn delete"><span class="material-icons">delete</span></button><!-- can show this delete button when status is "รอดำเนินการ" then it can be remove from db-->
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </main>
+
+  <!-- 🔻 Footer Bar -->
+  <div class="bottom-bar">
+    <div class="menu-btn" id="menu-toggle">
+      <span class="material-icons">menu</span>
+    </div>
+
+    <!-- Popup Menu -->
+    <div class="menu-popup" id="menu-popup">
+      <a href="index.html" class="menu-item">
+        <span class="material-icons">home</span> หน้าหลัก
+      </a>
+      <a href="#" id="logoutBtn" class="menu-item logout">
+        <span class="material-icons">logout</span> ออกจากระบบ
+      </a>
+    </div>
+  </div>
+
+  <!--  Confirm Delete Modal -->
+  <div class="modal" id="confirmModal">
+    <div class="modal-content">
+      <button class="close-btn" id="closeModal">×</button>
+      <p>คุณต้องการจะยกเลิกการแจ้งซ่อมนี้หรือไม่</p>
+      <div class="modal-actions">
+        <button class="confirm-btn" id="confirmDelete">ยืนยัน</button>
+        <button class="cancel-btn" id="cancelModal">ยกเลิก</button>
+      </div>
+    </div>
+  </div>
+
+<!--  Confirm Delete Modal -->
+<div class="modal" id="confirmModal">
+    <div class="modal-content">
+        <button class="close-btn" id="closeModal">×</button>
+        <p>คุณต้องการจะลบรายการนี้หรือไม่?</p>
+        <div class="modal-actions">
+            <button class="confirm-btn" id="confirmDelete">ยืนยัน</button>
+            <button class="cancel-btn" id="cancelModal">ยกเลิก</button>
+        </div>
+    </div>
+</div>
+
+  <script src="track.js"></script>
+</body>
+</html>

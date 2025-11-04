@@ -1,0 +1,131 @@
+/* Yellow Sub-header */
+.sub-header {
+  background-color: #fcd94a;
+  color: #000;
+  text-align: center;
+  font-weight: 700;
+  padding: 10px;
+  font-size: 1.1rem;
+}
+
+.repair-details {
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 20px;
+  margin: 20px auto;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  font-family: "Prompt", sans-serif;
+  line-height: 1.8;
+}
+
+.repair-details p {
+  margin: 6px 0;
+  font-size: 16px;
+  color: #333;
+}
+
+.status-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  background-color: #c90000;
+  border-radius: 50%;
+  margin-left: 5px;
+}
+
+.repair-image {
+  background-color: #e5e5e5;
+  border-radius: 8px;
+  width: 100%;
+  min-height: 120px;
+  margin: 15px 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+}
+
+.repair-image i {
+  font-size: 40px;
+  color: #999999;
+}
+
+.button-group {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 10px;
+}
+
+.btn-report {
+  background-color: #c90000;
+  color: white;
+  border: none;
+  border-radius: 20px;
+  padding: 10px 20px;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.btn-back {
+  background-color: #d9d9d9;
+  color: #333;
+  border: none;
+  border-radius: 20px;
+  padding: 10px 20px;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.btn-report:hover {
+  background-color: #a70000;
+}
+
+.btn-back:hover {
+  background-color: #bfbfbf;
+}
+
+.report-img {
+  width: 150px;
+  max-height: 150px;
+  object-fit: cover;
+  cursor: pointer;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+.image-modal {
+  display: none;
+  position: fixed;
+  z-index: 10000;
+  padding-top: 60px;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0,0,0,0.8);
+}
+
+.image-modal .modal-content {
+  margin: auto;
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: 90%;
+  max-height: 80%;
+  border-radius: 5px;
+}
+
+.image-modal .close {
+  position: absolute;
+  top: 15px;
+  right: 35px;
+  color: #fff;
+  font-size: 40px;
+  font-weight: bold;
+  cursor: pointer;
+}
