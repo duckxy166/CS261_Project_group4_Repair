@@ -4,6 +4,7 @@ public class ReportRequest {
     private Long id;
     private String status;
     private Long technicianId; // optional
+    private String priority;
 
     // getters & setters
     public Long getId() { return id; }
@@ -14,4 +15,7 @@ public class ReportRequest {
 
     public Long getTechnicianId() { return technicianId; }
     public void setTechnicianId(Long technicianId) { this.technicianId = technicianId; }
+    
+    public String getPriority() { return priority; }
+    public void setPriority(String priority) { this.priority = priority; }
 }

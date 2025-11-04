@@ -32,7 +32,11 @@ form.addEventListener('submit', async (e) => {
 		if (data.role === 'admin') {
 		    window.location.href = 'dashboard.html';
 		} else if (data.role === 'tech') {
+<<<<<<< HEAD
 		    window.location.href = 'RepairReportCRS.html';
+=======
+		    window.location.href = 'RepairList.html';
+>>>>>>> main
 		} else {
 		    window.location.href = 'index.html';
 		}
@@ -43,4 +47,18 @@ form.addEventListener('submit', async (e) => {
   } catch (err) {
     errorMsg.classList.remove('hidden');
   }
+});
+document.addEventListener("DOMContentLoaded", () => {
+    const accessDeniedMsg = document.getElementById('accessDeniedMsg');
+    const unauthenticatedMsg = document.getElementById('unauthenticatedMsg');
+
+    const params = new URLSearchParams(window.location.search);
+
+    if (params.has('access_denied')) {
+        accessDeniedMsg.classList.remove('hidden');
+    }
+
+    if (params.has('unauthenticated')) {
+        unauthenticatedMsg.classList.remove('hidden');
+    }
 });

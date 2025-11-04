@@ -9,6 +9,8 @@ import java.util.List;
 
 @Repository
 public interface ReportRepository extends JpaRepository<RepairRequest, Long> {
+	// Find all repair requests by reporter's username
+    List<RepairRequest> findByReporterUsername(String username);
 
     // Find all reports with a specific status
     List<RepairRequest> findByStatus(String status);
