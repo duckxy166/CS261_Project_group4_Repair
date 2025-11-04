@@ -4,19 +4,18 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ประวัติการแจ้งซ่อม (Request History)</title>
-  <!-- โหลด CSS -->
   <link rel="stylesheet" href="history.css">
-  <!-- โหลด Material Icons -->
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
 
 <body>
-  <!-- ส่วนหัว -->
+  <!-- Header -->
   <header class="header">
     <h1>ประวัติการแจ้งซ่อม<br><span>(Request History)</span></h1>
   </header>
 
-  <!-- เนื้อหา -->
+  <!-- Table -->
   <main class="container">
     <table>
       <thead>
@@ -26,44 +25,49 @@
           <th>ประเภทงาน</th>
           <th>รายละเอียดปัญหา</th>
           <th>สถานะการซ่อม</th>
-          <th>จัดการ</th>
         </tr>
       </thead>
       <tbody>
         <tr>
-          <td>05/10/2025</td>
+          <td>DD/MM/YYYY</td>
           <td>สมชาย</td>
-          <td>ไฟฟ้า</td>
-          <td>ไฟไม่ติด</td>
+          <td>ประเภทงาน</td>
+          <td>รายละเอียดปัญหา</td>
           <td>กำลังดำเนินการ</td>
-          <td><button class="delete-btn"><span class="material-icons">delete</span></button></td>
         </tr>
         <tr>
-          <td>06/10/2025</td>
+          <td>DD/MM/YYYY</td>
           <td>ใจดี</td>
-          <td>ประปา</td>
-          <td>น้ำรั่ว</td>
+          <td>ประเภทงาน</td>
+          <td>รายละเอียดปัญหา</td>
           <td>กำลังดำเนินการ</td>
-          <td><button class="delete-btn"><span class="material-icons">delete</span></button></td>
         </tr>
       </tbody>
     </table>
   </main>
 
-  <!-- เมนูเบอร์เกอร์ -->
-  <div class="bottom-menu">
-    <div class="menu-btn" id="menu-toggle"><span class="material-icons">menu</span></div>
-    <div class="menu-content" id="menu-content">
-      <a href="index.html" class="menu-item"><span class="material-icons">home</span> หน้าหลัก</a>
-      <a href="login.html" class="menu-item"><span class="material-icons">logout</span> ออกจากระบบ</a>
+  <!-- Bottom Bar -->
+  <div class="bottom-bar">
+    <div class="menu-btn" id="menu-toggle">
+      <span class="material-icons">menu</span>
+    </div>
+
+    <!-- Hidden menu -->
+    <div class="menu-popup" id="menu-popup">
+      <a href="index.html" class="menu-item">
+        <span class="material-icons">home</span> หน้าหลัก
+      </a>
+      <a href="#" id="logoutBtn" class="menu-item logout">
+        <span class="material-icons">logout</span> ออกจากระบบ
+      </a>
     </div>
   </div>
 
-  <!-- Modal ยืนยันการลบ -->
+  <!-- Confirmation Modal -->
   <div class="modal" id="confirmModal">
     <div class="modal-content">
-      <span class="close" id="closeModal">&times;</span>
-      <p>คุณต้องการจะยกเลิกการแจ้งซ่อมนี้หรือไม่</p>
+      <button class="close-btn" id="closeModal">×</button>
+      <p>คุณต้องการลบประวัติการแจ้งซ่อมนี้หรือไม่</p>
       <div class="modal-actions">
         <button class="confirm-btn" id="confirmDelete">ยืนยัน</button>
         <button class="cancel-btn" id="cancelModal">ยกเลิก</button>
@@ -71,7 +75,6 @@
     </div>
   </div>
 
-  <!-- โหลด JavaScript -->
   <script src="history.js"></script>
 </body>
 </html>

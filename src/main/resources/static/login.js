@@ -29,11 +29,13 @@ form.addEventListener('submit', async (e) => {
       loginBox.classList.add('hidden');
       successBox.classList.remove('hidden');
       setTimeout(() => {
-        if (data.role === 'admin') {
-          window.location.href = 'dashboard.html';
-        } else {
-          window.location.href = 'index.html';
-        }
+		if (data.role === 'admin') {
+		    window.location.href = 'dashboard.html';
+		} else if (data.role === 'tech') {
+		    window.location.href = 'RepairList.html';
+		} else {
+		    window.location.href = 'index.html';
+		}
       }, 1200);
     } else {
       errorMsg.classList.remove('hidden');
@@ -41,4 +43,18 @@ form.addEventListener('submit', async (e) => {
   } catch (err) {
     errorMsg.classList.remove('hidden');
   }
+});
+document.addEventListener("DOMContentLoaded", () => {
+    const accessDeniedMsg = document.getElementById('accessDeniedMsg');
+    const unauthenticatedMsg = document.getElementById('unauthenticatedMsg');
+
+    const params = new URLSearchParams(window.location.search);
+
+    if (params.has('access_denied')) {
+        accessDeniedMsg.classList.remove('hidden');
+    }
+
+    if (params.has('unauthenticated')) {
+        unauthenticatedMsg.classList.remove('hidden');
+    }
 });

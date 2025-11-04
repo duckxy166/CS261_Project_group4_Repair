@@ -1,67 +1,77 @@
-// --------------------------
-// 🍔 แสดง / ซ่อน เมนูเบอร์เกอร์
-// --------------------------
-const toggleBtn = document.getElementById('menu-toggle');
-const menu = document.getElementById('menu-content');
-toggleBtn.addEventListener('click', () => menu.classList.toggle('show'));
+//menu
+const toggleBtn = document.getElementById("menu-toggle");
+const menuPopup = document.getElementById("menu-popup");
 
-// --------------------------
-// 🗑 Modal การยืนยันการลบ
-// --------------------------
-const deleteButtons = document.querySelectorAll('.delete-btn');
-const modal = document.getElementById('confirmModal');
-const closeModal = document.getElementById('closeModal');
-const cancelModal = document.getElementById('cancelModal');
-const confirmDelete = document.getElementById('confirmDelete');
-let selectedRow = null;
+toggleBtn.addEventListener("click", (e) => {
+  e.stopPropagation();
+  menuPopup.classList.toggle("show");
+});
 
-deleteButtons.forEach(btn => {
-  btn.addEventListener('click', (e) => {
-    e.stopPropagation(); // ✅ ป้องกันการคลิกแถวพร้อมกัน
-    selectedRow = e.target.closest('tr');
-    modal.style.display = 'flex';
+window.addEventListener("click", (e) => {
+  if (!e.target.closest("#menu-popup") && !e.target.closest("#menu-toggle")) {
+    menuPopup.classList.remove("show");
+  }
+});
+
+//fetch /api/requests/user-reports
+async function loadUserReports() {
+  const tbody = document.querySelector("table tbody");
+  try {
+    const response = await fetch("/api/requests/user-reports", {
+      method: "GET",
+      credentials: "include", // include session cookie
+    });
+
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
+    const reports = await response.json();
+
+    // Filter
+    const finishedReports = reports.filter(r => r.status === "ซ่อมเสร็จ");
+
+    tbody.innerHTML = "";
+
+    if (finishedReports.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;">ไม่มีประวัติการซ่อมเสร็จ</td></tr>`;
+      return;
+    }
+
+    finishedReports.forEach((r) => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${r.createdAt ? new Date(r.createdAt).toLocaleDateString("th-TH") : "-"}</td>
+        <td>${r.reporter?.fullName || "-"}</td>
+        <td>${r.title || "-"}</td>
+        <td>${r.description || "-"}</td>
+        <td>${r.status}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+  } catch (err) {
+    console.error("Error loading reports:", err);
+    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:red;">เกิดข้อผิดพลาดในการโหลดข้อมูล</td></tr>`;
+  }
+}
+
+// init
+loadUserReports();
+
+//logout
+const logoutBtn = document.getElementById("logoutBtn");
+if (logoutBtn) {
+  logoutBtn.addEventListener("click", async (e) => {
+    e.preventDefault();
+    try {
+      const response = await fetch("/logout", { method: "GET" });
+      if (response.ok) {
+        window.location.href = "login.html"; 
+      } else {
+        alert("ไม่สามารถออกจากระบบได้");
+      }
+    } catch (err) {
+      console.error("Logout error:", err);
+      alert("เกิดข้อผิดพลาดในการออกจากระบบ");
+    }
   });
-});
-
-const close = () => {
-  modal.style.display = 'none';
-  selectedRow = null;
-};
-
-closeModal.onclick = close;
-cancelModal.onclick = close;
-window.onclick = (e) => {
-  if (e.target === modal) close();
-};
-
-confirmDelete.addEventListener('click', () => {
-  if (selectedRow) selectedRow.remove();
-  close();
-});
-
-// --------------------------
-// 📄 คลิกแถวเพื่อเปิดหน้า track.html
-// --------------------------
-const rows = document.querySelectorAll("tbody tr");
-
-rows.forEach(row => {
-  row.addEventListener("click", (e) => {
-    // ถ้าคลิกที่ปุ่มลบให้ข้าม
-    if (e.target.closest(".delete-btn")) return;
-
-    const cells = row.querySelectorAll("td");
-    const requestData = {
-      date: cells[0].innerText,
-      name: cells[1].innerText,
-      type: cells[2].innerText,
-      detail: cells[3].innerText,
-      status: cells[4].innerText
-    };
-
-    // เก็บข้อมูลใน localStorage
-    localStorage.setItem("selectedRequest", JSON.stringify(requestData));
-
-    // เปิดหน้า track.html
-    window.location.href = "track.html";
-  });
-});
+}
