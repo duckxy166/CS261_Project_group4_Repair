@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>แบบฟอร์มข้อเสนอแนะ</title>
+  <style>
+    body {
+      font-family: "Noto Sans Thai", sans-serif;
+      background-color: #f5f6fa;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    form {
+      background: #fff;
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      width: 320px;
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    label {
+      font-weight: 600;
+      display: block;
+      margin-bottom: 8px;
+    }
+    textarea {
+      width: 100%;
+      min-height: 100px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      resize: vertical;
+      font-family: inherit;
+    }
+    .stars {
+      display: flex;
+      justify-content: center;
+      gap: 6px;
+      font-size: 28px;
+      margin-bottom: 16px;
+      flex-direction: row-reverse;
+    }
+    .stars input { display: none; }
+    .stars label {
+      cursor: pointer;
+      color: #ccc;
+      transition: transform 0.1s;
+    }
+    .stars label:hover,
+    .stars label:hover ~ label,
+    .stars input:checked ~ label {
+      color: #fbbf24;
+    }
+    button {
+      width: 100%;
+      padding: 12px;
+      background-color: #2563eb;
+      border: none;
+      color: white;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 12px;
+    }
+    button:hover { background-color: #1e4ed8; }
+  </style>
+</head>
+<body>
+  <form action="/api/feedback" method="POST">
+    <h2>แบบฟอร์มข้อเสนอแนะ</h2>
+
+    <label>ประเมินดาว (Rating)</label>
+    <div class="stars">
+      <input type="radio" id="star5" name="rating" value="5" required />
+      <label for="star5">★</label>
+
+      <input type="radio" id="star4" name="rating" value="4" />
+      <label for="star4">★</label>
+
+      <input type="radio" id="star3" name="rating" value="3" />
+      <label for="star3">★</label>
+
+      <input type="radio" id="star2" name="rating" value="2" />
+      <label for="star2">★</label>
+
+      <input type="radio" id="star1" name="rating" value="1" />
+      <label for="star1">★</label>
+    </div>
+
+    <label for="comment">ข้อเสนอแนะ</label>
+    <textarea id="comment" name="comment" placeholder="พิมพ์ข้อเสนอแนะของคุณที่นี่..." required></textarea>
+
+    <button type="submit">ส่งข้อเสนอแนะ</button>
+  </form>
+</body>
+</html>
