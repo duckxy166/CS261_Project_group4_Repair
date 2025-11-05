@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>แสดงความคิดเห็นการใช้งาน (Feedback)</title>
+  <link rel="stylesheet" href="feedback.css">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+  <header class="header">
+    <h1>แสดงความคิดเห็นของคุณ<br><span>(User Feedback)</span></h1>
+  </header>
+
+  <main class="container">
+    <form id="feedbackForm">
+      <label for="message">ความคิดเห็นของคุณ:</label>
+      <textarea id="message" name="message" rows="6" required></textarea>
+
+      <label for="rating">ความพึงพอใจ:</label>
+      <select id="rating" name="rating" required>
+        <option value="">-- เลือกระดับความพึงพอใจ --</option>
+        <option value="5">ยอดเยี่ยม (5)</option>
+        <option value="4">ดีมาก (4)</option>
+        <option value="3">ปานกลาง (3)</option>
+        <option value="2">พอใช้ (2)</option>
+        <option value="1">ควรปรับปรุง (1)</option>
+      </select>
+
+      <button type="submit" class="submit-btn">ส่งความคิดเห็น</button>
+    </form>
+
+    <p id="responseMessage" style="text-align:center;margin-top:1rem;"></p>
+  </main>
+
+  <div class="bottom-bar">
+    <a href="index.html" class="menu-item">
+      <span class="material-icons">home</span> หน้าหลัก
+    </a>
+  </div>
+
+  <script src="feedback.js"></script>
+</body>
+</html>
