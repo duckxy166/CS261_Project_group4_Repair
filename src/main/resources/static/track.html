@@ -13,9 +13,9 @@
         <div class="logo">TU REPAIR</div>
         <nav>
             <ul>
-               <li><a href="RepairRequest.html">แจ้งซ่อม<br>( Repair Request )</a></li>
+                <li><a href="index.html">แจ้งซ่อม<br>( Repair Request )</a></li>
                 <li class="active"><a href="track.html">ติดตามสถานะ<br>( Track Request )</a></li>
-                <li><a href="history.html">ประวัติการแจ้งซ่อม<br>( Request History )</a></li>
+                <li><a href="#">ประวัติการแจ้งซ่อม<br>( Request History )</a></li>
             </ul>
         </nav>
         <div class="user-profile">
@@ -31,17 +31,21 @@
 
     <main>
         <div class="container">
-            <h1 style="margin: 20px 0 10px;">ติดตามสถานะ</h1>
-            <h2 style="font-weight: 500; margin-bottom: 20px;">( Track Request )</h2>
-
-            <div class="track-toolbar">
-                <div class="search-box">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                    <input id="trackSearch" type="text" placeholder="ค้นหาคำสำคัญ...">
+            <div class="track-header-row">
+                <div class="track-titlegroup">
+                    <h1 class="track-title">ติดตามสถานะ</h1>
+                    <h2 class="track-sub">( Track Request )</h2>
+                </div>
+                <div class="track-toolbar">
+                    <div class="search-box">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                        <input id="trackSearch" type="text" placeholder="ค้นหาคำสำคัญ...">
+                    </div>
                 </div>
             </div>
 
             <div class="track-card">
+                <div class="track-table-wrap">
                 <table class="track-table">
                     <thead>
                         <tr>
@@ -58,6 +62,7 @@
                         <!-- filled by script -->
                     </tbody>
                 </table>
+                </div>
                 <div class="track-pagination" id="trackPagination"></div>
             </div>
         </div>
@@ -140,15 +145,14 @@
         </div>
         <div class="detail-actions">
             <div class="detail-actions-left">
-                <!-- View mode buttons -->
-                <button id="detailCancelBtn" class="btn btn-danger">ยกเลิกการแจ้งซ่อม</button>
-                <button id="detailEditBtn" class="btn btn-warning">แก้ไข</button>
-                <!-- Edit mode buttons -->
+                <!-- กลุ่มซ้าย: ปุ่มสำหรับโหมดแก้ไขและโหมดดู -->
                 <button id="detailSaveBtn" class="btn btn-success hidden">บันทึกการแก้ไข</button>
                 <button id="detailAbortBtn" class="btn btn-danger hidden">ยกเลิก</button>
+                <button id="detailCancelBtn" class="btn btn-danger">ยกเลิกการแจ้งซ่อม</button>
+                <button id="detailEditBtn" class="btn btn-warning">แก้ไข</button>
             </div>
             <div class="detail-actions-right">
-                <!-- Common -->
+                <!-- ขวา: ปุ่มย้อนกลับ (common) -->
                 <button id="detailCloseBtn" class="btn btn-secondary">ย้อนกลับ</button>
             </div>
         </div>
