@@ -1,90 +1,168 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ติดตามสถานะการซ่อม (Track Request)</title>
-  <link rel="stylesheet" href="track.css">
-  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;600;700&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TU REPAIR - ติดตามสถานะ</title>
+    <link rel="stylesheet" href="RepairRequest.css">
+    <link rel="stylesheet" href="track.css">
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
-
 <body>
-  <!-- 🔺 Header -->
-  <header class="header">
-    <h1>ติดตามสถานะการซ่อม<br><span>(Track Request)</span></h1>
-  </header>
+    <header>
+        <div class="logo">TU REPAIR</div>
+        <nav>
+            <ul>
+               <li class="active"><a href="RepairRequest.html">แจ้งซ่อม<br>( Repair Request )</a></li>
+                <li><a href="track.html">ติดตามสถานะ<br>( Track Request )</a></li>
+                <li><a href="history.html">ประวัติการแจ้งซ่อม<br>( Request History )</a></li>
+            </ul>
+        </nav>
+        <div class="user-profile">
+            <div class="profile-pic">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+            </div>
+            <div class="user-name" id="currentUserName">-</div>
+            <div class="logout-icon" id="logoutBtn" aria-label="ออกจากระบบ">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+            </div>
+        </div>
+    </header>
 
-  <!-- Table -->
-  <main class="container">
-    <table>
-      <thead>
-        <tr>
-          <th>วันที่แจ้งซ่อม</th>
-          <th>ชื่อผู้แจ้ง</th>
-          <th>ผู้รับผิดชอบ</th>
-          <th>ประเภทงาน</th>
-          <th>สถานะการซ่อม</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody id="repairList">
-        <tr class="clickable-row" data-id="1">
-          <td>DD/MM/YYYY</td>
-          <td>สมชาย</td>
-          <td>ช่างเอกชัย</td>
-          <td>ไฟฟ้า</td>
-          <td>กำลังดำเนินการ</td>
-          <td>
-            <button class="icon-btn view"><span class="material-icons">search</span></button><!-- go to trackdetail.html -->
-            <button class="icon-btn delete"><span class="material-icons">delete</span></button><!-- can show this delete button when status is "รอดำเนินการ" then it can be remove from db-->
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </main>
+    <main>
+        <div class="container">
+            <h1 style="margin: 20px 0 10px;">ติดตามสถานะ</h1>
+            <h2 style="font-weight: 500; margin-bottom: 20px;">( Track Request )</h2>
 
-  <!-- 🔻 Footer Bar -->
-  <div class="bottom-bar">
-    <div class="menu-btn" id="menu-toggle">
-      <span class="material-icons">menu</span>
-    </div>
+            <div class="track-toolbar">
+                <div class="search-box">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    <input id="trackSearch" type="text" placeholder="ค้นหาคำสำคัญ...">
+                </div>
+            </div>
 
-    <!-- Popup Menu -->
-    <div class="menu-popup" id="menu-popup">
-      <a href="index.html" class="menu-item">
-        <span class="material-icons">home</span> หน้าหลัก
-      </a>
-      <a href="#" id="logoutBtn" class="menu-item logout">
-        <span class="material-icons">logout</span> ออกจากระบบ
-      </a>
-    </div>
-  </div>
+            <div class="track-card">
+                <table class="track-table">
+                    <thead>
+                        <tr>
+                            <th>เรื่องที่แจ้ง</th>
+                            <th>วันที่แจ้งซ่อม</th>
+                            <th>ชื่อผู้แจ้ง</th>
+                            <th>ผู้รับผิดชอบ</th>
+                            <th>ประเภทงาน</th>
+                            <th>สถานะการซ่อม</th>
+                            <th>อื่นๆ</th>
+                        </tr>
+                    </thead>
+                    <tbody id="trackTbody">
+                        <!-- filled by script -->
+                    </tbody>
+                </table>
+                <div class="track-pagination" id="trackPagination"></div>
+            </div>
+        </div>
+    </main>
 
-  <!--  Confirm Delete Modal -->
-  <div class="modal" id="confirmModal">
-    <div class="modal-content">
-      <button class="close-btn" id="closeModal">×</button>
-      <p>คุณต้องการจะยกเลิกการแจ้งซ่อมนี้หรือไม่</p>
-      <div class="modal-actions">
-        <button class="confirm-btn" id="confirmDelete">ยืนยัน</button>
-        <button class="cancel-btn" id="cancelModal">ยกเลิก</button>
-      </div>
-    </div>
-  </div>
-
-<!--  Confirm Delete Modal -->
-<div class="modal" id="confirmModal">
-    <div class="modal-content">
-        <button class="close-btn" id="closeModal">×</button>
-        <p>คุณต้องการจะลบรายการนี้หรือไม่?</p>
-        <div class="modal-actions">
-            <button class="confirm-btn" id="confirmDelete">ยืนยัน</button>
-            <button class="cancel-btn" id="cancelModal">ยกเลิก</button>
+    <!-- Confirm Delete Modal -->
+    <div id="confirmOverlay" class="modal-overlay" aria-hidden="true"></div>
+    <div id="confirmModal" class="confirm-modal" role="dialog" aria-modal="true" aria-labelledby="confirmTitle" aria-hidden="true">
+        <p id="confirmTitle" class="confirm-title">คุณต้องการจะยกเลิกการแจ้งซ่อมนี้หรือไม่</p>
+        <div class="confirm-actions">
+            <button id="confirmYes" class="btn btn-danger">ยืนยัน</button>
+            <button id="confirmNo" class="btn btn-secondary">ยกเลิก</button>
         </div>
     </div>
-</div>
 
-  <script src="track.js"></script>
+    <!-- Detail Modal -->
+    <div id="detailOverlay" class="modal-overlay" aria-hidden="true"></div>
+    <div id="detailModal" class="detail-modal" role="dialog" aria-modal="true" aria-labelledby="detailTitle" aria-hidden="true">
+        <div class="detail-header">
+            <div>
+                <h3 id="detailTitle" class="detail-title">รายละเอียดงาน</h3>
+                <div class="detail-sub">รายละเอียดงานซ่อม</div>
+            </div>
+            <span id="detailStatus" class="status-badge status-default">-</span>
+        </div>
+        <div class="detail-body">
+            <div class="detail-grid">
+                <label>วันที่แจ้งซ่อม
+                    <input id="detailDate" type="text" readonly>
+                </label>
+                <label>ชื่อผู้แจ้ง
+                    <input id="detailReporter" type="text" readonly>
+                </label>
+                <label>สถานที่
+                    <input id="detailLocation" type="text" readonly>
+                    <!-- Searchable combo for edit mode -->
+                    <div id="locCombo" class="combo hidden">
+                        <input id="locValue" class="combo-value" type="text" placeholder="ค้นหาสถานที่" />
+                        <div id="locPanel" class="combo-panel">
+                            <input id="locSearch" class="combo-search" type="text" placeholder="ค้นหาสถานที่" />
+                            <div id="locOptions" class="combo-options"></div>
+                        </div>
+                    </div>
+                </label>
+                <label>ผู้รับผิดชอบ
+                    <input id="detailAssignee" type="text" readonly>
+                </label>
+                <label>ประเภทของงาน
+                    <input id="detailCategory" type="text" readonly>
+                    <!-- Searchable combo for edit mode -->
+                    <div id="catCombo" class="combo hidden">
+                        <input id="catValue" class="combo-value" type="text" placeholder="ค้นหาประเภทของงาน" />
+                        <div id="catPanel" class="combo-panel">
+                            <input id="catSearch" class="combo-search" type="text" placeholder="ค้นหาประเภทของงาน" />
+                            <div id="catOptions" class="combo-options"></div>
+                        </div>
+                    </div>
+                </label>
+            </div>
+            <label class="detail-desc-label">รายละเอียดเพิ่มเติม
+                <textarea id="detailDesc" readonly placeholder="-"></textarea>
+            </label>
+            <div class="attach-grid">
+                <div id="detailFiles" class="detail-files attach-preview"></div>
+                <div id="uploadPanelContainer" class="attach-upload hidden">
+                    <div id="uploadDrop" class="upload-drop">
+                        <div class="upload-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <rect x="3" y="3" width="18" height="18" rx="3"></rect>
+                                <circle cx="8.5" cy="8.5" r="2.5"></circle>
+                                <path d="M21 15l-5-5-4 4-2-2-5 5"></path>
+                            </svg>
+                        </div>
+                        <div class="upload-text">ลากและวางไฟล์ที่นี่</div>
+                        <button id="uploadBtn" type="button" class="btn btn-warning upload-btn">เพิ่มรูป</button>
+                        <input id="uploadInput" type="file" accept="image/*" multiple class="upload-input" />
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="detail-actions">
+            <div class="detail-actions-left">
+                <!-- View mode buttons -->
+                <button id="detailCancelBtn" class="btn btn-danger">ยกเลิกการแจ้งซ่อม</button>
+                <button id="detailEditBtn" class="btn btn-warning">แก้ไข</button>
+                <!-- Edit mode buttons -->
+                <button id="detailSaveBtn" class="btn btn-success hidden">บันทึกการแก้ไข</button>
+                <button id="detailAbortBtn" class="btn btn-danger hidden">ยกเลิก</button>
+            </div>
+            <div class="detail-actions-right">
+                <!-- Common -->
+                <button id="detailCloseBtn" class="btn btn-secondary">ย้อนกลับ</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal ดูรูปเต็มจอ (สำหรับหน้าติดตาม) -->
+    <div id="imageModal" class="modal hidden" role="dialog" aria-modal="true" aria-label="ดูรูปเต็มจอ">
+        <div class="modal-content">
+            <img id="modalImg" alt="รูปแบบเต็มจอ" />
+            <button type="button" id="closeModal" class="btn btn-danger modal-close">ย้อนกลับ</button>
+        </div>
+    </div>
+
+    <script src="RepairRequest.js"></script>
+    <script src="track.js"></script>
 </body>
 </html>

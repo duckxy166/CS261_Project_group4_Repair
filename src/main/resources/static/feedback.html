@@ -43,4 +43,77 @@
 
   <script src="feedback.js"></script>
 </body>
+=======
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>แบบฟอร์มเสนอแนะ</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./feedback.css" />
+  </head>
+  <body>
+    <main class="feedback-container">
+      <header class="feedback-header">
+        <h1>แบบฟอร์มเสนอแนะ</h1>
+        <p>โปรดช่วยให้คะแนนและบอกเราว่าควรพัฒนาอะไรเพิ่มเติม</p>
+      </header>
+
+      <form class="feedback-form" aria-label="แบบฟอร์มแสดงความคิดเห็น">
+        <section class="form-section rating" aria-labelledby="rating-title">
+          <div class="section-header">
+            <h2 id="rating-title">ให้คะแนนความพึงพอใจของคุณ</h2>
+            <p class="section-subtitle">
+              เลือกระดับดาวเพื่อสะท้อนประสบการณ์ของคุณ (1 = ควรปรับปรุง, 5 = ยอดเยี่ยม)
+            </p>
+          </div>
+          <div class="rating-stars" role="radiogroup" aria-label="ระดับคะแนน 1 ถึง 5 ดาว">
+            <button type="button" class="star-button" data-value="1" aria-label="1 ดาว" aria-checked="false">★</button>
+            <button type="button" class="star-button" data-value="2" aria-label="2 ดาว" aria-checked="false">★</button>
+            <button type="button" class="star-button" data-value="3" aria-label="3 ดาว" aria-checked="false">★</button>
+            <button type="button" class="star-button" data-value="4" aria-label="4 ดาว" aria-checked="false">★</button>
+            <button type="button" class="star-button" data-value="5" aria-label="5 ดาว" aria-checked="false">★</button>
+          </div>
+          <p class="rating-hint" id="rating-output" aria-live="polite">
+            ยังไม่ได้เลือกคะแนน
+          </p>
+        </section>
+
+        <section class="form-section recommendation" aria-labelledby="recommendation-title">
+          <div class="section-header">
+            <h2 id="recommendation-title">ข้อเสนอแนะของคุณ</h2>
+            <p class="section-subtitle">
+              เขียนสิ่งที่อยากให้เราปรับปรุงหรือสิ่งที่คุณประทับใจ
+            </p>
+          </div>
+          <label class="sr-only" for="recommendation-input">เขียนข้อเสนอแนะ</label>
+          <textarea
+            id="recommendation-input"
+            name="recommendation"
+            rows="6"
+            maxlength="500"
+            placeholder="กรอกข้อความที่นี่..."
+            aria-describedby="recommendation-help"
+            required
+          ></textarea>
+          <p id="recommendation-help" class="character-count">เหลือ 500 ตัวอักษร</p>
+        </section>
+
+        <div class="form-footer">
+          <button type="submit" class="submit-button">ส่งความคิดเห็น</button>
+          <p class="helper-text">
+            เราจะนำความคิดเห็นของคุณไปใช้พัฒนาประสบการณ์ให้ดียิ่งขึ้น
+          </p>
+        </div>
+        <p class="form-message" id="form-message" role="status" aria-live="polite"></p>
+      </form>
+    </main>
+
+    <script src="./feedback.js" defer></script>
+  </body>
+
 </html>
