@@ -197,25 +197,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // ออกจากระบบ
-    const logoutBtn = document.getElementById('logoutBtn');
-    if (logoutBtn) {
-        logoutBtn.addEventListener('click', async function(e) {
-            e.preventDefault();
-            try {
-                const response = await fetch('/logout', { method: 'GET' });
-                if (response.ok) {
-                    window.location.href = 'login.html';
-                } else {
-                    alert('ไม่สามารถออกจากระบบได้');
-                }
-            } catch (err) {
-                console.error('Logout error:', err);
-                alert('เกิดข้อผิดพลาดในการออกจากระบบ');
-            }
-        });
-    }
-
     // ล้างแบบฟอร์ม
     const clearLink = document.getElementById('clearForm');
     if (clearLink) {

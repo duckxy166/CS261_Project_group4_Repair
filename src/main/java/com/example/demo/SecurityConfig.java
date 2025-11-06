@@ -21,6 +21,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.security.web.context.SecurityContextHolderFilter;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -78,7 +79,11 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
-
+                
+                .addFilterBefore(new CacheControlFilter(), SecurityContextHolderFilter.class)
+                
+                .headers(headers -> headers.disable())
+                
                 .addFilterBefore(new SessionUserFilter(), UsernamePasswordAuthenticationFilter.class)
 
                 .authorizeHttpRequests(authorize -> authorize
@@ -88,7 +93,8 @@ public class SecurityConfig {
                                 "/login.html",   
                                 "/login.css",
                                 "/login.js",
-                                "/api/login",    
+                                "/api/login",
+                                "/api/logout",
                                 "/api/webhook",  
                                 "/error",
                                 "/history.css"        
@@ -109,7 +115,8 @@ public class SecurityConfig {
                                 "/track.css", 
                                 "/track.js", 
                                 "/history.html",
-                                "/history.js"
+                                "/history.js",
+                                "/common.js"
                         ).hasAnyAuthority("Student", "Staff")
 
                         .requestMatchers(
@@ -134,7 +141,14 @@ public class SecurityConfig {
                 )
 
                 .formLogin(AbstractHttpConfigurer::disable)
-                .logout(AbstractHttpConfigurer::disable);
+                .logout(logout -> logout
+                        .logoutUrl("/api/logout") 
+                        .invalidateHttpSession(true) 
+                        .deleteCookies("JSESSIONID") 
+                        .logoutSuccessHandler((request, response, authentication) -> {
+                            response.setStatus(HttpServletResponse.SC_OK);
+                        })
+                );
 
         return http.build();
     }
