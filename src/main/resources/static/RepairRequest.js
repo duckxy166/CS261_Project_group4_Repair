@@ -1,5 +1,31 @@
 
+window.addEventListener('pageshow', function(event) {
+
+	if (event.persisted) {
+		console.log('Page loaded from bfcache. Forcing reload from server...');
+
+		window.location.reload();
+	}
+});
+
 document.addEventListener('DOMContentLoaded', function() {
+	const logoutBtn = document.getElementById('logoutBtn');
+	if (logoutBtn) {
+		logoutBtn.addEventListener('click', async function(e) {
+			e.preventDefault();
+			try {
+				const response = await fetch('/api/logout', { method: 'POST' });
+				if (response.ok || response.status === 401 || response.status === 403) {
+					window.location.href = 'login.html?logout=true';
+				} else {
+					alert('ไม่สามารถออกจากระบบได้: ' + response.status);
+				}
+			} catch (err) {
+				console.error('Logout error:', err);
+				window.location.href = 'login.html?logout_error=true';
+			}
+		});
+	}
     // ยูทิลสำหรับ UI Validation
     const titleInput = document.getElementById('title');
     const titleError = document.getElementById('titleError');
@@ -20,6 +46,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (nameEl && user && user.fullName) {
                     nameEl.textContent = user.fullName;
                 }
+				const emailEl = document.getElementById('currentUserEmail');
+				if (emailEl && user && user.email) {
+					emailEl.textContent = user.email;
+				}
             } else if (resp.status === 401 || resp.status === 403) {
                 alert('กรุณาเข้าสู่ระบบก่อนทำการแจ้งซ่อม');
                 window.location.href = 'login.html';

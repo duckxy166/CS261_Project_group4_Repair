@@ -115,8 +115,7 @@ public class SecurityConfig {
                                 "/track.css", 
                                 "/track.js", 
                                 "/history.html",
-                                "/history.js",
-                                "/common.js"
+                                "/history.js"
                         ).hasAnyAuthority("Student", "Staff")
 
                         .requestMatchers(
