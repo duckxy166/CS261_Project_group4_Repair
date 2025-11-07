@@ -52,7 +52,6 @@
       case 'waiting_parts':
         return [
           { action: 'detail', text: 'รายละเอียด' },
-          { action: 'delete', text: 'ลบงานนี้', warn: true }
         ];
       case 'done':
       case 'cancelled':
