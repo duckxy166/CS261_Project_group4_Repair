@@ -90,26 +90,14 @@
         </div>
         <div class="detail-body">
             <div class="detail-grid">
+                <!-- Row 1: วันที่แจ้งซ่อม | ชื่อผู้แจ้ง -->
                 <label>วันที่แจ้งซ่อม
                     <input id="detailDate" type="text" readonly>
                 </label>
                 <label>ชื่อผู้แจ้ง
                     <input id="detailReporter" type="text" readonly>
                 </label>
-                <label>สถานที่
-                    <input id="detailLocation" type="text" readonly>
-                    <!-- Searchable combo for edit mode -->
-                    <div id="locCombo" class="combo hidden">
-                        <input id="locValue" class="combo-value" type="text" placeholder="ค้นหาสถานที่" />
-                        <div id="locPanel" class="combo-panel">
-                            <input id="locSearch" class="combo-search" type="text" placeholder="ค้นหาสถานที่" />
-                            <div id="locOptions" class="combo-options"></div>
-                        </div>
-                    </div>
-                </label>
-                <label>ผู้รับผิดชอบ
-                    <input id="detailAssignee" type="text" readonly>
-                </label>
+                <!-- Row 2: ประเภทของงาน | ผู้รับผิดชอบ -->
                 <label>ประเภทของงาน
                     <input id="detailCategory" type="text" readonly>
                     <!-- Searchable combo for edit mode -->
@@ -121,8 +109,34 @@
                         </div>
                     </div>
                 </label>
+                <label>ผู้รับผิดชอบ
+                    <input id="detailAssignee" type="text" readonly>
+                </label>
+                <!-- Row 3: สถานที่ | ห้อง -->
+                <label>สถานที่
+                    <input id="detailLocation" type="text" readonly>
+                    <!-- Searchable combo for edit mode -->
+                    <div id="locCombo" class="combo hidden">
+                        <input id="locValue" class="combo-value" type="text" placeholder="ค้นหาสถานที่" />
+                        <div id="locPanel" class="combo-panel">
+                            <input id="locSearch" class="combo-search" type="text" placeholder="ค้นหาสถานที่" />
+                            <div id="locOptions" class="combo-options"></div>
+                        </div>
+                    </div>
+                </label>
+                <label>ห้อง
+                    <input id="detailRoom" type="text" readonly>
+                </label>
             </div>
-            <label class="detail-desc-label">รายละเอียดเพิ่มเติม
+            <!-- รายละเอียดสถานที่เพิ่มเติม -->
+            <label class="detail-desc-label">รายละเอียดสถานที่เพิ่มเติม
+                <input id="detailLocationExtra" type="text" readonly placeholder="-" />
+            </label>
+            <!-- กรอกรายละเอียดงาน (แสดงเมื่อประเภทงาน = อื่นๆ) -->
+            <label id="workLabel" class="detail-desc-label hidden">รายละเอียดงาน
+                <input id="detailWork" type="text" readonly placeholder="-" />
+            </label>
+            <label class="detail-desc-label">รายละเอียดปัญหา
                 <textarea id="detailDesc" readonly placeholder="-"></textarea>
             </label>
             <div class="attach-grid">
@@ -166,7 +180,7 @@
         </div>
     </div>
 
-	<script src="common.js"></script>
+    <script src="RepairRequest.js"></script>
     <script src="track.js"></script>
 </body>
 </html>
