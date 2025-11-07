@@ -28,7 +28,6 @@ document.addEventListener('DOMContentLoaded', function() {
 			}
 		});
 	}
-
 });
 
 (async () => {
@@ -101,28 +100,27 @@ document.addEventListener('DOMContentLoaded', function() {
 
 	// Define which actions appear per status
 	function getActions(statusKey) {
-		switch (statusKey) {
-			case 'pending':
-				return [
-					{ action: 'detail', text: 'รายละเอียด' },
-					{ action: 'edit', text: 'แก้ไข' },
-					{ action: 'delete', text: 'ลบงานนี้', warn: true }
-				];
-			case 'assigned':
-			case 'processing':
-			case 'checking':
-			case 'waiting_parts':
-				return [
-					{ action: 'detail', text: 'รายละเอียด' },
-					{ action: 'delete', text: 'ลบงานนี้', warn: true }
-				];
-			case 'done':
-			case 'cancelled':
-			default:
-				return [
-					{ action: 'detail', text: 'รายละเอียด' }
-				];
-		}
+	  switch (statusKey) {
+	    case 'pending':
+	      return [
+	        { action: 'detail', text: 'รายละเอียด' },
+	        { action: 'edit', text: 'แก้ไข' },
+	        { action: 'delete', text: 'ลบงานนี้', warn: true }
+	      ];
+	    case 'assigned':
+	    case 'processing':
+	    case 'checking':
+	    case 'waiting_parts':
+	      return [
+	        { action: 'detail', text: 'รายละเอียด' },
+	      ];
+	    case 'done':
+	    case 'cancelled':
+	    default:
+	      return [
+	        { action: 'detail', text: 'รายละเอียด' }
+	      ];
+	  }
 	}
 
 	function fmtDate(dateStr) {
