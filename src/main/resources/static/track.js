@@ -74,54 +74,42 @@ document.addEventListener('DOMContentLoaded', function() {
 	let filtered = [];
 	let currentPage = 1;
 
-	const statusMap = {
-		pending: { text: 'รอดำเนินการ', cls: 'status-pending' },
-		processing: { text: 'กำลังดำเนินการ', cls: 'status-processing' },
-		waiting_parts: { text: 'รออะไหล่/รอช่าง', cls: 'status-waiting' },
-		checking: { text: 'กำลังตรวจสอบ', cls: 'status-checking' },
-		assigned: { text: 'อยู่ระหว่างซ่อม', cls: 'status-assigned' },
-		done: { text: 'สำเร็จ', cls: 'status-success' },
-		cancelled: { text: 'ยกเลิก', cls: 'status-cancelled' }
-	};
+const statusMap = {
+        'pending':      { text: 'รอดำเนินการ',       cls: 'status-pending' },
+        'processing':   { text: 'กำลังดำเนินการ',     cls: 'status-processing' },
+        'assigned':     { text: 'อยู่ระหว่างซ่อม',    cls: 'status-assigned' },
+        'checking':     { text: 'กำลังตรวจสอบ',      cls: 'status-checking' }, 
+        'done':         { text: 'สำเร็จ',           cls: 'status-success' },
+        'cancelled':    { text: 'ยกเลิก',           cls: 'status-cancelled' }
+    };
 
-	// Normalize status to canonical keys regardless of backend language
 	function normalizeStatus(s) {
-		const v = String(s || '').toLowerCase();
-		if (!v) return 'pending';
-		if (['pending', 'รอดำเนินการ'].includes(v)) return 'pending';
-		if (['processing', 'กำลังดำเนินการ'].includes(v)) return 'processing';
-		if (['waiting_parts', 'รออะไหล่', 'รออะไหล่/รอช่าง'].includes(v)) return 'waiting_parts';
-		if (['checking', 'กำลังตรวจสอบ', 'กำลังตรวจสอบงานซ่อม'].includes(v)) return 'checking';
-		if (['assigned', 'อยู่ระหว่างซ่อม'].includes(v)) return 'assigned';
-		if (['done', 'สำเร็จ', 'success'].includes(v)) return 'done';
-		if (['cancelled', 'ยกเลิก'].includes(v)) return 'cancelled';
-		return 'pending';
-	}
+        if (!s) return 'pending';
+        const v = String(s).trim().toLowerCase();
+        
+        if (v === 'รอดำเนินการ' || v === 'pending') return 'pending';
+        if (v === 'กำลังดำเนินการ' || v === 'processing') return 'processing';
+        if (v === 'อยู่ระหว่างซ่อม' || v === 'assigned' || v === 'กำลังซ่อม') return 'assigned';
+        if (v.includes('ตรวจสอบ') || v === 'checking') return 'checking';
+        if (v === 'สำเร็จ' || v === 'ซ่อมเสร็จ' || v === 'done' || v === 'success' || v === 'completed') return 'done';
+        if (v === 'ยกเลิก' || v === 'cancelled') return 'cancelled';
+        
+        return 'pending'; 
+    }
 
 	// Define which actions appear per status
 	function getActions(statusKey) {
-	  switch (statusKey) {
-	    case 'pending':
-	      return [
-	        { action: 'detail', text: 'รายละเอียด' },
-	        { action: 'edit', text: 'แก้ไข' },
-	        { action: 'delete', text: 'ลบงานนี้', warn: true }
-	      ];
-	    case 'assigned':
-	    case 'processing':
-	    case 'checking':
-	    case 'waiting_parts':
-	      return [
-	        { action: 'detail', text: 'รายละเอียด' },
-	      ];
-	    case 'done':
-	    case 'cancelled':
-	    default:
-	      return [
-	        { action: 'detail', text: 'รายละเอียด' }
-	      ];
-	  }
-	}
+        if (statusKey === 'pending') {
+            return [
+                { action: 'detail', text: 'รายละเอียด' },
+                { action: 'edit', text: 'แก้ไข' },
+                { action: 'delete', text: 'ยกเลิกคำขอ', warn: true }
+            ];
+        }
+        return [
+            { action: 'detail', text: 'รายละเอียด' }
+        ];
+    }
 
 function truncate(str, length) {
         if (!str) return '-';
