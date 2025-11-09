@@ -463,12 +463,41 @@ document.addEventListener('DOMContentLoaded', function() {
 		dEdit.style.display = statusKey === 'pending' ? 'inline-block' : 'none';
 	}
 
-	function openDetailModal(id) {
+	async function openDetailModal(id) {
 		const item = allItems.find(it => String(it.id || it._id) === String(id));
 		if (!item) return;
 		currentDetailId = String(item.id || item._id);
 		fillDetailFields(item);
 		exitEditMode();
+		
+		// โหลดไฟล์แนบของงานนี้จาก backend
+		const filesBox = document.getElementById('detailFiles');
+		filesBox.innerHTML = '';
+
+		try {
+		  const res = await fetch(`/api/files/${encodeURIComponent(id)}`, { credentials: 'include' });
+		  if (res.ok) {
+		    const files = await res.json(); // [{id, originalFilename, ...}]
+		    if (Array.isArray(files) && files.length) {
+		      files.forEach(f => {
+		        const el = document.createElement('div');
+		        el.className = 'detail-file';
+		        const img = document.createElement('img');
+		        img.src = `/api/files/${encodeURIComponent(id)}/${encodeURIComponent(f.id)}/download`;
+		        img.alt = f.originalFilename || 'image';
+		        el.appendChild(img);
+		        filesBox.appendChild(el);
+		      });
+		    } else {
+		      filesBox.innerHTML = '<div class="placeholder">ไม่มีไฟล์แนบ</div>';
+		    }
+		  } else {
+		    filesBox.innerHTML = '<div class="placeholder">โหลดไฟล์แนบไม่สำเร็จ</div>';
+		  }
+		} catch {
+		  filesBox.innerHTML = '<div class="placeholder">เกิดข้อผิดพลาดขณะโหลดไฟล์แนบ</div>';
+		}
+
 		// prepare combos with data each time we open
 		const locValues = uniqueValues('location', ['อาคาร SC', 'อาคาร บร.1', 'อาคาร บร.2', 'อาคาร บร.3']);
 		const catValues = uniqueValues('category', ['ไฟฟ้า', 'ประปา', 'ประตู/ล็อก', 'เฟอร์นิเจอร์']);
@@ -575,67 +604,84 @@ document.addEventListener('DOMContentLoaded', function() {
 	});
 
 	if (dSave) dSave.addEventListener('click', async () => {
-		if (!currentDetailId) return;
-		try {
-			const locComboCtl = window._locComboCtl;
-			const catComboCtl = window._catComboCtl;
-			const desc = document.getElementById('detailDesc');
-			const payload = {
-				location: locComboCtl ? locComboCtl.getValue() : undefined,
-				category: catComboCtl ? catComboCtl.getValue() : undefined,
-				description: desc ? desc.value : undefined
-			};
-			const resp = await fetch(`/api/requests/${encodeURIComponent(currentDetailId)}`, {
-				method: 'PUT',
-				headers: { 'Content-Type': 'application/json' },
-				credentials: 'include',
-				body: JSON.stringify(payload)
-			});
-			if (!resp.ok) throw new Error('บันทึกการแก้ไขไม่สำเร็จ');
-			// Upload images if any
-			if (pendingFiles && pendingFiles.length) {
-				const fd = new FormData();
-				pendingFiles.forEach(f => fd.append('files', f));
-				const uploadResp = await fetch(`/api/requests/${encodeURIComponent(currentDetailId)}/files`, { method: 'POST', body: fd, credentials: 'include' });
-				if (!uploadResp.ok) throw new Error('อัปโหลดรูปไม่สำเร็จ');
-			}
-			// Update local list
-			const idx = allItems.findIndex(it => String(it.id || it._id) === String(currentDetailId));
-			if (idx >= 0) {
-				const addedFiles = (pendingFiles || []).map(f => ({ name: f.name }));
-				const files = Array.isArray(allItems[idx].files) ? allItems[idx].files.concat(addedFiles) : addedFiles;
-				allItems[idx] = { ...allItems[idx], ...payload, files };
-				fillDetailFields(allItems[idx]);
-			}
-			applySearch();
-			pendingFiles = [];
-			exitEditMode();
-		} catch (err) {
-			console.error('Save edit error:', err);
-			alert('เกิดข้อผิดพลาดในการบันทึกการแก้ไข');
-		}
-	});
+	  if (!currentDetailId) return;
 
+	  try {
+	    const locComboCtl = window._locComboCtl;
+	    const catComboCtl = window._catComboCtl;
+	    const desc = document.getElementById('detailDesc');
+
+	    const formData = new FormData();
+	    formData.append("title", document.getElementById("detailTitle").textContent.trim());
+	    formData.append("location", locComboCtl ? locComboCtl.getValue() : "");
+	    formData.append("description", desc ? desc.value : "");
+		formData.append("category", catComboCtl ? catComboCtl.getValue() : "");
+	    formData.append("existingAttachments", JSON.stringify([]));
+	    formData.append("removedAttachments", JSON.stringify([]));
+
+	    // แนบไฟล์ใหม่ที่เพิ่ม
+	    if (pendingFiles && pendingFiles.length) {
+	      pendingFiles.forEach(f => formData.append("newAttachments", f));
+	    }
+
+	    try {
+	      const resp = await fetch(`/api/requests/${encodeURIComponent(currentDetailId)}`, {
+	        method: "PUT",
+	        credentials: "include",
+	        body: formData
+	      });
+
+	      console.log("Update response status:", resp.status);
+
+	      if (!resp.ok) {
+	        const errText = await resp.text();
+	        console.error("Update failed:", errText);
+	        alert("เกิดข้อผิดพลาดในการบันทึกการแก้ไข: " + errText);
+	        return;
+	      }
+
+	      let data = null;
+	      try {
+	        data = await resp.json();
+	        console.log("Updated data:", data);
+	      } catch (err) {
+	        console.warn("ไม่มี JSON response (ไม่เป็นไร)");
+	      }
+
+	      alert("บันทึกการแก้ไขสำเร็จ!");
+	      window.location.reload();
+
+	    } catch (err) {
+	      console.error("Update error:", err);
+	      alert("ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้");
+	    }
+
+	  } catch (err) {
+	    console.error("Outer try error:", err);
+	  }
+	}); 
+	
 	// Image viewer for detail thumbnails
 	const imageModal = document.getElementById('imageModal');
 	const modalImg = document.getElementById('modalImg');
 	const closeModal = document.getElementById('closeModal');
 	const filesContainer = document.getElementById('detailFiles');
 	if (filesContainer && imageModal && modalImg && closeModal) {
-		filesContainer.addEventListener('click', (e) => {
-			const imgEl = e.target.closest('.detail-file img');
-			if (!imgEl) return;
-			modalImg.src = imgEl.src;
-			imageModal.classList.remove('hidden');
-		});
-		closeModal.addEventListener('click', () => {
-			imageModal.classList.add('hidden');
-		});
-		imageModal.addEventListener('click', (e) => {
-			if (e.target === imageModal) imageModal.classList.add('hidden');
-		});
-		document.addEventListener('keydown', (e) => {
-			if (e.key === 'Escape') imageModal.classList.add('hidden');
-		});
+	  filesContainer.addEventListener('click', (e) => {
+	    const imgEl = e.target.closest('.detail-file img');
+	    if (!imgEl) return;
+	    modalImg.src = imgEl.src;
+	    imageModal.classList.remove('hidden');
+	  });
+	  closeModal.addEventListener('click', () => {
+	    imageModal.classList.add('hidden');
+	  });
+	  imageModal.addEventListener('click', (e) => {
+	    if (e.target === imageModal) imageModal.classList.add('hidden');
+	  });
+	  document.addEventListener('keydown', (e) => {
+	    if (e.key === 'Escape') imageModal.classList.add('hidden');
+	  });
 	}
-})();
+
+	})();

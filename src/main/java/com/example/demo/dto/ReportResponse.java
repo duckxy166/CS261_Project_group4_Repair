@@ -11,6 +11,8 @@ public class ReportResponse {
     private String description;
     private String reporterName;
     private LocalDateTime createdAt;
+    private String category;
+    
     // constructor
     public ReportResponse(Long id, String status, String technician) {
         this.id = id;
@@ -28,7 +30,7 @@ public class ReportResponse {
     }
     public ReportResponse(Long id, String status, String technician, String title,
             String location, String description, String reporterName,
-            LocalDateTime createdAt) {
+            LocalDateTime createdAt, String category) {
 	this.id = id;
 	this.status = status;
 	this.technician = technician;
@@ -37,6 +39,8 @@ public class ReportResponse {
 	this.description = description;
 	this.reporterName = reporterName;
 	this.createdAt = createdAt;
+	this.category = category;
+	
     }
     // getters
     public Long getId() { return id; }
@@ -47,7 +51,7 @@ public class ReportResponse {
     public String getDescription() { return description; }
     public String getReporterName() { return reporterName; }
     public LocalDateTime getCreatedAt() { return createdAt; }
-    
+    public String getCategory(){ return category; }
 	
 
 }

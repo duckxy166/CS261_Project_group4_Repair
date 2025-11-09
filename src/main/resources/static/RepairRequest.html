@@ -60,11 +60,16 @@
 
             <!-- แบบฟอร์มแจ้งซ่อม: เก็บข้อมูลชื่อผู้แจ้ง, สถานที่, ประเภทงาน, รูป, รายละเอียด -->
             <form id="repairForm" th:action="@{/submit-repair}" method="post" enctype="multipart/form-data">
-                <div class="form-group">
-                    <label for="title">ชื่อผู้แจ้ง</label>
-                    <input type="text" id="title" name="title" class="form-control" placeholder="">
-                    <div id="titleError" class="error-msg hidden">กรุณากรอกชื่อผู้แจ้ง</div>
-                </div>
+				<div class="form-group">
+				  <label for="reporterName">ชื่อผู้แจ้ง</label>
+				  <input type="text" id="reporterName" name="reporterName" class="form-control" readonly>
+				</div>
+				
+				<div class="form-group">
+				  <label for="title">เรื่องที่แจ้ง</label>
+				  <input type="text" id="title" name="title" class="form-control" placeholder="กรอกหัวข้อปัญหา เช่น ไฟไม่ติดที่ SC1">
+				  <div id="titleError" class="error-msg hidden">กรุณากรอกเรื่องที่แจ้ง</div>
+				</div>
 
                 <div class="form-group">
                     <!-- ฟิลด์เลือกสถานที่และ dropdown -->
@@ -90,7 +95,7 @@
                     <!-- ฟิลด์เลือกประเภทงานและ dropdown -->
                     <label for="type">ประเภทงาน</label>
                     <div class="dropdown">
-                        <input type="text" id="type" name="type" class="form-control" placeholder="เลือกประเภทงาน" readonly>
+						<input type="text" id="category" name="category" class="form-control" placeholder="เลือกประเภทงาน" readonly>
                         <div class="dropdown-content" id="typeDropdown">
                             <a href="#" data-value="ไฟฟ้า">ไฟฟ้า</a>
                             <a href="#" data-value="ประปา">ประปา</a>

@@ -15,6 +15,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import jakarta.servlet.http.HttpSession;
+
+import org.springframework.http.MediaType;
 import java.util.List;
 
 @RestController
@@ -44,13 +46,14 @@ public class ReportController {
         if (user == null) {
             throw new RuntimeException("Not logged in");
         }
-
+        
         RepairRequest report = new RepairRequest();
         report.setTitle(dto.getTitle());
         report.setDescription(dto.getDescription());
         report.setPriority(dto.getPriority());
         report.setLocation(dto.getLocation());
         report.setReporter(user);
+        report.setCategory(dto.getCategory());
 
         return reportService.createReport(report);
     }
@@ -100,6 +103,7 @@ public class ReportController {
         User user = (User) session.getAttribute("user");
         if (user == null) return List.of();
         return reportService.getUserTrackReports(user);
+        
     }
 
     // ---------------- Delete report ----------------
@@ -148,22 +152,25 @@ public class ReportController {
                 updated.getLocation(),
                 updated.getDescription(),
                 updated.getReporter().getFullName(),
-                updated.getCreatedAt()
+                updated.getCreatedAt(),
+                updated.getCategory()
         );
 
         return ResponseEntity.ok(response);
     }
 
     // ---------------- Update (title, location, description, attachments) ----------------
-    @PutMapping("/{id}")
+    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<RepairRequest> updateRequest(
             @PathVariable Long id,
             @RequestParam("title") String title,
             @RequestParam("location") String location,
             @RequestParam("description") String description,
+            @RequestParam(value = "category", required = false) String category,
             @RequestParam("existingAttachments") String existingAttachmentsJson,
             @RequestParam(value = "newAttachments", required = false) List<MultipartFile> newAttachments,
             @RequestParam(value = "removedAttachments", required = false) String removedAttachmentsJson
+            
     ) {
     	try {
         // Optional: parse existingAttachments if needed (or just pass as JSON string if your service ignores it)
@@ -172,10 +179,12 @@ public class ReportController {
                 title,
                 location,
                 description,
+                category,
                 existingAttachmentsJson,
                 newAttachments,
                 removedAttachmentsJson
         );
+        updated.setCategory(category);
         return ResponseEntity.ok(updated);
 
 	    }catch (Exception e) {

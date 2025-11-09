@@ -76,7 +76,9 @@ public class ReportService {
                         r.getLocation(),
                         r.getDescription(),
                         r.getReporter().getFullName(),
-                        r.getCreatedAt()
+                        r.getCreatedAt(),
+                        r.getCategory()
+
                 ))
                 .toList();
     }
@@ -121,7 +123,8 @@ public class ReportService {
                 report.getLocation(),
                 report.getDescription(),
                 report.getReporter().getFullName(),
-                report.getCreatedAt()
+                report.getCreatedAt(),
+                report.getCategory()
         );
     }
     
@@ -131,13 +134,20 @@ public class ReportService {
             String title,
             String location,
             String description,
+            String category,
             String existingAttachmentsJson,
             List<MultipartFile> newAttachments,
             String removedAttachmentsJson
+            
     ) {
         RepairRequest report = reportRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Report not found"));
-
+        report.setTitle(title);
+        report.setLocation(location);
+        report.setDescription(description);
+        if (category != null && !category.isBlank()) {
+            report.setCategory(category);
+        }
         ObjectMapper mapper = new ObjectMapper();
 
         // 1️⃣ Remove deleted attachments
