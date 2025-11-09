@@ -123,6 +123,11 @@ document.addEventListener('DOMContentLoaded', function() {
 	  }
 	}
 
+function truncate(str, length) {
+        if (!str) return '-';
+        return str.length > length ? str.substring(0, length) + '...' : str;
+    }
+
 	function fmtDate(dateStr) {
 		try {
 			const d = new Date(dateStr);
@@ -137,46 +142,55 @@ document.addEventListener('DOMContentLoaded', function() {
 	}
 
 	function render() {
-		const start = (currentPage - 1) * PAGE_SIZE;
-		const pageItems = filtered.slice(start, start + PAGE_SIZE);
-		tbody.innerHTML = pageItems.map(item => {
-			const statusKey = normalizeStatus(item.status);
-			const statusInfo = statusMap[statusKey] || { text: item.status || '-', cls: 'status-default' };
-			const title = item.title || item.subject || '-';
-			const reporter = item.reporterFullName || item.reporterName || '-';
-			const assignee = item.assigneeName || '-';
-			const category = item.category || item.type || '-';
-			const created = fmtDate(item.createdAt || item.created_at || item.date);
-			const id = item.id || item._id || '';
-			const actions = getActions(statusKey);
-			const menuHtml = `
+        const start = (currentPage - 1) * PAGE_SIZE;
+        const pageItems = filtered.slice(start, start + PAGE_SIZE);
+        
+        tbody.innerHTML = pageItems.map(item => {
+            const statusKey = normalizeStatus(item.status);
+            const statusInfo = statusMap[statusKey] || { text: item.status || '-', cls: 'status-default' };
+            
+            // 🔥 แก้ไขตรงนี้: ดึง description มาตัดคำเพื่อแสดงเป็นหัวข้อเรื่อง
+            const subjectDisplay = truncate(item.description, 40); // ตัดเหลือ 40 ตัวอักษร
+            
+            const reporter = item.reporterFullName || item.reporterName || '-';
+            const assignee = item.assigneeName || '-';
+            const category = item.category || item.type || '-';
+            const created = fmtDate(item.createdAt || item.created_at || item.date);
+            const id = item.id || item._id || '';
+            const actions = getActions(statusKey);
+
+            // ส่วนสร้างเมนูจุดสามจุด (คงเดิมตามไฟล์ที่คุณส่งมาล่าสุด)
+            const menuHtml = `
             <div class="more-menu" role="menu" aria-hidden="true">
               ${actions.map((a, i) => `
                 ${i > 0 ? '<div class="mi-divider"></div>' : ''}
-                <button class="menu-item ${a.warn ? 'warn' : ''}" data-action="${a.action}" data-id="${escapeHtml(id)}">
+                <button class="menu-item ${a.warn ? 'warn' : ''}" data-action="${a.action}" data-id="${escapeHtml(String(id))}">
                   <span class="mi-icon">${a.action === 'detail' ? '🔎' : a.action === 'edit' ? '✏️' : '🗑️'}</span>
                   <span class="mi-text">${a.text}</span>
                 </button>
               `).join('')}
             </div>`;
-			return `
-        <tr data-id="${escapeHtml(id)}">
-          <td>${escapeHtml(title)}</td>
-          <td>${escapeHtml(created)}</td>
-          <td>${escapeHtml(reporter)}</td>
-          <td>${escapeHtml(assignee)}</td>
-          <td>${escapeHtml(category)}</td>
-          <td><span class="status-badge ${statusInfo.cls}">${statusInfo.text}</span></td>
-          <td class="actions-cell">
-            <button class="more-btn" aria-label="เมนูอื่นๆ" data-id="${escapeHtml(id)}">&#8226;&#8226;&#8226;</button>
-            ${menuHtml}
-          </td>
-        </tr>
-      `;
-		}).join('');
 
-		renderPagination();
-	}
+            return `
+                <tr data-id="${escapeHtml(String(id))}">
+                  <td title="${escapeHtml(item.description || '')}" style="font-weight:500;">
+                    ${escapeHtml(subjectDisplay)}
+                  </td>
+                  <td>${escapeHtml(created)}</td>
+                  <td>${escapeHtml(reporter)}</td>
+                  <td>${escapeHtml(assignee)}</td>
+                  <td>${escapeHtml(category)}</td>
+                  <td><span class="status-badge ${statusInfo.cls}">${statusInfo.text}</span></td>
+                  <td class="actions-cell">
+                    <button class="more-btn" aria-label="เมนูอื่นๆ" data-id="${escapeHtml(String(id))}">&#8226;&#8226;&#8226;</button>
+                    ${menuHtml}
+                  </td>
+                </tr>
+            `;
+        }).join('');
+
+        renderPagination();
+    }
 
 	function renderPagination() {
 		const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
