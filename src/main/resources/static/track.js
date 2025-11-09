@@ -78,23 +78,39 @@ const statusMap = {
         'pending':      { text: 'รอดำเนินการ',       cls: 'status-pending' },
         'processing':   { text: 'กำลังดำเนินการ',     cls: 'status-processing' },
         'assigned':     { text: 'อยู่ระหว่างซ่อม',    cls: 'status-assigned' },
-        'checking':     { text: 'กำลังตรวจสอบ',      cls: 'status-checking' }, 
+        'checking':     { text: 'กำลังตรวจสอบ',      cls: 'status-checking' },
         'done':         { text: 'สำเร็จ',           cls: 'status-success' },
         'cancelled':    { text: 'ยกเลิก',           cls: 'status-cancelled' }
     };
 
-	function normalizeStatus(s) {
+function normalizeStatus(s) {
         if (!s) return 'pending';
-        const v = String(s).trim().toLowerCase();
-        
-        if (v === 'รอดำเนินการ' || v === 'pending') return 'pending';
-        if (v === 'กำลังดำเนินการ' || v === 'processing') return 'processing';
-        if (v === 'อยู่ระหว่างซ่อม' || v === 'assigned' || v === 'กำลังซ่อม') return 'assigned';
-        if (v.includes('ตรวจสอบ') || v === 'checking') return 'checking';
-        if (v === 'สำเร็จ' || v === 'ซ่อมเสร็จ' || v === 'done' || v === 'success' || v === 'completed') return 'done';
-        if (v === 'ยกเลิก' || v === 'cancelled') return 'cancelled';
-        
-        return 'pending'; 
+        const v = String(s).trim(); // ไม่ใช้ .toLowerCase() กับภาษาไทยเพื่อความชัวร์
+
+        // ✅ 1. จับคู่ตรงตัวตาม State Diagram เป๊ะๆ (สำคัญที่สุด)
+        if (v === 'รอดำเนินการ') return 'pending';
+        if (v === 'กำลังดำเนินการ') return 'processing';
+        if (v === 'อยู่ระหว่างซ่อม') return 'assigned';
+        if (v === 'กำลังตรวจสอบงานซ่อม') return 'checking'; // 🔥 ต้องตรงกับ DB ทุกตัวอักษร
+        if (v === 'สำเร็จ') return 'done';
+        if (v === 'ยกเลิก') return 'cancelled';
+
+        // 🔍 2. เผื่อกรณีมีช่องว่างหน้าหลัง หรือใช้คำภาษาอังกฤษ (Fallback)
+        const vLower = v.toLowerCase();
+        if (vLower === 'pending') return 'pending';
+        if (vLower === 'processing') return 'processing';
+        if (vLower === 'assigned') return 'assigned';
+        if (vLower === 'checking') return 'checking';
+        if (vLower === 'done' || vLower === 'success') return 'done';
+        if (vLower === 'cancelled') return 'cancelled';
+
+        // ⚠️ 3. จับคู่แบบบางส่วน (ใช้เฉพาะถ้าจำเป็นจริงๆ)
+        // ต้องระวังคำว่า "ซ่อม" หรือ "เสร็จ" ที่อาจโผล่ในหลายสถานะ
+        if (vLower.includes('ตรวจสอบ')) return 'checking'; 
+        if (vLower.includes('อยู่ระหว่างซ่อม')) return 'assigned';
+
+        // ถ้าไม่ตรงเลย ให้เป็น pending ไว้ก่อน
+        return 'pending';
     }
 
 	// Define which actions appear per status
@@ -138,7 +154,7 @@ function truncate(str, length) {
             const statusInfo = statusMap[statusKey] || { text: item.status || '-', cls: 'status-default' };
             
             // 🔥 แก้ไขตรงนี้: ดึง description มาตัดคำเพื่อแสดงเป็นหัวข้อเรื่อง
-            const subjectDisplay = truncate(item.description, 40); // ตัดเหลือ 40 ตัวอักษร
+            const subjectDisplay = truncate(item.title || item.subject, 30);
             
             const reporter = item.reporterFullName || item.reporterName || '-';
             const assignee = item.assigneeName || '-';
@@ -437,8 +453,7 @@ function applySearch() {
 	function fillDetailFields(item) {
 		const statusKey = normalizeStatus(item.status);
 		const statusInfo = statusMap[statusKey] || { text: item.status || '-', cls: 'status-default' };
-		const byId = (id) => document.getElementById(id);
-		byId('detailTitle').textContent = item.title || item.subject || '-';
+	document.getElementById('detailTitle').value = item.title || item.subject || '-';		byId('detailTitle').textContent = item.title || item.subject || '-';
 		const stEl = byId('detailStatus');
 		stEl.textContent = statusInfo.text;
 		stEl.className = `status-badge ${statusInfo.cls}`;
@@ -546,6 +561,8 @@ function applySearch() {
 		const btn = document.getElementById('uploadBtn');
 		const input = document.getElementById('uploadInput');
 		const previewBox = document.getElementById('detailFiles');
+		const titleInput = document.getElementById('detailTitle');
+    if (titleInput) titleInput.readOnly = false;
 		// toggle controls
 		if (locInput && locCombo) { locInput.classList.add('hidden'); locCombo.classList.remove('hidden'); }
 		if (catInput && catCombo) { catInput.classList.add('hidden'); catCombo.classList.remove('hidden'); }
@@ -593,6 +610,8 @@ function applySearch() {
 		const catCombo = document.getElementById('catCombo');
 		const desc = document.getElementById('detailDesc');
 		const uploadWrap = document.getElementById('uploadPanelContainer');
+		const titleInput = document.getElementById('detailTitle');
+    if (titleInput) titleInput.readOnly = true;  
 		// toggle controls
 		if (locInput && locCombo) { locInput.classList.remove('hidden'); locCombo.classList.add('hidden'); }
 		if (catInput && catCombo) { catInput.classList.remove('hidden'); catCombo.classList.add('hidden'); }
@@ -622,8 +641,7 @@ function applySearch() {
 	    const catComboCtl = window._catComboCtl;
 	    const desc = document.getElementById('detailDesc');
 
-	    const formData = new FormData();
-	    formData.append("title", document.getElementById("detailTitle").textContent.trim());
+formData.append("title", document.getElementById("detailTitle").value.trim());	    formData.append("title", document.getElementById("detailTitle").textContent.trim());
 	    formData.append("location", locComboCtl ? locComboCtl.getValue() : "");
 	    formData.append("description", desc ? desc.value : "");
 		formData.append("category", catComboCtl ? catComboCtl.getValue() : "");
