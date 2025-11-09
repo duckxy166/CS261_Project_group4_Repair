@@ -201,20 +201,29 @@ function truncate(str, length) {
 		paginationEl.innerHTML = html;
 	}
 
-	function applySearch() {
-		const q = (searchInput.value || '').toLowerCase().trim();
-		if (!q) {
-			filtered = allItems.slice();
-		} else {
-			filtered = allItems.filter(it => {
-				const buf = [it.title, it.subject, it.reporterFullName, it.reporterName, it.assigneeName, it.category, it.type]
-					.map(v => (v || '').toLowerCase()).join(' ');
-				return buf.includes(q);
-			});
-		}
-		currentPage = 1;
-		render();
-	}
+function applySearch() {
+        const q = (searchInput.value || '').toLowerCase().trim();
+        if (!q) {
+            filtered = allItems.slice();
+        } else {
+            filtered = allItems.filter(it => {
+                const buf = [
+                    it.title,         
+                    it.description,     
+                    it.location,         
+                    it.reporterName,     
+                    it.technician,  
+                    it.category,           
+                    it.status              
+                ].map(v => (v || '').toLowerCase()).join(' ');
+                
+                // เช็คว่าคำค้น (q) อยู่ใน buf หรือไม่
+                return buf.includes(q);
+            });
+        }
+        currentPage = 1;
+        render();
+    }
 
 	function escapeHtml(str) {
 		return String(str)
