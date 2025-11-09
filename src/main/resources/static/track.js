@@ -647,60 +647,62 @@ const titleInput = document.getElementById('detailTitleInput');
 	});
 
 	if (dSave) dSave.addEventListener('click', async () => {
-	  if (!currentDetailId) return;
+    if (!currentDetailId) return;
 
-	  try {
-	    const locComboCtl = window._locComboCtl;
-	    const catComboCtl = window._catComboCtl;
-	    const desc = document.getElementById('detailDesc');
+    try {
+        // ✅ 1. สร้าง FormData object ขึ้นมาก่อน (สำคัญมาก!)
+        const formData = new FormData();
 
-formData.append("title", document.getElementById("detailTitleInput").value.trim());	    formData.append("location", locComboCtl ? locComboCtl.getValue() : "");
-	    formData.append("description", desc ? desc.value : "");
-		formData.append("category", catComboCtl ? catComboCtl.getValue() : "");
-	    formData.append("existingAttachments", JSON.stringify([]));
-	    formData.append("removedAttachments", JSON.stringify([]));
+        // ดึงค่าจาก input ต่างๆ
+        const locComboCtl = window._locComboCtl;
+        const catComboCtl = window._catComboCtl;
+        const desc = document.getElementById('detailDesc');
+        // ใช้ ID ใหม่ที่เราเพิ่งแก้ไป
+        const titleInput = document.getElementById('detailTitleInput');
 
-	    // แนบไฟล์ใหม่ที่เพิ่ม
-	    if (pendingFiles && pendingFiles.length) {
-	      pendingFiles.forEach(f => formData.append("newAttachments", f));
-	    }
+        // ✅ 2. เอาค่าใส่ FormData
+        formData.append("title", titleInput ? titleInput.value.trim() : "-");
+        formData.append("location", locComboCtl ? locComboCtl.getValue() : "");
+        formData.append("description", desc ? desc.value : "");
+        formData.append("category", catComboCtl ? catComboCtl.getValue() : "");
 
-	    try {
-	      const resp = await fetch(`/api/requests/${encodeURIComponent(currentDetailId)}`, {
-	        method: "PUT",
-	        credentials: "include",
-	        body: formData
-	      });
+        // ค่า attachments (ถ้า backend ต้องการ)
+        formData.append("existingAttachments", JSON.stringify([]));
+        formData.append("removedAttachments", JSON.stringify([]));
 
-	      console.log("Update response status:", resp.status);
+        // แนบไฟล์ใหม่ที่เพิ่ม (ถ้ามี)
+        if (pendingFiles && pendingFiles.length) {
+            pendingFiles.forEach(f => formData.append("newAttachments", f));
+        }
 
-	      if (!resp.ok) {
-	        const errText = await resp.text();
-	        console.error("Update failed:", errText);
-	        alert("เกิดข้อผิดพลาดในการบันทึกการแก้ไข: " + errText);
-	        return;
-	      }
+        try {
+            const resp = await fetch(`/api/requests/${encodeURIComponent(currentDetailId)}`, {
+                method: "PUT",
+                credentials: "include",
+                body: formData
+            });
 
-	      let data = null;
-	      try {
-	        data = await resp.json();
-	        console.log("Updated data:", data);
-	      } catch (err) {
-	        console.warn("ไม่มี JSON response (ไม่เป็นไร)");
-	      }
+            console.log("Update response status:", resp.status);
 
-	      alert("บันทึกการแก้ไขสำเร็จ!");
-	      window.location.reload();
+            if (!resp.ok) {
+                const errText = await resp.text();
+                console.error("Update failed:", errText);
+                alert("เกิดข้อผิดพลาดในการบันทึกการแก้ไข: " + errText);
+                return;
+            }
 
-	    } catch (err) {
-	      console.error("Update error:", err);
-	      alert("ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้");
-	    }
+            alert("บันทึกการแก้ไขสำเร็จ!");
+            window.location.reload();
 
-	  } catch (err) {
-	    console.error("Outer try error:", err);
-	  }
-	}); 
+        } catch (err) {
+            console.error("Update error:", err);
+            alert("ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้");
+        }
+
+    } catch (err) {
+        console.error("Outer try error:", err);
+    }
+});
 	
 	// Image viewer for detail thumbnails
 	const imageModal = document.getElementById('imageModal');
