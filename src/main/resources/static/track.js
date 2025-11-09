@@ -1,4 +1,5 @@
 /* Track Request page script */
+const byId = (id) => document.getElementById(id);
 window.addEventListener('pageshow', function(event) {
 
 	if (event.persisted) {
@@ -74,54 +75,63 @@ document.addEventListener('DOMContentLoaded', function() {
 	let filtered = [];
 	let currentPage = 1;
 
-	const statusMap = {
-		pending: { text: 'รอดำเนินการ', cls: 'status-pending' },
-		processing: { text: 'กำลังดำเนินการ', cls: 'status-processing' },
-		waiting_parts: { text: 'รออะไหล่/รอช่าง', cls: 'status-waiting' },
-		checking: { text: 'กำลังตรวจสอบ', cls: 'status-checking' },
-		assigned: { text: 'อยู่ระหว่างซ่อม', cls: 'status-assigned' },
-		done: { text: 'สำเร็จ', cls: 'status-success' },
-		cancelled: { text: 'ยกเลิก', cls: 'status-cancelled' }
-	};
+const statusMap = {
+        'pending':      { text: 'รอดำเนินการ',       cls: 'status-pending' },
+        'processing':   { text: 'กำลังดำเนินการ',     cls: 'status-processing' },
+        'assigned':     { text: 'อยู่ระหว่างซ่อม',    cls: 'status-assigned' },
+        'checking':     { text: 'กำลังตรวจสอบ',      cls: 'status-checking' },
+        'done':         { text: 'สำเร็จ',           cls: 'status-success' },
+        'cancelled':    { text: 'ยกเลิก',           cls: 'status-cancelled' }
+    };
 
-	// Normalize status to canonical keys regardless of backend language
-	function normalizeStatus(s) {
-		const v = String(s || '').toLowerCase();
-		if (!v) return 'pending';
-		if (['pending', 'รอดำเนินการ'].includes(v)) return 'pending';
-		if (['processing', 'กำลังดำเนินการ'].includes(v)) return 'processing';
-		if (['waiting_parts', 'รออะไหล่', 'รออะไหล่/รอช่าง'].includes(v)) return 'waiting_parts';
-		if (['checking', 'กำลังตรวจสอบ', 'กำลังตรวจสอบงานซ่อม'].includes(v)) return 'checking';
-		if (['assigned', 'อยู่ระหว่างซ่อม'].includes(v)) return 'assigned';
-		if (['done', 'สำเร็จ', 'success'].includes(v)) return 'done';
-		if (['cancelled', 'ยกเลิก'].includes(v)) return 'cancelled';
-		return 'pending';
-	}
+function normalizeStatus(s) {
+        if (!s) return 'pending';
+        const v = String(s).trim(); // ไม่ใช้ .toLowerCase() กับภาษาไทยเพื่อความชัวร์
+
+        // ✅ 1. จับคู่ตรงตัวตาม State Diagram เป๊ะๆ (สำคัญที่สุด)
+        if (v === 'รอดำเนินการ') return 'pending';
+        if (v === 'กำลังดำเนินการ') return 'processing';
+        if (v === 'อยู่ระหว่างซ่อม') return 'assigned';
+        if (v === 'กำลังตรวจสอบงานซ่อม') return 'checking'; // 🔥 ต้องตรงกับ DB ทุกตัวอักษร
+        if (v === 'สำเร็จ') return 'done';
+        if (v === 'ยกเลิก') return 'cancelled';
+
+        // 🔍 2. เผื่อกรณีมีช่องว่างหน้าหลัง หรือใช้คำภาษาอังกฤษ (Fallback)
+        const vLower = v.toLowerCase();
+        if (vLower === 'pending') return 'pending';
+        if (vLower === 'processing') return 'processing';
+        if (vLower === 'assigned') return 'assigned';
+        if (vLower === 'checking') return 'checking';
+        if (vLower === 'done' || vLower === 'success') return 'done';
+        if (vLower === 'cancelled') return 'cancelled';
+
+        // ⚠️ 3. จับคู่แบบบางส่วน (ใช้เฉพาะถ้าจำเป็นจริงๆ)
+        // ต้องระวังคำว่า "ซ่อม" หรือ "เสร็จ" ที่อาจโผล่ในหลายสถานะ
+        if (vLower.includes('ตรวจสอบ')) return 'checking'; 
+        if (vLower.includes('อยู่ระหว่างซ่อม')) return 'assigned';
+
+        // ถ้าไม่ตรงเลย ให้เป็น pending ไว้ก่อน
+        return 'pending';
+    }
 
 	// Define which actions appear per status
 	function getActions(statusKey) {
-	  switch (statusKey) {
-	    case 'pending':
-	      return [
-	        { action: 'detail', text: 'รายละเอียด' },
-	        { action: 'edit', text: 'แก้ไข' },
-	        { action: 'delete', text: 'ลบงานนี้', warn: true }
-	      ];
-	    case 'assigned':
-	    case 'processing':
-	    case 'checking':
-	    case 'waiting_parts':
-	      return [
-	        { action: 'detail', text: 'รายละเอียด' },
-	      ];
-	    case 'done':
-	    case 'cancelled':
-	    default:
-	      return [
-	        { action: 'detail', text: 'รายละเอียด' }
-	      ];
-	  }
-	}
+        if (statusKey === 'pending') {
+            return [
+                { action: 'detail', text: 'รายละเอียด' },
+                { action: 'edit', text: 'แก้ไข' },
+                { action: 'delete', text: 'ยกเลิกคำขอ', warn: true }
+            ];
+        }
+        return [
+            { action: 'detail', text: 'รายละเอียด' }
+        ];
+    }
+
+function truncate(str, length) {
+        if (!str) return '-';
+        return str.length > length ? str.substring(0, length) + '...' : str;
+    }
 
 	function fmtDate(dateStr) {
 		try {
@@ -137,46 +147,55 @@ document.addEventListener('DOMContentLoaded', function() {
 	}
 
 	function render() {
-		const start = (currentPage - 1) * PAGE_SIZE;
-		const pageItems = filtered.slice(start, start + PAGE_SIZE);
-		tbody.innerHTML = pageItems.map(item => {
-			const statusKey = normalizeStatus(item.status);
-			const statusInfo = statusMap[statusKey] || { text: item.status || '-', cls: 'status-default' };
-			const title = item.title || item.subject || '-';
-			const reporter = item.reporterFullName || item.reporterName || '-';
-			const assignee = item.assigneeName || '-';
-			const category = item.category || item.type || '-';
-			const created = fmtDate(item.createdAt || item.created_at || item.date);
-			const id = item.id || item._id || '';
-			const actions = getActions(statusKey);
-			const menuHtml = `
+        const start = (currentPage - 1) * PAGE_SIZE;
+        const pageItems = filtered.slice(start, start + PAGE_SIZE);
+        
+        tbody.innerHTML = pageItems.map(item => {
+            const statusKey = normalizeStatus(item.status);
+            const statusInfo = statusMap[statusKey] || { text: item.status || '-', cls: 'status-default' };
+            
+            // 🔥 แก้ไขตรงนี้: ดึง description มาตัดคำเพื่อแสดงเป็นหัวข้อเรื่อง
+            const subjectDisplay = truncate(item.title || item.subject, 30);
+            
+            const reporter = item.reporterFullName || item.reporterName || '-';
+            const assignee = item.assigneeName || '-';
+            const category = item.category || item.type || '-';
+            const created = fmtDate(item.createdAt || item.created_at || item.date);
+            const id = item.id || item._id || '';
+            const actions = getActions(statusKey);
+
+            // ส่วนสร้างเมนูจุดสามจุด (คงเดิมตามไฟล์ที่คุณส่งมาล่าสุด)
+            const menuHtml = `
             <div class="more-menu" role="menu" aria-hidden="true">
               ${actions.map((a, i) => `
                 ${i > 0 ? '<div class="mi-divider"></div>' : ''}
-                <button class="menu-item ${a.warn ? 'warn' : ''}" data-action="${a.action}" data-id="${escapeHtml(id)}">
+                <button class="menu-item ${a.warn ? 'warn' : ''}" data-action="${a.action}" data-id="${escapeHtml(String(id))}">
                   <span class="mi-icon">${a.action === 'detail' ? '🔎' : a.action === 'edit' ? '✏️' : '🗑️'}</span>
                   <span class="mi-text">${a.text}</span>
                 </button>
               `).join('')}
             </div>`;
-			return `
-        <tr data-id="${escapeHtml(id)}">
-          <td>${escapeHtml(title)}</td>
-          <td>${escapeHtml(created)}</td>
-          <td>${escapeHtml(reporter)}</td>
-          <td>${escapeHtml(assignee)}</td>
-          <td>${escapeHtml(category)}</td>
-          <td><span class="status-badge ${statusInfo.cls}">${statusInfo.text}</span></td>
-          <td class="actions-cell">
-            <button class="more-btn" aria-label="เมนูอื่นๆ" data-id="${escapeHtml(id)}">&#8226;&#8226;&#8226;</button>
-            ${menuHtml}
-          </td>
-        </tr>
-      `;
-		}).join('');
 
-		renderPagination();
-	}
+            return `
+                <tr data-id="${escapeHtml(String(id))}">
+                  <td title="${escapeHtml(item.description || '')}" style="font-weight:500;">
+                    ${escapeHtml(subjectDisplay)}
+                  </td>
+                  <td>${escapeHtml(created)}</td>
+                  <td>${escapeHtml(reporter)}</td>
+                  <td>${escapeHtml(assignee)}</td>
+                  <td>${escapeHtml(category)}</td>
+                  <td><span class="status-badge ${statusInfo.cls}">${statusInfo.text}</span></td>
+                  <td class="actions-cell">
+                    <button class="more-btn" aria-label="เมนูอื่นๆ" data-id="${escapeHtml(String(id))}">&#8226;&#8226;&#8226;</button>
+                    ${menuHtml}
+                  </td>
+                </tr>
+            `;
+        }).join('');
+
+        renderPagination();
+    }
 
 	function renderPagination() {
 		const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
@@ -199,20 +218,29 @@ document.addEventListener('DOMContentLoaded', function() {
 		paginationEl.innerHTML = html;
 	}
 
-	function applySearch() {
-		const q = (searchInput.value || '').toLowerCase().trim();
-		if (!q) {
-			filtered = allItems.slice();
-		} else {
-			filtered = allItems.filter(it => {
-				const buf = [it.title, it.subject, it.reporterFullName, it.reporterName, it.assigneeName, it.category, it.type]
-					.map(v => (v || '').toLowerCase()).join(' ');
-				return buf.includes(q);
-			});
-		}
-		currentPage = 1;
-		render();
-	}
+function applySearch() {
+        const q = (searchInput.value || '').toLowerCase().trim();
+        if (!q) {
+            filtered = allItems.slice();
+        } else {
+            filtered = allItems.filter(it => {
+                const buf = [
+                    it.title,         
+                    it.description,     
+                    it.location,         
+                    it.reporterName,     
+                    it.technician,  
+                    it.category,           
+                    it.status              
+                ].map(v => (v || '').toLowerCase()).join(' ');
+                
+                // เช็คว่าคำค้น (q) อยู่ใน buf หรือไม่
+                return buf.includes(q);
+            });
+        }
+        currentPage = 1;
+        render();
+    }
 
 	function escapeHtml(str) {
 		return String(str)
@@ -424,51 +452,91 @@ document.addEventListener('DOMContentLoaded', function() {
 	}
 
 	function fillDetailFields(item) {
-		const statusKey = normalizeStatus(item.status);
-		const statusInfo = statusMap[statusKey] || { text: item.status || '-', cls: 'status-default' };
-		const byId = (id) => document.getElementById(id);
-		byId('detailTitle').textContent = item.title || item.subject || '-';
-		const stEl = byId('detailStatus');
-		stEl.textContent = statusInfo.text;
-		stEl.className = `status-badge ${statusInfo.cls}`;
-		byId('detailDate').value = fmtDate(item.createdAt || item.created_at || item.date);
-		byId('detailReporter').value = item.reporterFullName || item.reporterName || '-';
-		byId('detailLocation').value = item.location || item.place || '-';
-		byId('detailAssignee').value = item.assigneeName || '-';
-		byId('detailCategory').value = item.category || item.type || '-';
-		byId('detailDesc').value = item.description || item.desc || '-';
-		const filesBox = byId('detailFiles');
-		filesBox.innerHTML = '';
-		// simple placeholder files (API optional)
-		if (Array.isArray(item.files) && item.files.length) {
-			item.files.forEach((f) => {
-				const el = document.createElement('div');
-				el.className = 'detail-file';
-				if (f && f.url) {
-					const img = document.createElement('img');
-					img.src = f.url;
-					el.appendChild(img);
-				} else {
-					el.textContent = 'ภาพ';
-				}
-				filesBox.appendChild(el);
-			});
-		} else {
-			const el = document.createElement('div');
-			el.className = 'detail-file';
-			el.textContent = 'ไม่มีรูป';
-			filesBox.appendChild(el);
-		}
-		// button availability
-		dEdit.style.display = statusKey === 'pending' ? 'inline-block' : 'none';
-	}
+    const statusKey = normalizeStatus(item.status);
+    const statusInfo = statusMap[statusKey] || { text: item.status || '-', cls: 'status-default' };
 
-	function openDetailModal(id) {
+    // ใช้ ID ใหม่ที่แก้ไขไปใน track.html
+    byId('detailTitleInput').value = item.title || item.subject || '-';
+
+    // แก้ไขส่วนแสดงสถานะ (stEl) ให้ถูกต้อง
+    const stEl = byId('detailStatus');
+    if (stEl) {
+        stEl.textContent = statusInfo.text;
+        stEl.className = `status-badge ${statusInfo.cls}`;
+    }
+
+    // ใช้ byId() ที่เราสร้างไว้ด้านบน
+    byId('detailDate').value = fmtDate(item.createdAt || item.created_at || item.date);
+    byId('detailReporter').value = item.reporterFullName || item.reporterName || '-';
+    byId('detailLocation').value = item.location || item.place || '-';
+    byId('detailAssignee').value = item.assigneeName || '-';
+    byId('detailCategory').value = item.category || item.type || '-';
+    byId('detailDesc').value = item.description || item.desc || '-';
+
+    // ส่วนแสดงไฟล์แนบ
+    const filesBox = byId('detailFiles');
+    filesBox.innerHTML = '';
+    if (Array.isArray(item.files) && item.files.length) {
+        item.files.forEach((f) => {
+            const el = document.createElement('div');
+            el.className = 'detail-file';
+            if (f && f.url) {
+                const img = document.createElement('img');
+                img.src = f.url;
+                el.appendChild(img);
+            } else {
+                el.textContent = 'ภาพ';
+            }
+            filesBox.appendChild(el);
+        });
+    } else {
+        const el = document.createElement('div');
+        el.className = 'detail-file';
+        el.textContent = 'ไม่มีรูป';
+        filesBox.appendChild(el);
+    }
+
+    // ปรับการแสดงปุ่มแก้ไข
+    const dEdit = document.getElementById('detailEditBtn');
+    if (dEdit) {
+        dEdit.style.display = statusKey === 'pending' ? 'inline-block' : 'none';
+    }
+}
+	async function openDetailModal(id) {
 		const item = allItems.find(it => String(it.id || it._id) === String(id));
 		if (!item) return;
 		currentDetailId = String(item.id || item._id);
 		fillDetailFields(item);
 		exitEditMode();
+		
+		// โหลดไฟล์แนบของงานนี้จาก backend
+		const filesBox = document.getElementById('detailFiles');
+		filesBox.innerHTML = '';
+
+		try {
+		  const res = await fetch(`/api/files/${encodeURIComponent(id)}`, { credentials: 'include' });
+		  if (res.ok) {
+		    const files = await res.json(); // [{id, originalFilename, ...}]
+		    if (Array.isArray(files) && files.length) {
+		      files.forEach(f => {
+		        const el = document.createElement('div');
+		        el.className = 'detail-file';
+		        const img = document.createElement('img');
+		        img.src = `/api/files/${encodeURIComponent(id)}/${encodeURIComponent(f.id)}/download`;
+		        img.alt = f.originalFilename || 'image';
+		        el.appendChild(img);
+		        filesBox.appendChild(el);
+		      });
+		    } else {
+		      filesBox.innerHTML = '<div class="placeholder">ไม่มีไฟล์แนบ</div>';
+		    }
+		  } else {
+		    filesBox.innerHTML = '<div class="placeholder">โหลดไฟล์แนบไม่สำเร็จ</div>';
+		  }
+		} catch {
+		  filesBox.innerHTML = '<div class="placeholder">เกิดข้อผิดพลาดขณะโหลดไฟล์แนบ</div>';
+		}
+
 		// prepare combos with data each time we open
 		const locValues = uniqueValues('location', ['อาคาร SC', 'อาคาร บร.1', 'อาคาร บร.2', 'อาคาร บร.3']);
 		const catValues = uniqueValues('category', ['ไฟฟ้า', 'ประปา', 'ประตู/ล็อก', 'เฟอร์นิเจอร์']);
@@ -506,6 +574,8 @@ document.addEventListener('DOMContentLoaded', function() {
 		const btn = document.getElementById('uploadBtn');
 		const input = document.getElementById('uploadInput');
 		const previewBox = document.getElementById('detailFiles');
+const titleInput = document.getElementById('detailTitleInput');
+    if (titleInput) titleInput.readOnly = false;
 		// toggle controls
 		if (locInput && locCombo) { locInput.classList.add('hidden'); locCombo.classList.remove('hidden'); }
 		if (catInput && catCombo) { catInput.classList.add('hidden'); catCombo.classList.remove('hidden'); }
@@ -553,6 +623,8 @@ document.addEventListener('DOMContentLoaded', function() {
 		const catCombo = document.getElementById('catCombo');
 		const desc = document.getElementById('detailDesc');
 		const uploadWrap = document.getElementById('uploadPanelContainer');
+		const titleInput = document.getElementById('detailTitleInput');
+    if (titleInput) titleInput.readOnly = true;  
 		// toggle controls
 		if (locInput && locCombo) { locInput.classList.remove('hidden'); locCombo.classList.add('hidden'); }
 		if (catInput && catCombo) { catInput.classList.remove('hidden'); catCombo.classList.add('hidden'); }
@@ -575,67 +647,84 @@ document.addEventListener('DOMContentLoaded', function() {
 	});
 
 	if (dSave) dSave.addEventListener('click', async () => {
-		if (!currentDetailId) return;
-		try {
-			const locComboCtl = window._locComboCtl;
-			const catComboCtl = window._catComboCtl;
-			const desc = document.getElementById('detailDesc');
-			const payload = {
-				location: locComboCtl ? locComboCtl.getValue() : undefined,
-				category: catComboCtl ? catComboCtl.getValue() : undefined,
-				description: desc ? desc.value : undefined
-			};
-			const resp = await fetch(`/api/requests/${encodeURIComponent(currentDetailId)}`, {
-				method: 'PUT',
-				headers: { 'Content-Type': 'application/json' },
-				credentials: 'include',
-				body: JSON.stringify(payload)
-			});
-			if (!resp.ok) throw new Error('บันทึกการแก้ไขไม่สำเร็จ');
-			// Upload images if any
-			if (pendingFiles && pendingFiles.length) {
-				const fd = new FormData();
-				pendingFiles.forEach(f => fd.append('files', f));
-				const uploadResp = await fetch(`/api/requests/${encodeURIComponent(currentDetailId)}/files`, { method: 'POST', body: fd, credentials: 'include' });
-				if (!uploadResp.ok) throw new Error('อัปโหลดรูปไม่สำเร็จ');
-			}
-			// Update local list
-			const idx = allItems.findIndex(it => String(it.id || it._id) === String(currentDetailId));
-			if (idx >= 0) {
-				const addedFiles = (pendingFiles || []).map(f => ({ name: f.name }));
-				const files = Array.isArray(allItems[idx].files) ? allItems[idx].files.concat(addedFiles) : addedFiles;
-				allItems[idx] = { ...allItems[idx], ...payload, files };
-				fillDetailFields(allItems[idx]);
-			}
-			applySearch();
-			pendingFiles = [];
-			exitEditMode();
-		} catch (err) {
-			console.error('Save edit error:', err);
-			alert('เกิดข้อผิดพลาดในการบันทึกการแก้ไข');
-		}
-	});
+    if (!currentDetailId) return;
 
+    try {
+        // ✅ 1. สร้าง FormData object ขึ้นมาก่อน (สำคัญมาก!)
+        const formData = new FormData();
+
+        // ดึงค่าจาก input ต่างๆ
+        const locComboCtl = window._locComboCtl;
+        const catComboCtl = window._catComboCtl;
+        const desc = document.getElementById('detailDesc');
+        // ใช้ ID ใหม่ที่เราเพิ่งแก้ไป
+        const titleInput = document.getElementById('detailTitleInput');
+
+        // ✅ 2. เอาค่าใส่ FormData
+        formData.append("title", titleInput ? titleInput.value.trim() : "-");
+        formData.append("location", locComboCtl ? locComboCtl.getValue() : "");
+        formData.append("description", desc ? desc.value : "");
+        formData.append("category", catComboCtl ? catComboCtl.getValue() : "");
+
+        // ค่า attachments (ถ้า backend ต้องการ)
+        formData.append("existingAttachments", JSON.stringify([]));
+        formData.append("removedAttachments", JSON.stringify([]));
+
+        // แนบไฟล์ใหม่ที่เพิ่ม (ถ้ามี)
+        if (pendingFiles && pendingFiles.length) {
+            pendingFiles.forEach(f => formData.append("newAttachments", f));
+        }
+
+        try {
+            const resp = await fetch(`/api/requests/${encodeURIComponent(currentDetailId)}`, {
+                method: "PUT",
+                credentials: "include",
+                body: formData
+            });
+
+            console.log("Update response status:", resp.status);
+
+            if (!resp.ok) {
+                const errText = await resp.text();
+                console.error("Update failed:", errText);
+                alert("เกิดข้อผิดพลาดในการบันทึกการแก้ไข: " + errText);
+                return;
+            }
+
+            alert("บันทึกการแก้ไขสำเร็จ!");
+            window.location.reload();
+
+        } catch (err) {
+            console.error("Update error:", err);
+            alert("ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้");
+        }
+
+    } catch (err) {
+        console.error("Outer try error:", err);
+    }
+});
+	
 	// Image viewer for detail thumbnails
 	const imageModal = document.getElementById('imageModal');
 	const modalImg = document.getElementById('modalImg');
 	const closeModal = document.getElementById('closeModal');
 	const filesContainer = document.getElementById('detailFiles');
 	if (filesContainer && imageModal && modalImg && closeModal) {
-		filesContainer.addEventListener('click', (e) => {
-			const imgEl = e.target.closest('.detail-file img');
-			if (!imgEl) return;
-			modalImg.src = imgEl.src;
-			imageModal.classList.remove('hidden');
-		});
-		closeModal.addEventListener('click', () => {
-			imageModal.classList.add('hidden');
-		});
-		imageModal.addEventListener('click', (e) => {
-			if (e.target === imageModal) imageModal.classList.add('hidden');
-		});
-		document.addEventListener('keydown', (e) => {
-			if (e.key === 'Escape') imageModal.classList.add('hidden');
-		});
+	  filesContainer.addEventListener('click', (e) => {
+	    const imgEl = e.target.closest('.detail-file img');
+	    if (!imgEl) return;
+	    modalImg.src = imgEl.src;
+	    imageModal.classList.remove('hidden');
+	  });
+	  closeModal.addEventListener('click', () => {
+	    imageModal.classList.add('hidden');
+	  });
+	  imageModal.addEventListener('click', (e) => {
+	    if (e.target === imageModal) imageModal.classList.add('hidden');
+	  });
+	  document.addEventListener('keydown', (e) => {
+	    if (e.key === 'Escape') imageModal.classList.add('hidden');
+	  });
 	}
-})();
+
+	})();
