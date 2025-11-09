@@ -1,4 +1,5 @@
 /* Track Request page script */
+const byId = (id) => document.getElementById(id);
 window.addEventListener('pageshow', function(event) {
 
 	if (event.persisted) {
@@ -451,44 +452,56 @@ function applySearch() {
 	}
 
 	function fillDetailFields(item) {
-		const statusKey = normalizeStatus(item.status);
-		const statusInfo = statusMap[statusKey] || { text: item.status || '-', cls: 'status-default' };
-	document.getElementById('detailTitle').value = item.title || item.subject || '-';		byId('detailTitle').textContent = item.title || item.subject || '-';
-		const stEl = byId('detailStatus');
-		stEl.textContent = statusInfo.text;
-		stEl.className = `status-badge ${statusInfo.cls}`;
-		byId('detailDate').value = fmtDate(item.createdAt || item.created_at || item.date);
-		byId('detailReporter').value = item.reporterFullName || item.reporterName || '-';
-		byId('detailLocation').value = item.location || item.place || '-';
-		byId('detailAssignee').value = item.assigneeName || '-';
-		byId('detailCategory').value = item.category || item.type || '-';
-		byId('detailDesc').value = item.description || item.desc || '-';
-		const filesBox = byId('detailFiles');
-		filesBox.innerHTML = '';
-		// simple placeholder files (API optional)
-		if (Array.isArray(item.files) && item.files.length) {
-			item.files.forEach((f) => {
-				const el = document.createElement('div');
-				el.className = 'detail-file';
-				if (f && f.url) {
-					const img = document.createElement('img');
-					img.src = f.url;
-					el.appendChild(img);
-				} else {
-					el.textContent = 'ภาพ';
-				}
-				filesBox.appendChild(el);
-			});
-		} else {
-			const el = document.createElement('div');
-			el.className = 'detail-file';
-			el.textContent = 'ไม่มีรูป';
-			filesBox.appendChild(el);
-		}
-		// button availability
-		dEdit.style.display = statusKey === 'pending' ? 'inline-block' : 'none';
-	}
+    const statusKey = normalizeStatus(item.status);
+    const statusInfo = statusMap[statusKey] || { text: item.status || '-', cls: 'status-default' };
 
+    // ใช้ ID ใหม่ที่แก้ไขไปใน track.html
+    byId('detailTitleInput').value = item.title || item.subject || '-';
+
+    // แก้ไขส่วนแสดงสถานะ (stEl) ให้ถูกต้อง
+    const stEl = byId('detailStatus');
+    if (stEl) {
+        stEl.textContent = statusInfo.text;
+        stEl.className = `status-badge ${statusInfo.cls}`;
+    }
+
+    // ใช้ byId() ที่เราสร้างไว้ด้านบน
+    byId('detailDate').value = fmtDate(item.createdAt || item.created_at || item.date);
+    byId('detailReporter').value = item.reporterFullName || item.reporterName || '-';
+    byId('detailLocation').value = item.location || item.place || '-';
+    byId('detailAssignee').value = item.assigneeName || '-';
+    byId('detailCategory').value = item.category || item.type || '-';
+    byId('detailDesc').value = item.description || item.desc || '-';
+
+    // ส่วนแสดงไฟล์แนบ
+    const filesBox = byId('detailFiles');
+    filesBox.innerHTML = '';
+    if (Array.isArray(item.files) && item.files.length) {
+        item.files.forEach((f) => {
+            const el = document.createElement('div');
+            el.className = 'detail-file';
+            if (f && f.url) {
+                const img = document.createElement('img');
+                img.src = f.url;
+                el.appendChild(img);
+            } else {
+                el.textContent = 'ภาพ';
+            }
+            filesBox.appendChild(el);
+        });
+    } else {
+        const el = document.createElement('div');
+        el.className = 'detail-file';
+        el.textContent = 'ไม่มีรูป';
+        filesBox.appendChild(el);
+    }
+
+    // ปรับการแสดงปุ่มแก้ไข
+    const dEdit = document.getElementById('detailEditBtn');
+    if (dEdit) {
+        dEdit.style.display = statusKey === 'pending' ? 'inline-block' : 'none';
+    }
+}
 	async function openDetailModal(id) {
 		const item = allItems.find(it => String(it.id || it._id) === String(id));
 		if (!item) return;
@@ -561,7 +574,7 @@ function applySearch() {
 		const btn = document.getElementById('uploadBtn');
 		const input = document.getElementById('uploadInput');
 		const previewBox = document.getElementById('detailFiles');
-		const titleInput = document.getElementById('detailTitle');
+const titleInput = document.getElementById('detailTitleInput');
     if (titleInput) titleInput.readOnly = false;
 		// toggle controls
 		if (locInput && locCombo) { locInput.classList.add('hidden'); locCombo.classList.remove('hidden'); }
@@ -610,7 +623,7 @@ function applySearch() {
 		const catCombo = document.getElementById('catCombo');
 		const desc = document.getElementById('detailDesc');
 		const uploadWrap = document.getElementById('uploadPanelContainer');
-		const titleInput = document.getElementById('detailTitle');
+		const titleInput = document.getElementById('detailTitleInput');
     if (titleInput) titleInput.readOnly = true;  
 		// toggle controls
 		if (locInput && locCombo) { locInput.classList.remove('hidden'); locCombo.classList.add('hidden'); }
@@ -641,8 +654,7 @@ function applySearch() {
 	    const catComboCtl = window._catComboCtl;
 	    const desc = document.getElementById('detailDesc');
 
-formData.append("title", document.getElementById("detailTitle").value.trim());	    formData.append("title", document.getElementById("detailTitle").textContent.trim());
-	    formData.append("location", locComboCtl ? locComboCtl.getValue() : "");
+formData.append("title", document.getElementById("detailTitleInput").value.trim());	    formData.append("location", locComboCtl ? locComboCtl.getValue() : "");
 	    formData.append("description", desc ? desc.value : "");
 		formData.append("category", catComboCtl ? catComboCtl.getValue() : "");
 	    formData.append("existingAttachments", JSON.stringify([]));
