@@ -65,7 +65,7 @@ recommendationInput.addEventListener("input", () => {
     characterCount.textContent = `เหลือ ${remaining} ตัวอักษร`;
 });
 
-form.addEventListener("submit", (event) => {
+form.addEventListener("submit", async (event) => {
     event.preventDefault();
 
     if (!currentRating) {
@@ -79,13 +79,34 @@ form.addEventListener("submit", (event) => {
         return;
     }
 
-    showMessage("ขอบคุณสำหรับความคิดเห็นของคุณ!", "success");
+	const feedbackData = {
+	        rating: currentRating,
+	        recommendation: recommendationInput.value.trim()
+	    };
 
-    // small delay so user can see the success message before redirect
-    setTimeout(() => {
-        window.location.href = "history.html"; // redirect to history page
-    }, 1000);
+	    try {
+	        const response = await fetch("http://localhost:8080/api/feedback/submit", {
+	            method: "POST",
+	            headers: {
+	                "Content-Type": "application/json"
+	            },
+	            body: JSON.stringify(feedbackData)
+	        });
+
+	        if (response.ok) {
+	            showMessage("ขอบคุณสำหรับความคิดเห็นของคุณ!", "success");
+				// small delay so user can see the success message before redirect
+				setTimeout(() => {
+	                window.location.href = "history.html";
+	            }, 1000);
+	        } else {
+	            showMessage("เกิดข้อผิดพลาดในการส่งข้อมูล", "error");
+	        }
+	    } catch (error) {
+	        console.error(error);
+	        showMessage("ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้", "error");
+	    }
 
 });
-
+// 🟢 ตั้งค่าดาวเริ่มต้นให้เป็น “ยังไม่ได้เลือกคะแนน”
 updateStars(currentRating);
