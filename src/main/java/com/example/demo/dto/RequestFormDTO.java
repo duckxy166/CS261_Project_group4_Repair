@@ -5,6 +5,7 @@ public class RequestFormDTO {
 	private String description;
 	private String priority;
 	private String location;
+	private String locationDetail;
 	private String category;
 
 	// getter & setter
@@ -46,6 +47,14 @@ public class RequestFormDTO {
 
 	public void setCategory(String category) {
 		this.category = category;
+	}
+
+	public String getLocationDetail() {
+		return locationDetail;
+	}
+
+	public void setLocationDetail(String locationDetail) {
+		this.locationDetail = locationDetail;
 	}
 
 }

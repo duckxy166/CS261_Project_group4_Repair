@@ -101,3 +101,24 @@ document.addEventListener("DOMContentLoaded", async () => {
     container.innerHTML = `<p>เกิดข้อผิดพลาดในการโหลดข้อมูล</p>`;
   }
 });
+document.addEventListener("DOMContentLoaded", () => {
+  // 🔹 Get request ID from URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const requestId = urlParams.get("id");
+
+  console.log("Repair Request ID:", requestId);
+
+  // Example: maybe fetch details using requestId
+  // fetch(`/api/requests/${requestId}`)
+  //   .then((res) => res.json())
+  //   .then((data) => console.log(data));
+
+  // 🔹 When click to go to RepairReportCRS
+  const goToCRSBtn = document.getElementById("goToCRS");
+  if (goToCRSBtn) {
+    goToCRSBtn.addEventListener("click", () => {
+      // Pass same requestId to RepairReportCRS.html
+      window.location.href = `RepairReportCRS.html?id=${requestId}`;
+    });
+  }
+});

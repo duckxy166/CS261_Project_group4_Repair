@@ -74,6 +74,7 @@ public class ReportService {
                         r.getTechnician(),
                         r.getTitle(),
                         r.getLocation(),
+                        r.getLocationDetail(),
                         r.getDescription(),
                         r.getReporter().getFullName(),
                         r.getCreatedAt(),
@@ -129,6 +130,7 @@ public class ReportService {
                 report.getTechnician(),
                 report.getTitle(),
                 report.getLocation(),
+                report.getLocationDetail(),
                 report.getDescription(),
                 report.getReporter().getFullName(),
                 report.getCreatedAt(),
@@ -143,6 +145,7 @@ public class ReportService {
             String location,
             String description,
             String category,
+            String locationDetail,
             String existingAttachmentsJson,
             List<MultipartFile> newAttachments,
             String removedAttachmentsJson
@@ -153,6 +156,7 @@ public class ReportService {
         report.setTitle(title);
         report.setLocation(location);
         report.setDescription(description);
+        report.setLocationDetail(locationDetail);
         if (category != null && !category.isBlank()) {
             report.setCategory(category);
         }

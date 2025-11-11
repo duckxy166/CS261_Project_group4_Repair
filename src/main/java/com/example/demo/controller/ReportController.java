@@ -54,6 +54,7 @@ public class ReportController {
         report.setLocation(dto.getLocation());
         report.setReporter(user);
         report.setCategory(dto.getCategory());
+        report.setLocationDetail(dto.getLocationDetail());
 
         return reportService.createReport(report);
     }
@@ -159,6 +160,7 @@ public class ReportController {
                 updated.getTechnician(),
                 updated.getTitle(),
                 updated.getLocation(),
+                updated.getLocationDetail(),
                 updated.getDescription(),
                 updated.getReporter().getFullName(),
                 updated.getCreatedAt(),
@@ -176,6 +178,7 @@ public class ReportController {
             @RequestParam("location") String location,
             @RequestParam("description") String description,
             @RequestParam(value = "category", required = false) String category,
+            @RequestParam(value = "locationDetail", required = false) String locationDetail,
             @RequestParam("existingAttachments") String existingAttachmentsJson,
             @RequestParam(value = "newAttachments", required = false) List<MultipartFile> newAttachments,
             @RequestParam(value = "removedAttachments", required = false) String removedAttachmentsJson
@@ -189,6 +192,7 @@ public class ReportController {
                 location,
                 description,
                 category,
+                locationDetail,
                 existingAttachmentsJson,
                 newAttachments,
                 removedAttachmentsJson

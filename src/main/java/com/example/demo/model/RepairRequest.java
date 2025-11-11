@@ -26,6 +26,8 @@ public class RepairRequest {
 	private String location;
 	@Column(name = "category", columnDefinition = "NVARCHAR(100)")
 	private String category;
+	@Column(name = "location_detail", columnDefinition = "NVARCHAR(255)")
+	private String locationDetail;
 
 	@Column(updatable = false)
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
@@ -115,6 +117,14 @@ public class RepairRequest {
 		this.category = category;
 	}
 
+	public String getLocationDetail() {
+	    return locationDetail;
+	}
+
+	public void setLocationDetail(String locationDetail) {
+	    this.locationDetail = locationDetail;
+	}
+	
 	@PrePersist
 	protected void onCreate() {
 		this.createdAt = LocalDateTime.now();
