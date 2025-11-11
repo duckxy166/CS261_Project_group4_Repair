@@ -166,14 +166,14 @@ document.addEventListener("DOMContentLoaded", () => {
     return s.substring(0, len) + "...";
   };
 
-  const pillClassByStatus = (s) => {
-    const t = String(s || "").toLowerCase();
-    if (["สำเร็จ", "เสร็จสิ้น", "completed", "done"].includes(t)) return "pill success";
-    if (["กำลังซ่อม", "กำลังตรวจสอบ"].includes(t)) return "pill info";
-    if (["รออะไหล่", "รออนุมัติ", "รอดำเนินการ", "รับเรื่อง"].includes(t)) return "pill warn";
-    return "pill gray";
-  };
-
+ const pillClassByStatus = (s) => {
+    const t = String(s || "").trim().toLowerCase(); // เพิ่ม .trim() กันเหนียว
+    if (["สำเร็จ", "เสร็จสิ้น", "completed", "done", "ซ่อมเสร็จ"].includes(t)) return "pill success"; // เพิ่ม "ซ่อมเสร็จ"
+    if (["กำลังซ่อม", "กำลังตรวจสอบ"].includes(t)) return "pill info";
+    if (["รออะไหล่", "รออนุมัติ", "รอดำเนินการ", "รับเรื่อง"].includes(t)) return "pill warn";
+    if (["ยกเลิก"].includes(t)) return "pill gray"; // เพิ่ม "ยกเลิก"
+    return "pill gray";
+  };
   const kebabMenu = (id) => `<button class="kebab" data-id="${id}" title="เพิ่มเติม" aria-label="เพิ่มเติม">⋯</button>`;
 
   // ===== Header actions =====
@@ -457,9 +457,11 @@ document.addEventListener("DOMContentLoaded", () => {
         rawItems = MOCK_ITEMS;
       } else {
         let list = [];
-        let res = await fetch("/api/requests/history");
-        if (!res.ok) res = await fetch("/api/requests");
+        // ===== 1. แก้ไข API ให้เรียก /user-reports =====
+        let res = await fetch("/api/requests/user-reports");
+        
         if (res.ok) list = await res.json();
+        
         rawItems = (Array.isArray(list) ? list : []).map((x) => ({
           id: x.id || x._id,
           title: x.title || "",
@@ -476,15 +478,30 @@ document.addEventListener("DOMContentLoaded", () => {
           reportText: x.reportText || "",
           reportImageUrl: x.reportImageUrl || ""
         }));
-     // กรองข้อมูลดิบ (rawItems) ให้เหลือเฉพาะสถานะ "สำเร็จ"
-      rawItems = rawItems.filter((item) => {
-        const status = String(item.status || "").trim();
-        return status === "สำเร็จ";
-      });
-      window.__HISTORY_DATA__ = rawItems; // rawItems จะมีเฉพาะรายการที่สำเร็จ
+      } // <--- สังเกตว่า else { ... } จบตรงนี้
+
+      // ===== 2. กรองข้อมูล (โค้ดส่วนนี้ถูกต้องแล้ว) =====
+      // กรองข้อมูลดิบ (rawItems) ให้เหลือเฉพาะสถานะ "สำเร็จ" หรือ "ยกเลิก"
+      rawItems = rawItems.filter((item) => {
+        const status = String(item.status || "").trim().toLowerCase();
+        
+        // รายการสถานะที่ถือว่า "สำเร็จ"
+        const successStates = ["สำเร็จ", "เสร็จสิ้น", "completed", "done", "ซ่อมเสร็จ"];
+        
+        // รายการสถานะที่ถือว่า "ยกเลิก"
+        const cancelledStates = ["ยกเลิก"];
+
+        // เก็บไว้ถ้าสถานะอยู่ในรายการใดรายการหนึ่ง
+        return successStates.includes(status) || cancelledStates.includes(status);
+      });
+      
+      // ===== 3. ลบโค้ดที่ซ้ำซ้อน/พัง ออกไปแล้ว =====
+
+      window.__HISTORY_DATA__ = rawItems; 
       viewItems = [...rawItems];
       applySort();
       render(1);
+
     } catch (err) {
       console.error("Load history fail:", err);
       rawItems = [];
