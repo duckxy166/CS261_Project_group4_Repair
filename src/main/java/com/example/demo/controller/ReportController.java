@@ -74,6 +74,15 @@ public class ReportController {
         return reportRepository.findByReporter(user);
     }
 
+    @GetMapping("/history")
+    public List<RepairRequest> getUserHistory(HttpSession session) {
+        User user = (User) session.getAttribute("user");
+        if (user == null) {
+            return List.of();
+        }
+        return reportService.getUserHistoryReports(user);
+    }
+
     // ---------------- Update report status ----------------
     @PostMapping("/update-status")
     public ReportResponse updateStatus(@RequestBody ReportRequest request) {

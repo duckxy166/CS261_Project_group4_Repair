@@ -5,7 +5,7 @@ window.addEventListener("pageshow", (e) => { if (e.persisted) window.location.re
 document.addEventListener("DOMContentLoaded", () => {
   // ===== Config =====
   const PAGE_SIZE = 8;
-  const USE_MOCK = true; // <- set to false when wiring real APIs
+  const USE_MOCK = false; // <- set to false when wiring real APIs
 
   // ===== Elements: Header =====
   const logoutBtn = document.getElementById("logoutBtn");
@@ -69,7 +69,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let __feedbackItem__ = null;
 
   // ===== Mock Data =====
-  const MOCK_ITEMS = [
+  const MOCK_ITEMS = false[
     {
       id: "R-250101-001",
       title: "ลิฟต์เสีย",

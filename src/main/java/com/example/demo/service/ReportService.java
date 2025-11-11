@@ -82,6 +82,14 @@ public class ReportService {
                 ))
                 .toList();
     }
+// ---------------- Fetch user COMPLETED reports for History ----------------
+    public List<RepairRequest> getUserHistoryReports(User user) {
+        return reportRepository.findByReporter(user).stream()
+                .filter(r -> ("ซ่อมเสร็จ".equals(r.getStatus()) 
+                            || "เสร็จ".equals(r.getStatus()) 
+                            || "สำเร็จ".equals(r.getStatus())))
+                .toList();
+    }
 
 
     // ---------------- Delete report ----------------
