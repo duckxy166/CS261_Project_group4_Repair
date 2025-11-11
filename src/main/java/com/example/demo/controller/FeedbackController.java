@@ -17,4 +17,14 @@ public class FeedbackController {
     public Feedback submitFeedback(@RequestBody Feedback feedback) {
         return feedbackRepository.save(feedback);
     }
+    
+    @GetMapping("/next-id")
+    public long getNextFeedbackId() {
+        // ดึง ID ล่าสุดจากฐานข้อมูล
+        return feedbackRepository.findAll().stream()
+                .mapToLong(Feedback::getId)
+                .max()
+                .orElse(0L) + 1;
+    }
+
 }
