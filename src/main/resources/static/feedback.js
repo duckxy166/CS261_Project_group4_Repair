@@ -110,3 +110,21 @@ form.addEventListener("submit", async (event) => {
 });
 // 🟢 ตั้งค่าดาวเริ่มต้นให้เป็น “ยังไม่ได้เลือกคะแนน”
 updateStars(currentRating);
+
+// 🟣 โหลดหมายเลขฟอร์ม (ID) จาก backend
+const formNumber = document.getElementById("form-number");
+
+async function loadFormNumber() {
+    try {
+        const response = await fetch("http://localhost:8080/api/feedback/next-id");
+        if (!response.ok) throw new Error("โหลดหมายเลขฟอร์มไม่สำเร็จ");
+        const nextId = await response.text(); // รับหมายเลขเป็นข้อความ
+        formNumber.textContent = `แบบฟอร์มเสนอแนะลำดับที่ ${nextId}`;
+    } catch (error) {
+        console.error(error);
+        formNumber.textContent = "ไม่สามารถโหลดหมายเลขฟอร์มได้";
+    }
+}
+
+loadFormNumber(); // เรียกตอนเปิดหน้า
+
