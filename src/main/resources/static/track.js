@@ -261,8 +261,18 @@ function applySearch() {
 			}
 			if (!res.ok) throw new Error('โหลดข้อมูลล้มเหลว');
 			const data = await res.json();
-			allItems = Array.isArray(data) ? data : (data.items || []);
-			filtered = allItems.slice();
+            // 1. เก็บข้อมูลดิบไว้ในตัวแปรใหม่
+			const rawData = Array.isArray(data) ? data : (data.items || []); 
+
+            // 2. เพิ่มตัวกรอง
+            // กรองเอาเฉพาะรายการที่ "ไม่ใช่" สถานะ 'done' และ 'cancelled'
+            allItems = rawData.filter((item) => {
+                const statusKey = normalizeStatus(item.status); // ใช้ฟังก์ชัน normalizeStatus ที่มีอยู่แล้ว
+                return statusKey !== 'done' && statusKey !== 'cancelled';
+            });
+            // จบส่วนที่เพิ่ม
+
+			filtered = allItems.slice(); // 3. ส่งข้อมูลที่กรองแล้วไปแสดงผล
 			render();
 		} catch (err) {
 			tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:#d9534f;">ไม่สามารถโหลดรายการ (${escapeHtml(err.message)})</td></tr>`;
