@@ -69,7 +69,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let __feedbackItem__ = null;
 
   // ===== Mock Data =====
-  const MOCK_ITEMS = false[
+  const MOCK_ITEMS = [
     {
       id: "R-250101-001",
       title: "ลิฟต์เสีย",
@@ -157,6 +157,13 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!v) return "—";
     const d = new Date(v);
     return Number.isNaN(d.getTime()) ? "—" : d.toLocaleDateString("th-TH");
+  };
+
+  const truncate = (v, len = 40) => { // 40 คือความยาวสูงสุด
+    if (!v) return "—";
+    const s = String(v);
+    if (s.length <= len) return s;
+    return s.substring(0, len) + "...";
   };
 
   const pillClassByStatus = (s) => {
@@ -250,7 +257,7 @@ document.addEventListener("DOMContentLoaded", () => {
     pageData.forEach((r) => {
       const tr = document.createElement("tr");
       tr.innerHTML = `
-        <td>${r.title || "-"}</td>
+        <td>${truncate(r.title) || "-"}</td>
         <td>${fmtDate(r.createdAt)}</td>
         <td>${r.reporter?.fullName || "-"}</td>
         <td>${r.assignee?.fullName || "-"}</td>
@@ -469,8 +476,12 @@ document.addEventListener("DOMContentLoaded", () => {
           reportText: x.reportText || "",
           reportImageUrl: x.reportImageUrl || ""
         }));
-      }
-      window.__HISTORY_DATA__ = rawItems;
+     // กรองข้อมูลดิบ (rawItems) ให้เหลือเฉพาะสถานะ "สำเร็จ"
+      rawItems = rawItems.filter((item) => {
+        const status = String(item.status || "").trim();
+        return status === "สำเร็จ";
+      });
+      window.__HISTORY_DATA__ = rawItems; // rawItems จะมีเฉพาะรายการที่สำเร็จ
       viewItems = [...rawItems];
       applySort();
       render(1);
