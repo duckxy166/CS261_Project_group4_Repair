@@ -39,7 +39,6 @@
   background-color: #e5e5e5;
   border-radius: 8px;
   width: 100%;
-<<<<<<< HEAD
   min-height: 120px;
   margin: 15px 0;
   display: flex;
@@ -47,13 +46,6 @@
   justify-content: center;
   align-items: center;
   gap: 5px;
-=======
-  height: 120px;
-  margin: 15px 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
->>>>>>> main
 }
 
 .repair-image i {
@@ -95,7 +87,6 @@
 .btn-back:hover {
   background-color: #bfbfbf;
 }
-<<<<<<< HEAD
 
 .report-img {
   width: 150px;
@@ -138,5 +129,3 @@
   font-weight: bold;
   cursor: pointer;
 }
-=======
->>>>>>> main

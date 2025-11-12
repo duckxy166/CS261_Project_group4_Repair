@@ -74,10 +74,21 @@ public class ReportService {
                         r.getTechnician(),
                         r.getTitle(),
                         r.getLocation(),
+                        r.getLocationDetail(),
                         r.getDescription(),
                         r.getReporter().getFullName(),
-                        r.getCreatedAt()
+                        r.getCreatedAt(),
+                        r.getCategory()
+
                 ))
+                .toList();
+    }
+// ---------------- Fetch user COMPLETED reports for History ----------------
+    public List<RepairRequest> getUserHistoryReports(User user) {
+        return reportRepository.findByReporter(user).stream()
+                .filter(r -> ("ซ่อมเสร็จ".equals(r.getStatus()) 
+                            || "เสร็จ".equals(r.getStatus()) 
+                            || "สำเร็จ".equals(r.getStatus())))
                 .toList();
     }
 
@@ -119,9 +130,11 @@ public class ReportService {
                 report.getTechnician(),
                 report.getTitle(),
                 report.getLocation(),
+                report.getLocationDetail(),
                 report.getDescription(),
                 report.getReporter().getFullName(),
-                report.getCreatedAt()
+                report.getCreatedAt(),
+                report.getCategory()
         );
     }
     
@@ -131,13 +144,22 @@ public class ReportService {
             String title,
             String location,
             String description,
+            String category,
+            String locationDetail,
             String existingAttachmentsJson,
             List<MultipartFile> newAttachments,
             String removedAttachmentsJson
+            
     ) {
         RepairRequest report = reportRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Report not found"));
-
+        report.setTitle(title);
+        report.setLocation(location);
+        report.setDescription(description);
+        report.setLocationDetail(locationDetail);
+        if (category != null && !category.isBlank()) {
+            report.setCategory(category);
+        }
         ObjectMapper mapper = new ObjectMapper();
 
         // 1️⃣ Remove deleted attachments

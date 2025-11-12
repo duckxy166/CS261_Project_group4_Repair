@@ -99,6 +99,26 @@ nav ul li.active a {
     color: #c41230;
 }
 
+.user-details {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    line-height: 1.2; /* ลดระยะห่างระหว่างบรรทัดของชื่อและอีเมล */
+}
+
+.user-name {
+    color: #fff;
+    font-weight: 400;
+    font-size: clamp(16px, 1.6vw, 18px);
+}
+
+
+.user-email {
+    color: #f0f0f0; /* สีขาวที่สว่างน้อยกว่าเล็กน้อย */
+    font-size: clamp(12px, 1vw, 14px); /* ทำให้ตัวอักษรเล็กกว่าชื่อ */
+    font-weight: 300;
+}
+
 .logout-icon {
     margin-left: 16px;
     cursor: pointer;

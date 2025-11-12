@@ -2,75 +2,252 @@
 <html lang="th">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ประวัติการแจ้งซ่อม (Request History)</title>
-  <link rel="stylesheet" href="history.css">
-  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;600;700&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>TU REPAIR - ระบบแจ้งซ่อม</title>
+  <link rel="stylesheet" href="history.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
-
 <body>
-  <!-- Header -->
-  <header class="header">
-    <h1>ประวัติการแจ้งซ่อม<br><span>(Request History)</span></h1>
+  <!-- ===== Header ===== -->
+  <header>
+    <div class="logo">TU REPAIR</div>
+    <nav>
+      <ul>
+        <li><a href="RepairRequest.html">แจ้งซ่อม<br>( Repair Request )</a></li>
+        <li><a href="track.html">ติดตามสถานะ<br>( Track Request )</a></li>
+        <li class="active">
+          <a href="history.html">ประวัติการแจ้งซ่อม<br>( Request History )</a>
+        </li>
+      </ul>
+    </nav>
+    <div class="user-profile">
+      <div class="profile-pic">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+      </div>
+      <div class="user-details">
+        <div class="user-name" id="currentUserName">Loading...</div>
+        <div class="user-email" id="currentUserEmail"></div>
+      </div>
+      <div class="logout-icon" id="logoutBtn" aria-label="ออกจากระบบ" style="cursor:pointer;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+      </div>
+    </div>
   </header>
 
-  <!-- Table -->
-  <main class="container">
-    <table>
-      <thead>
-        <tr>
-          <th>วันที่แจ้งซ่อม</th>
-          <th>ชื่อผู้แจ้ง</th>
-          <th>ประเภทงาน</th>
-          <th>รายละเอียดปัญหา</th>
-          <th>สถานะการซ่อม</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>DD/MM/YYYY</td>
-          <td>สมชาย</td>
-          <td>ประเภทงาน</td>
-          <td>รายละเอียดปัญหา</td>
-          <td>กำลังดำเนินการ</td>
-        </tr>
-        <tr>
-          <td>DD/MM/YYYY</td>
-          <td>ใจดี</td>
-          <td>ประเภทงาน</td>
-          <td>รายละเอียดปัญหา</td>
-          <td>กำลังดำเนินการ</td>
-        </tr>
-      </tbody>
-    </table>
+  <!-- ===== Main ===== -->
+  <main>
+    <div class="container history-wrapper">
+      <div class="history-head">
+        <div class="title-block">
+          <div class="title">ประวัติการแจ้งซ่อม</div>
+          <div class="subtitle">( Request History )</div>
+        </div>
+
+        <div class="toolbar">
+          <div class="search">
+            <span class="search-icon">🔍</span>
+            <input id="searchInput" type="text" placeholder="ค้นหาเรื่องที่แจ้ง / ผู้แจ้ง / ผู้รับผิดชอบ"/>
+          </div>
+
+          <div class="filter">
+            <button id="filterBtn" class="filter-btn">
+              <span>Filter</span>
+            </button>
+            <div id="filterPanel" class="filter-panel hidden" role="menu">
+              <label><input type="radio" name="sortBy" value="createdAt" checked> วันที่แจ้งซ่อม</label>
+              <label><input type="radio" name="sortBy" value="closedAt"> วันที่ซ่อมเสร็จ</label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="table-card">
+        <table class="history-table" aria-label="ตารางประวัติการแจ้งซ่อม">
+          <thead>
+            <tr>
+              <th>เรื่องที่แจ้ง</th>
+              <th>วันที่แจ้งซ่อม</th>
+              <th>ชื่อผู้แจ้ง</th>
+              <th>ผู้รับผิดชอบ</th>
+              <th>วันที่ซ่อมเสร็จ</th>
+              <th>สถานะการซ่อม</th>
+              <th class="th-actions"></th>
+            </tr>
+          </thead>
+          <tbody id="historyTbody">
+            <!-- rows inserted by JS -->
+          </tbody>
+        </table>
+
+        <div class="empty-state hidden" id="emptyState">ไม่พบข้อมูล</div>
+      </div>
+
+      <div class="pager">
+        <div class="pager-left">
+          <button class="text-btn" id="backToTrack">ย้อนกลับ</button>
+        </div>
+        <div class="pager-mid" id="pageNumbers"><!-- 01 02 03 ... --></div>
+        <div class="pager-right">
+          <button class="text-btn" id="nextPageBtn">หน้าถัดไป ➜</button>
+        </div>
+      </div>
+    </div>
   </main>
 
-  <!-- Bottom Bar -->
-  <div class="bottom-bar">
-    <div class="menu-btn" id="menu-toggle">
-      <span class="material-icons">menu</span>
-    </div>
+  <!-- ===== Detail Modal ===== -->
+  <div id="detailModal" class="modal hidden" role="dialog" aria-modal="true" aria-label="รายละเอียดงานซ่อม">
+    <div class="modal-card modal--history">
+      <div class="modal-header">
+        <div class="mh-left">
+          <h3 class="modal-title" id="dm-title">-</h3>
+          <div class="modal-sub">รายละเอียดงานซ่อม</div>
+        </div>
+        <div class="mh-right">
+          <span id="dm-status" class="pill gray">-</span>
+        </div>
+      </div>
 
-    <!-- Hidden menu -->
-    <div class="menu-popup" id="menu-popup">
-      <a href="index.html" class="menu-item">
-        <span class="material-icons">home</span> หน้าหลัก
-      </a>
-      <a href="#" id="logoutBtn" class="menu-item logout">
-        <span class="material-icons">logout</span> ออกจากระบบ
-      </a>
+      <div class="modal-body modal-body--history">
+        <div class="row r1">
+          <div class="cell">
+            <input id="dm-created" class="ro ro--date" type="text" readonly placeholder="DD/MM/YYYY" />
+          </div>
+          <div class="cell right-info">
+            <div class="info-inline"><span class="lbl">ชื่อผู้แจ้ง :</span> <span id="dm-reporter">-</span></div>
+            <div class="info-inline"><span class="lbl">ผู้รับผิดชอบ :</span> <span id="dm-assignee">-</span></div>
+          </div>
+        </div>
+
+        <div class="row r2">
+          <div class="info-box">
+            <span class="lbl">สถานที่ :</span>
+            <span id="dm-location">-</span>
+          </div>
+          <div class="info-box">
+            <span class="lbl">ประเภทของงาน :</span>
+            <span id="dm-category">-</span>
+          </div>
+        </div>
+
+        <div class="row r3">
+          <textarea id="dm-desc" class="ro ro--note" readonly placeholder="รายละเอียด"></textarea>
+        </div>
+
+        <div class="row r4">
+          <div class="image-box" id="dm-imageBox">
+            <img id="dm-image" alt="ภาพประกอบงานซ่อม" />
+            <div class="img-placeholder" id="dm-imgPh">
+              <svg xmlns="http://www.w3.org/2000/svg" width="38" height="38" fill="none" stroke="currentColor"
+                stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color:#9ca3af">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                <polyline points="21 15 16 10 5 21"></polyline>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer modal-footer--history">
+        <button id="dm-reportBtn" class="btn-yellow">รายงานการซ่อม</button>
+        <div class="spacer"></div>
+        <button id="dm-closeBtn" class="btn-ghost">ย้อนกลับ</button>
+      </div>
     </div>
   </div>
 
-  <!-- Confirmation Modal -->
-  <div class="modal" id="confirmModal">
-    <div class="modal-content">
-      <button class="close-btn" id="closeModal">×</button>
-      <p>คุณต้องการลบประวัติการแจ้งซ่อมนี้หรือไม่</p>
-      <div class="modal-actions">
-        <button class="confirm-btn" id="confirmDelete">ยืนยัน</button>
-        <button class="cancel-btn" id="cancelModal">ยกเลิก</button>
+  <!-- ===== Repair Report Modal ===== -->
+  <div id="reportModal" class="modal hidden" role="dialog" aria-modal="true" aria-label="รายงานการซ่อมจากช่าง">
+    <div class="modal-card modal--report">
+      <div class="modal-header">
+        <div class="mh-left">
+          <h3 class="modal-title" id="rm-title">-</h3>
+          <div class="modal-sub">รายงานการซ่อม</div>
+        </div>
+        <div class="mh-right">
+          <span id="rm-status" class="pill gray">-</span>
+        </div>
+      </div>
+
+      <div class="modal-body report-body">
+        <div class="report-row r1">
+          <div class="report-box">
+            <input id="rm-date" class="ro ro--date" type="text" readonly placeholder="DD/MM/YYYY" />
+          </div>
+          <div class="report-box info-grid">
+            <div class="info-inline"><span class="lbl">ประเภทของงาน :</span> <span id="rm-category">-</span></div>
+            <div class="info-inline"><span class="lbl">สถานที่ :</span> <span id="rm-location">-</span></div>
+            <div class="info-inline"><span class="lbl">ชื่อผู้แจ้ง :</span> <span id="rm-reporter">-</span></div>
+            <div class="info-inline"><span class="lbl">ผู้รับผิดชอบ :</span> <span id="rm-assignee">-</span></div>
+          </div>
+        </div>
+
+        <div class="report-row r2">
+          <textarea id="rm-text" class="ro ro--note" readonly placeholder="รายละเอียดการซ่อม"></textarea>
+        </div>
+
+        <div class="report-row r3">
+          <div class="image-box" id="rm-imageBox">
+            <img id="rm-image" alt="รูปหลังซ่อม" />
+            <div class="img-placeholder" id="rm-imgPh">
+              <svg xmlns="http://www.w3.org/2000/svg" width="38" height="38" fill="none" stroke="currentColor"
+                stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color:#9ca3af">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                <polyline points="21 15 16 10 5 21"></polyline>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer report-footer">
+        <button id="rm-feedbackBtn" class="btn-yellow hidden">ให้ข้อเสนอแนะ</button>
+        <div class="spacer"></div>
+        <button id="rm-closeBtn" class="btn-ghost">ย้อนกลับ</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== Feedback Modal ===== -->
+  <div id="feedbackModal" class="modal hidden" role="dialog" aria-modal="true" aria-label="แบบฟอร์มเสนอแนะ">
+    <div class="modal-card fb-card">
+      <div class="modal-header">
+        <div>
+          <h3 class="modal-title">แบบฟอร์มเสนอแนะ</h3>
+          <div class="modal-sub">โปรดช่วยให้คะแนนและบอกเราว่าควรพัฒนาอะไรเพิ่มเติม</div>
+        </div>
+      </div>
+
+      <div class="modal-body fb-body">
+        <section class="fb-section">
+          <div class="fb-title">ให้คะแนนความพึงพอใจของคุณ</div>
+          <div class="fb-sub">เลือกระดับดาวเพื่อสะท้อนประสบการณ์ของคุณ (1 = ควรปรับปรุง, 5 = ยอดเยี่ยม)</div>
+
+          <div class="stars" id="fb-stars" aria-label="ให้คะแนนเป็นจำนวนดาว" role="radiogroup">
+            <button class="star-btn" data-value="1" aria-label="1 ดาว" role="radio" aria-checked="false">★</button>
+            <button class="star-btn" data-value="2" aria-label="2 ดาว" role="radio" aria-checked="false">★</button>
+            <button class="star-btn" data-value="3" aria-label="3 ดาว" role="radio" aria-checked="false">★</button>
+            <button class="star-btn" data-value="4" aria-label="4 ดาว" role="radio" aria-checked="false">★</button>
+            <button class="star-btn" data-value="5" aria-label="5 ดาว" role="radio" aria-checked="false">★</button>
+          </div>
+
+          <div class="fb-hint" id="fb-hint">ยังไม่ได้เลือกคะแนน</div>
+        </section>
+
+        <section class="fb-section">
+          <div class="fb-title">ข้อเสนอแนะของคุณ</div>
+          <div class="fb-sub">เขียนสิ่งที่อยากให้เราปรับปรุงหรือสิ่งที่คุณประทับใจ</div>
+
+          <textarea id="fb-text" class="fb-textarea" maxlength="500" placeholder="กรอกข้อความที่นี่..."></textarea>
+          <div class="fb-counter"><span id="fb-count">0</span>/500</div>
+        </section>
+      </div>
+
+      <div class="modal-footer fb-footer">
+        <button id="fb-submit" class="btn-submit">ส่งความคิดเห็น</button>
+        <div class="spacer"></div>
+        <button id="fb-cancel" class="btn-ghost">ยกเลิก</button>
       </div>
     </div>
   </div>

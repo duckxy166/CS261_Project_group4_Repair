@@ -10,9 +10,9 @@
 .track-table tbody td { padding:12px; border-bottom:1px solid #f3f3f3; color:#333; }
 .track-table tbody tr:hover { background:#fafafa; }
 
-.status-badge { display:inline-block; padding:6px 10px; border-radius:14px; font-size:12px; font-weight:600; }
+.status-badge { display:inline-block; padding:10px 16px; border-radius:16px; font-size:14px; font-weight:700; box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
 .status-default { background:#e0e0e0; color:#333; }
-.status-pending { background:#ffe59d; color:#8a6d3b; }
+.status-pending { background:#f9e2a0; color:#6b4b00; }
 .status-processing { background:#a7e3ff; color:#0b6ea9; }
 .status-waiting { background:#ffd0a3; color:#9a5a1a; }
 .status-checking { background:#b9f5d0; color:#1e6f50; }
@@ -76,6 +76,7 @@
 .detail-grid input { border: 1px solid #eee; border-radius: 10px; padding: 10px; background: #f9f9f9; }
 .detail-grid select { border: 1px solid #eee; border-radius: 10px; padding: 10px; background: #fff; }
 .detail-desc-label { display: flex; flex-direction: column; gap: 6px; font-weight: 600; color: #444; }
+.detail-desc-label input { border: 1px solid #eee; border-radius: 10px; padding: 10px; background: #f9f9f9; }
 .detail-desc-label textarea { border: 1px solid #eee; border-radius: 10px; padding: 10px; min-height: 100px; background: #f9f9f9; resize: vertical; }
 .detail-files { display: flex; gap: 8px; flex-wrap: wrap; padding-top: 8px; }
 .detail-file { width: 80px; height: 80px; border-radius: 8px; background: #e9ecef; display:flex; align-items:center; justify-content:center; color:#999; font-weight:700; overflow:hidden; }
@@ -118,3 +119,21 @@
 .track-titlegroup { display: flex; flex-direction: column; align-items: flex-start; text-align: left; flex: 1; }
 .track-title { margin: 0; font-size: clamp(26px, 2.6vw, 34px); font-weight: 800; color: #111; }
 .track-sub { margin: 6px 0 0; font-weight: 800; color: #111; font-size: clamp(22px, 2.2vw, 28px); }
+.detail-title-input {
+    width: 100%;
+    font-size: 24px;      /* ปรับขนาดตามความเหมาะสมให้เหมือน h2 เดิม */
+    font-weight: 600;
+    color: #333;
+    border: none;         /* เอาขอบออก */
+    background: transparent;
+    padding: 5px 0;
+    margin-bottom: 15px;
+    outline: none;
+}
+
+/* ตอนอยู่ในโหมดแก้ไข (ไม่ใช่ readonly) ให้มีเส้นใต้สีฟ้า */
+.detail-title-input:not([readonly]) {
+    border-bottom: 2px solid #3498db;
+    background-color: #f8f9fa; /* ใส่สีพื้นหลังจางๆ ให้รู้ว่ากรอกได้ */
+    padding-left: 5px;
+}
