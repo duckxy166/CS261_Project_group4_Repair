@@ -5,7 +5,7 @@ window.addEventListener("pageshow", (e) => { if (e.persisted) location.reload();
 document.addEventListener("DOMContentLoaded", () => {
   /* ---------- Config ---------- */
   const PAGE_SIZE = 8;
-  const USE_MOCK = true; // set false when wiring real APIs
+  const USE_MOCK = false; // set false when wiring real APIs
 
   /* ---------- Header ---------- */
   const logoutBtn = document.getElementById("logoutBtn");
