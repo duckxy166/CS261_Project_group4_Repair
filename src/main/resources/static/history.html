@@ -156,7 +156,7 @@
     </div>
   </div>
 
-  <!-- ===== Repair Report Modal ===== -->
+  <!-- ===== Repair Report Modal (REPLACE THIS WHOLE BLOCK) ===== -->
   <div id="reportModal" class="modal hidden" role="dialog" aria-modal="true" aria-label="รายงานการซ่อมจากช่าง">
     <div class="modal-card modal--report">
       <div class="modal-header">
@@ -165,42 +165,64 @@
           <div class="modal-sub">รายงานการซ่อม</div>
         </div>
         <div class="mh-right">
-          <span id="rm-status" class="pill gray">-</span>
+          <span id="rm-status" class="pill success">สำเร็จ</span>
         </div>
       </div>
-
+  
       <div class="modal-body report-body">
-        <div class="report-row r1">
-          <div class="report-box">
-            <input id="rm-date" class="ro ro--date" type="text" readonly placeholder="DD/MM/YYYY" />
+        <div class="report-grid">
+          <!-- LEFT -->
+          <div class="col-left">
+            <div class="report-row">
+              <input id="rm-date" class="ro ro--date" type="text" readonly placeholder="DD/MM/YYYY" />
+            </div>
+  
+            <div class="report-info-2col">
+              <div class="info-inline"><span class="lbl">สถานที่ :</span> <span id="rm-location">-</span></div>
+              <div class="info-inline"><span class="lbl">ประเภทของงาน :</span> <span id="rm-category">-</span></div>
+              <div class="info-inline"><span class="lbl">ผู้รับผิดชอบ :</span> <span id="rm-assignee">-</span></div>
+              <div class="info-inline"><span class="lbl">ชื่อผู้แจ้ง :</span> <span id="rm-reporter">-</span></div>
+            </div>
+  
+            <!-- 4 text blocks like the mock -->
+            <div class="text-block">
+              <div class="tb-title">สาเหตุการเสีย :</div>
+              <textarea id="rm-cause" class="ro ro--note" readonly placeholder="รายละเอียดสาเหตุ"></textarea>
+            </div>
+  
+            <div class="text-block">
+              <div class="tb-title">วิธีการซ่อม :</div>
+              <textarea id="rm-method" class="ro ro--note" readonly placeholder="รายละเอียดวิธีการซ่อม"></textarea>
+            </div>
+  
+            <div class="text-block">
+              <div class="tb-title">ชิ้นส่วนที่เปลี่ยน :</div>
+              <textarea id="rm-parts" class="ro ro--note" readonly placeholder="รายการอะไหล่ / จำนวน"></textarea>
+            </div>
+  
+            <div class="text-block">
+              <div class="tb-title">ค่าใช้จ่าย :</div>
+              <textarea id="rm-cost" class="ro ro--note" readonly placeholder="สรุปค่าใช้จ่าย"></textarea>
+            </div>
           </div>
-          <div class="report-box info-grid">
-            <div class="info-inline"><span class="lbl">ประเภทของงาน :</span> <span id="rm-category">-</span></div>
-            <div class="info-inline"><span class="lbl">สถานที่ :</span> <span id="rm-location">-</span></div>
-            <div class="info-inline"><span class="lbl">ชื่อผู้แจ้ง :</span> <span id="rm-reporter">-</span></div>
-            <div class="info-inline"><span class="lbl">ผู้รับผิดชอบ :</span> <span id="rm-assignee">-</span></div>
-          </div>
-        </div>
-
-        <div class="report-row r2">
-          <textarea id="rm-text" class="ro ro--note" readonly placeholder="รายละเอียดการซ่อม"></textarea>
-        </div>
-
-        <div class="report-row r3">
-          <div class="image-box" id="rm-imageBox">
-            <img id="rm-image" alt="รูปหลังซ่อม" />
-            <div class="img-placeholder" id="rm-imgPh">
-              <svg xmlns="http://www.w3.org/2000/svg" width="38" height="38" fill="none" stroke="currentColor"
-                stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color:#9ca3af">
-                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                <circle cx="8.5" cy="8.5" r="1.5"></circle>
-                <polyline points="21 15 16 10 5 21"></polyline>
-              </svg>
+  
+          <!-- RIGHT -->
+          <div class="col-right">
+            <div class="image-box" id="rm-imageBox">
+              <img id="rm-image" alt="รูปหลังซ่อม" />
+              <div class="img-placeholder" id="rm-imgPh">
+                <svg xmlns="http://www.w3.org/2000/svg" width="38" height="38" fill="none" stroke="currentColor"
+                  stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color:#9ca3af">
+                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                  <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                  <polyline points="21 15 16 10 5 21"></polyline>
+                </svg>
+              </div>
             </div>
           </div>
         </div>
       </div>
-
+  
       <div class="modal-footer report-footer">
         <button id="rm-feedbackBtn" class="btn-yellow hidden">ให้ข้อเสนอแนะ</button>
         <div class="spacer"></div>
