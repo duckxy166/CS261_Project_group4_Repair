@@ -25,11 +25,6 @@ public class AttachmentController {
     private final AttachmentRepository attachmentRepo;
     private final FileStorageService storage;
     
-    // Constructor 
-    public AttachmentController(AttachmentRepository attachmentRepo, FileStorageService storage) {
-        this.attachmentRepo = attachmentRepo;
-        this.storage = storage;
-    }
     // ---------------- List attachments ----------------
     @GetMapping
     public List<Attachment> list(@PathVariable Long requestId) {

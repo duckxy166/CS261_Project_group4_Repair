@@ -30,10 +30,6 @@ public class FileStorageService {
     
     @Value("${storage.upload-dir:uploads}") // fallback to "uploads"
     private String uploadDir;
-    public FileStorageService(AttachmentRepository attachmentRepo, ReportRepository repairRepo) {
-        this.attachmentRepo = attachmentRepo;
-        this.repairRepo = repairRepo;
-    }
     // 🔹 List all attachments by RepairRequest ID
     public List<Attachment> listByRequest(Long requestId) {
         return attachmentRepo.findByRepairRequestId(requestId);
