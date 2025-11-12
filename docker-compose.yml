@@ -3,7 +3,7 @@ version: '3.8'
 services:
   # SQL Server Database
   sqlserver:
-    image: mcr.microsoft.com/mssql/server:2022-latest
+    image: mcr.microsoft.com/azure-sql-edge
     container_name: sqlserver-db
     restart: always
     environment:
