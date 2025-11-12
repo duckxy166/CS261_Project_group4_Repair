@@ -1,30 +1,47 @@
 package com.example.demo.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
 import com.example.demo.model.Feedback;
+import com.example.demo.model.RepairRequest;
+import com.example.demo.model.User;
 import com.example.demo.repository.FeedbackRepository;
+import com.example.demo.repository.ReportRepository;
+import jakarta.servlet.http.HttpSession;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping("/api/feedback")
-@CrossOrigin(origins = "*") // อนุญาตให้หน้า HTML เรียก API ได้
 public class FeedbackController {
 
-    @Autowired
-    private FeedbackRepository feedbackRepository;
+    private final FeedbackRepository feedbackRepository;
+    private final ReportRepository reportRepository;
 
-    @PostMapping("/submit")
-    public Feedback submitFeedback(@RequestBody Feedback feedback) {
-        return feedbackRepository.save(feedback);
-    }
-    
-    @GetMapping("/next-id")
-    public long getNextFeedbackId() {
-        // ดึง ID ล่าสุดจากฐานข้อมูล
-        return feedbackRepository.findAll().stream()
-                .mapToLong(Feedback::getId)
-                .max()
-                .orElse(0L) + 1;
+    public FeedbackController(FeedbackRepository feedbackRepository, ReportRepository reportRepository) {
+        this.feedbackRepository = feedbackRepository;
+        this.reportRepository = reportRepository;
     }
 
+    @PostMapping
+    public ResponseEntity<?> createFeedback(@RequestBody Feedback feedback, HttpSession session) {
+        User user = (User) session.getAttribute("user");
+        if (user == null) {
+            return ResponseEntity.status(401).body("Unauthorized");
+        }
+
+        // เชื่อมกับรายงานซ่อมที่ส่งมา
+        RepairRequest report = reportRepository.findById(feedback.getReportId())
+                .orElse(null);
+
+        if (report == null) {
+            return ResponseEntity.badRequest().body("Report not found");
+        }
+
+        feedback.setUser(user);
+        feedback.setReport(report);
+        feedback.setCreatedAt(LocalDateTime.now());
+
+        feedbackRepository.save(feedback);
+        return ResponseEntity.ok("Feedback saved");
+    }
 }

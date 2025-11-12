@@ -418,7 +418,7 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
     const payload = {
-      requestId: __feedbackItem__.id,
+      reportId: __feedbackItem__.id,
       rating: __feedbackScore__,
       comment: (fbText?.value || "").trim()
     };
@@ -428,6 +428,7 @@ document.addEventListener("DOMContentLoaded", () => {
         alert("ขอบคุณสำหรับความคิดเห็นของคุณ!");
         closeFeedback();
         reportModal?.classList.add("hidden");
+		window.location.href = "history.html";
         return;
       }
       const res = await fetch("/api/feedback", {
