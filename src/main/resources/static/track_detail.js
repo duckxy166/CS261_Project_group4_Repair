@@ -25,7 +25,7 @@ async function loadReportDetail() {
 
   try {
     // Fetch report detail
-    const resReport = await fetch(`/api/requests/${reportId}`);
+    const resReport = await fetch(`/api/requests/${reportId}`); 
     if (!resReport.ok) throw new Error("ไม่สามารถโหลดข้อมูลได้");
     const report = await resReport.json();
 
@@ -55,6 +55,7 @@ async function loadReportDetail() {
       <p>ผู้รับผิดชอบ : ${report.technician || "-"}</p>
       <p>ประเภทของงาน : ${report.title || "-"}</p>
       <p>สถานที่ : ${report.location || "-"}</p>
+	  <p>รายละเอียดสถานที่เพิ่มเติม : ${report.locationDetail || "-"}</p>
       <p>รายละเอียดงาน : ${report.description || "-"}</p>
       <p>สถานะการซ่อม : ${report.status || "-"} <span class="dot"></span></p>
 
