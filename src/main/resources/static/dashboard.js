@@ -33,9 +33,9 @@ document.addEventListener("DOMContentLoaded", async () => {
           </select>
         </td>
 
-        <td>
+<td>
           <select class="status-select">
-            ${["รอดำเนินการ", "กำลังดำเนินการ", "อยู่ระหว่างซ่อม", "กำลังตรวจสอบงานซ่อม", "สำเร็จ", "ยกเลิก"].map(status => `
+            ${["รอดำเนินการ", "กำลังดำเนินการ", "อยู่ระหว่างซ่อม", "กำลังตรวจสอบงานซ่อม","ยังไม่ให้คะแนน", "สำเร็จ", "ยกเลิก"].map(status => `
               <option value="${status}" ${report.status === status ? "selected" : ""}>${status}</option>
             `).join("")}
           </select>
