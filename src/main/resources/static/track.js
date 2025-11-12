@@ -376,19 +376,37 @@ document.addEventListener('DOMContentLoaded', function() {
 	if (btnNo) btnNo.addEventListener('click', hideDeleteConfirm);
 	if (overlay) overlay.addEventListener('click', hideDeleteConfirm);
 	if (btnYes) btnYes.addEventListener('click', async () => {
-		if (!deleteTargetId) return hideDeleteConfirm();
-		try {
-			const resp = await fetch(`/api/requests/${encodeURIComponent(deleteTargetId)}`, { method: 'DELETE', credentials: 'include' });
-			if (!resp.ok) throw new Error('ลบงานไม่สำเร็จ');
-			allItems = allItems.filter(it => String(it.id || it._id) !== String(deleteTargetId));
-			applySearch();
-		} catch (err) {
-			console.error('Delete error:', err);
-			alert('เกิดข้อผิดพลาดในการลบงาน');
-		} finally {
-			hideDeleteConfirm();
-		}
+	    if (!deleteTargetId) return hideDeleteConfirm();
+	    try {
+	        const resp = await fetch('/api/requests/update-status', {
+	            method: 'POST',
+	            headers: { 'Content-Type': 'application/json' },
+	            body: JSON.stringify({
+	                id: deleteTargetId,
+	                status: 'ยกเลิก',
+	                technicianId: null,
+	                priority: null
+	            }),
+	            credentials: 'include'
+	        });
+
+	        if (!resp.ok) throw new Error('ไม่สามารถยกเลิกงานได้');
+
+	        const result = await resp.json();
+	        console.log('Update result:', result);
+	        alert('ยกเลิกงานเรียบร้อยแล้ว');
+
+	        allItems = allItems.filter(it => String(it.id || it._id) !== String(deleteTargetId));
+	        applySearch();
+
+	    } catch (err) {
+	        console.error('Cancel request error:', err);
+	        alert('เกิดข้อผิดพลาดขณะยกเลิกงาน');
+	    } finally {
+	        hideDeleteConfirm();
+	    }
 	});
+
 
 	// Detail modal logic
 	const dOverlay = document.getElementById('detailOverlay');
@@ -517,50 +535,61 @@ document.addEventListener('DOMContentLoaded', function() {
 		}
 	}
 	async function openDetailModal(id) {
-		const item = allItems.find(it => String(it.id || it._id) === String(id));
-		if (!item) return;
-		currentDetailId = String(item.id || item._id);
-		fillDetailFields(item);
-		exitEditMode();
+	    const item = allItems.find(it => String(it.id || it._id) === String(id));
+	    if (!item) return;
+	    currentDetailId = String(item.id || item._id);
+	    fillDetailFields(item);
+	    exitEditMode();
 
-		// โหลดไฟล์แนบของงานนี้จาก backend
-		const filesBox = document.getElementById('detailFiles');
-		filesBox.innerHTML = '';
-
-		try {
-			const res = await fetch(`/api/files/${encodeURIComponent(id)}`, { credentials: 'include' });
-			if (res.ok) {
-				const files = await res.json(); // [{id, originalFilename, ...}]
-				if (Array.isArray(files) && files.length) {
-					files.forEach(f => {
-						const el = document.createElement('div');
-						el.className = 'detail-file';
-						const img = document.createElement('img');
-						img.src = `/api/files/${encodeURIComponent(id)}/${encodeURIComponent(f.id)}/download`;
-						img.alt = f.originalFilename || 'image';
-						el.appendChild(img);
-						filesBox.appendChild(el);
-					});
-				} else {
-					filesBox.innerHTML = '<div class="placeholder">ไม่มีไฟล์แนบ</div>';
-				}
-			} else {
-				filesBox.innerHTML = '<div class="placeholder">โหลดไฟล์แนบไม่สำเร็จ</div>';
-			}
-		} catch {
-			filesBox.innerHTML = '<div class="placeholder">เกิดข้อผิดพลาดขณะโหลดไฟล์แนบ</div>';
+	    // --- Hide/Show Cancel Button based on status ---
+		const cancelBtn = document.getElementById('detailCancelBtn');
+		console.log('Item status:', item.status); // check the real value
+		if (item.status && item.status.trim() === 'รอดำเนินการ') {
+		    cancelBtn.style.display = 'inline-block';
+		} else {
+		    cancelBtn.style.display = 'none';
 		}
 
-		// prepare combos with data each time we open
-		const locValues = uniqueValues('location', ['อาคาร SC', 'อาคาร บร.1', 'อาคาร บร.2', 'อาคาร บร.3']);
-		const catValues = uniqueValues('category', ['ไฟฟ้า', 'ประปา', 'ประตู/ล็อก', 'เฟอร์นิเจอร์']);
-		window._locComboCtl = setupCombo('loc', locValues, item.location || item.place || '');
-		window._catComboCtl = setupCombo('cat', catValues, item.category || item.type || '');
-		if (dOverlay) dOverlay.classList.add('show');
-		if (dModal) dModal.classList.add('show');
-		if (dOverlay) dOverlay.setAttribute('aria-hidden', 'false');
-		if (dModal) dModal.setAttribute('aria-hidden', 'false');
+	    // โหลดไฟล์แนบของงานนี้จาก backend
+	    const filesBox = document.getElementById('detailFiles');
+	    filesBox.innerHTML = '';
+
+	    try {
+	        const res = await fetch(`/api/files/${encodeURIComponent(id)}`, { credentials: 'include' });
+	        if (res.ok) {
+	            const files = await res.json(); // [{id, originalFilename, ...}]
+	            if (Array.isArray(files) && files.length) {
+	                files.forEach(f => {
+	                    const el = document.createElement('div');
+	                    el.className = 'detail-file';
+	                    const img = document.createElement('img');
+	                    img.src = `/api/files/${encodeURIComponent(id)}/${encodeURIComponent(f.id)}/download`;
+	                    img.alt = f.originalFilename || 'image';
+	                    el.appendChild(img);
+	                    filesBox.appendChild(el);
+	                });
+	            } else {
+	                filesBox.innerHTML = '<div class="placeholder">ไม่มีไฟล์แนบ</div>';
+	            }
+	        } else {
+	            filesBox.innerHTML = '<div class="placeholder">โหลดไฟล์แนบไม่สำเร็จ</div>';
+	        }
+	    } catch {
+	        filesBox.innerHTML = '<div class="placeholder">เกิดข้อผิดพลาดขณะโหลดไฟล์แนบ</div>';
+	    }
+
+	    // prepare combos with data each time we open
+	    const locValues = uniqueValues('location', ['อาคาร SC', 'อาคาร บร.1', 'อาคาร บร.2', 'อาคาร บร.3']);
+	    const catValues = uniqueValues('category', ['ไฟฟ้า', 'ประปา', 'ประตู/ล็อก', 'เฟอร์นิเจอร์']);
+	    window._locComboCtl = setupCombo('loc', locValues, item.location || item.place || '');
+	    window._catComboCtl = setupCombo('cat', catValues, item.category || item.type || '');
+
+	    if (dOverlay) dOverlay.classList.add('show');
+	    if (dModal) dModal.classList.add('show');
+	    if (dOverlay) dOverlay.setAttribute('aria-hidden', 'false');
+	    if (dModal) dModal.setAttribute('aria-hidden', 'false');
 	}
+
 
 	function closeDetailModal() {
 		if (dOverlay) dOverlay.classList.remove('show');
@@ -571,11 +600,39 @@ document.addEventListener('DOMContentLoaded', function() {
 
 	if (dClose) dClose.addEventListener('click', closeDetailModal);
 	if (dOverlay) dOverlay.addEventListener('click', closeDetailModal);
-	if (dCancel) dCancel.addEventListener('click', () => {
-		// reuse delete modal
-		const id = currentDetailId;
-		closeDetailModal();
-		if (id) showDeleteConfirm(id);
+	if (dCancel) dCancel.addEventListener('click', async () => {
+	    const id = currentDetailId;
+	    if (!id) return;
+
+	    try {
+	        const resp = await fetch('/api/update-status', {
+	            method: 'POST',
+	            headers: { 'Content-Type': 'application/json' },
+	            body: JSON.stringify({
+	                id: id,
+	                status: 'ยกเลิก',
+	                technicianId: null,   // optional, can remove if backend allows
+	                priority: null        // optional
+	            }),
+	            credentials: 'include'
+	        });
+
+	        if (!resp.ok) throw new Error('ไม่สามารถยกเลิกงานได้');
+
+	        const result = await resp.json();
+	        console.log('Update result:', result);
+	        alert('ยกเลิกงานเรียบร้อยแล้ว');
+
+	        // update UI
+	        closeDetailModal();
+	        // optional: remove from allItems / re-render table
+	        allItems = allItems.filter(it => String(it.id || it._id) !== String(id));
+	        applySearch();
+
+	    } catch (err) {
+	        console.error(err);
+	        alert('เกิดข้อผิดพลาดขณะยกเลิกงาน');
+	    }
 	});
 	function enterEditMode() {
 		const locInput = document.getElementById('detailLocation');

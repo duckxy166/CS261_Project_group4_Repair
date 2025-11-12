@@ -198,9 +198,8 @@ document.addEventListener("DOMContentLoaded", () => {
   function applySort() {
     const sortBy = (document.querySelector('input[name="sortBy"]:checked')?.value) || "createdAt";
     viewItems.sort((a, b) => {
-      const va = a?.[sortBy] ? new Date(a[sortBy]).getTime() : 0;
-      const vb = b?.[sortBy] ? new Date(b[sortBy]).getTime() : 0;
-      return vb - va;
+		const va = a?.[sortBy] ? new Date(a[sortBy]).getTime() : (sortBy === 'closedAt' ? new Date(a.createdAt).getTime() : 0);
+		const vb = b?.[sortBy] ? new Date(b[sortBy]).getTime() : (sortBy === 'closedAt' ? new Date(b.createdAt).getTime() : 0);
     });
   }
 
@@ -237,8 +236,10 @@ document.addEventListener("DOMContentLoaded", () => {
         <td>${fmtDate(r.createdAt)}</td>
         <td>${r.reporter?.fullName || "-"}</td>
         <td>${r.assignee?.fullName || "-"}</td>
-        <td>${fmtDate(r.closedAt)}</td>
-        <td class="td-status"><span class="${pillClassByNormalized(r._normalizedStatus)}">${r._normalizedStatus}</span></td>
+        <td>${fmtDate(r.updatedAt)}</td>
+        <td class="td-status">
+          <span class="${pillClassByNormalized(r._normalizedStatus)}">${r._normalizedStatus}</span>
+        </td>
         <td class="td-actions">${kebabBtnHTML(r.id)}</td>
       `;
       tbody.appendChild(tr);
@@ -491,31 +492,32 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       // map & normalize; keep only the 3 states
-      rawItems = (Array.isArray(list) ? list : []).map((x) => {
-        const mapped = {
-          id: x.id || x._id,
-          title: x.title || "",
-          reporter: x.reporter || { fullName: x.requesterName || "" },
-          assignee: x.assignee || { fullName: x.technicianName || "" },
-          createdAt: x.createdAt || x.requestDate || x.submittedAt,
-          closedAt: x.closedAt || x.completedAt,
-          status: x.status || x.currentStatus || "",
-          location: x.location || x.locationDetail || "",
-          category: x.category || "",
-          description: x.description || x.problemDescription || "",
-          imageUrl: x.imageUrl || "",
-          reportDate: x.reportDate || x.completedAt || "",
-          reportText: x.reportText || "",
-          reportImageUrl: x.reportImageUrl || "",
-          // NEW: 4 blocks
-          reportCause: x.reportCause || "",
-          reportMethod: x.reportMethod || "",
-          reportParts: x.reportParts || "",
-          reportCost: x.reportCost || ""
-        };
-        mapped._normalizedStatus = normalizeStatus(mapped.status);
-        return mapped;
-      }).filter(it => it._normalizedStatus !== null); // keep only 3 states
+	  rawItems = (Array.isArray(list) ? list : []).map((x) => {
+	      const mapped = {
+	          id: x.id || x._id,
+	          title: x.title || "",
+	          reporter: x.reporter || { fullName: x.requesterName || "" },
+	          assignee: x.assignee || { fullName: x.technicianName || "" },
+	          createdAt: x.createdAt || x.requestDate || x.submittedAt,
+	          closedAt: x.closedAt || x.completedAt,
+			  updatedAt: x.updatedAt || x.completedAt,
+	          status: x.status || x.currentStatus || "",
+	          location: x.location || x.locationDetail || "",
+	          category: x.category || "",
+	          description: x.description || x.problemDescription || "",
+	          imageUrl: x.imageUrl || "",
+	          reportDate: x.reportDate || x.completedAt || "",
+	          reportText: x.reportText || "",
+	          reportImageUrl: x.reportImageUrl || "",
+	          reportCause: x.reportCause || "",
+	          reportMethod: x.reportMethod || "",
+	          reportParts: x.reportParts || "",
+	          reportCost: x.reportCost || ""
+	      };
+	      mapped._normalizedStatus = normalizeStatus(mapped.status);
+	      return mapped;
+	  }).filter(it => it._normalizedStatus === 'สำเร็จ'); //  only keep "สำเร็จ"
+
 
       window.__HISTORY_DATA__ = rawItems;
       viewItems = [...rawItems];
