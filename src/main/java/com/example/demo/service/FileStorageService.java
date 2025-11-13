@@ -5,7 +5,7 @@ import com.example.demo.model.RepairRequest;
 import com.example.demo.repository.AttachmentRepository;
 import com.example.demo.repository.ReportRepository;
 
-import lombok.RequiredArgsConstructor;
+//import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
-@RequiredArgsConstructor
+//@RequiredArgsConstructor
 public class FileStorageService {
 
     private final AttachmentRepository attachmentRepo;
@@ -30,6 +30,13 @@ public class FileStorageService {
     
     @Value("${storage.upload-dir:uploads}") // fallback to "uploads"
     private String uploadDir;
+    
+    public FileStorageService(AttachmentRepository attachmentRepo, ReportRepository repairRepo) {
+        this.attachmentRepo = attachmentRepo;
+        this.repairRepo = repairRepo;
+    }
+    
+    
     // 🔹 List all attachments by RepairRequest ID
     public List<Attachment> listByRequest(Long requestId) {
         return attachmentRepo.findByRepairRequestId(requestId);
