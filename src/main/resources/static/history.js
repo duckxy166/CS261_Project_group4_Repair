@@ -168,7 +168,10 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   /* ---------- Toolbar ---------- */
-  backToTrack?.addEventListener("click", () => (location.href = "track.html"));
+  backToTrack?.addEventListener("click", () =>   {
+      const total = Math.ceil(viewItems.length / PAGE_SIZE);
+      if (currentPage > total) { currentPage--; render(); }
+    });
   filterBtn?.addEventListener("click", () => filterPanel.classList.toggle("hidden"));
   document.addEventListener("click", (e) => {
     if (filterPanel && !filterPanel.contains(e.target) && !filterBtn?.contains(e.target)) filterPanel.classList.add("hidden");

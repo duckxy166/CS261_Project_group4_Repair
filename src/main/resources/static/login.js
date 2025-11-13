@@ -35,7 +35,7 @@ form.addEventListener('submit', async (e) => {
 
 		    window.location.href = 'RepairList.html';
 		} else {
-		    window.location.href = 'index.html';
+		    window.location.href = 'RepairRequest.html';
 		}
       }, 1200);
     } else {
