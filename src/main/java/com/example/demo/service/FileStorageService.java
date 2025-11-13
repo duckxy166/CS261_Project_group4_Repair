@@ -28,6 +28,10 @@ public class FileStorageService {
     // Default root folder if not configured
     private final Path rootLocation = Paths.get("uploads");
     
+    public FileStorageService(AttachmentRepository attachmentRepo, ReportRepository repairRepo) {
+        this.attachmentRepo = attachmentRepo;
+        this.repairRepo = repairRepo;
+    }
     
     @Value("${storage.upload-dir:uploads}") // fallback to "uploads"
     private String uploadDir;
