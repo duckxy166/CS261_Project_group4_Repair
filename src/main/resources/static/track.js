@@ -378,6 +378,8 @@ document.addEventListener('DOMContentLoaded', function() {
 	if (btnYes) btnYes.addEventListener('click', async () => {
 	    if (!deleteTargetId) return hideDeleteConfirm();
 	    try {
+			console.log('deleteTargetId:', deleteTargetId);
+
 	        const resp = await fetch('/api/requests/update-status', {
 	            method: 'POST',
 	            headers: { 'Content-Type': 'application/json' },
@@ -504,7 +506,14 @@ document.addEventListener('DOMContentLoaded', function() {
 		if (extraField) {
 			extraField.value = item.locationDetail || '-';
 		}
-
+		const cancelBtn = document.getElementById('detailCancelBtn');
+		if (cancelBtn) {
+		  if (item.status === 'รอดำเนินการ') {
+		    cancelBtn.style.display = 'inline-block';
+		  } else {
+		    cancelBtn.style.display = 'none';
+		  }
+		}
 		// ส่วนแสดงไฟล์แนบ
 		const filesBox = byId('detailFiles');
 		filesBox.innerHTML = '';
@@ -534,6 +543,40 @@ document.addEventListener('DOMContentLoaded', function() {
 			dEdit.style.display = statusKey === 'pending' ? 'inline-block' : 'none';
 		}
 	}
+	// ปุ่มยกเลิกการแจ้งซ่อม
+	dCancel.addEventListener('click', async () => {
+	  if (!currentDetailId) {
+	    alert('ไม่พบรหัสคำขอ');
+	    return;
+	  }
+
+	  if (!confirm('คุณต้องการยกเลิกงานนี้ใช่หรือไม่?')) return;
+
+	  try {
+	    const resp = await fetch('/api/requests/update-status', {
+	      method: 'POST',
+	      headers: { 'Content-Type': 'application/json' },
+	      body: JSON.stringify({
+	        id: currentDetailId,
+	        status: 'ยกเลิก',
+	        technicianId: null,
+	        priority: null
+	      }),
+	      credentials: 'include'
+	    });
+
+	    if (!resp.ok) throw new Error('ไม่สามารถยกเลิกงานได้');
+
+	    alert('ยกเลิกงานเรียบร้อยแล้ว');
+	    dModal.setAttribute('aria-hidden', 'true');
+	    dOverlay.setAttribute('aria-hidden', 'true');
+	    location.reload(); // reload after cancel success
+	  } catch (err) {
+	    console.error('Cancel request error:', err);
+	    alert('เกิดข้อผิดพลาดขณะยกเลิกงาน');
+	  }
+	});
+
 	async function openDetailModal(id) {
 	    const item = allItems.find(it => String(it.id || it._id) === String(id));
 	    if (!item) return;
@@ -600,40 +643,40 @@ document.addEventListener('DOMContentLoaded', function() {
 
 	if (dClose) dClose.addEventListener('click', closeDetailModal);
 	if (dOverlay) dOverlay.addEventListener('click', closeDetailModal);
-	if (dCancel) dCancel.addEventListener('click', async () => {
-	    const id = currentDetailId;
-	    if (!id) return;
-
-	    try {
-	        const resp = await fetch('/api/update-status', {
-	            method: 'POST',
-	            headers: { 'Content-Type': 'application/json' },
-	            body: JSON.stringify({
-	                id: id,
-	                status: 'ยกเลิก',
-	                technicianId: null,   // optional, can remove if backend allows
-	                priority: null        // optional
-	            }),
-	            credentials: 'include'
-	        });
-
-	        if (!resp.ok) throw new Error('ไม่สามารถยกเลิกงานได้');
-
-	        const result = await resp.json();
-	        console.log('Update result:', result);
-	        alert('ยกเลิกงานเรียบร้อยแล้ว');
-
-	        // update UI
-	        closeDetailModal();
-	        // optional: remove from allItems / re-render table
-	        allItems = allItems.filter(it => String(it.id || it._id) !== String(id));
-	        applySearch();
-
-	    } catch (err) {
-	        console.error(err);
-	        alert('เกิดข้อผิดพลาดขณะยกเลิกงาน');
+	if (dCancel) 	dCancel.addEventListener('click', async () => {
+	  if (!currentDetailId) {
+	    alert('ไม่พบรหัสคำขอ');
+	    return;
+	  }
+	  try {
+	    const resp = await fetch('/api/requests/update-status', {
+	      method: 'POST',
+	      headers: { 'Content-Type': 'application/json' },
+	      body: JSON.stringify({
+	        id: currentDetailId,
+	        status: 'ยกเลิก',
+	        technicianId: null,
+	        priority: null
+	      }),
+	      credentials: 'include'
+	    });
+	    if (!resp.ok) {
+	      throw new Error('ไม่สามารถยกเลิกงานได้');
 	    }
+	    let result = null;
+	    try {
+	      result = await resp.json();
+	      console.log('Update result:', result);
+	    } catch {
+	      console.warn('Response was not valid JSON (ignored)');
+	    }
+
+	  } catch (err) {
+	    console.error('Cancel request error:', err);
+	    alert('เกิดข้อผิดพลาดขณะยกเลิกงาน');
+	  }
 	});
+
 	function enterEditMode() {
 		const locInput = document.getElementById('detailLocation');
 		const locCombo = document.getElementById('locCombo');
