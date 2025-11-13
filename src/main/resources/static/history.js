@@ -121,24 +121,25 @@ document.addEventListener("DOMContentLoaded", () => {
   ];
 
   /* ---------- Status normalization (ONLY 3 labels) ---------- */
-  const SUCCESS_WORDS = ["สำเร็จ","เสร็จสิ้น","completed","complete","done","ซ่อมเสร็จ"];
-  const CANCEL_WORDS  = ["ยกเลิก","cancelled","canceled","cancel"];
-  const NORATE_WORDS  = ["ยังไม่ได้คะแนน","ยังไม่ให้คะแนน","not rated","no rating","awaiting rating"];
+const SUCCESS_WORDS = ["สำเร็จ", "เสร็จสิ้น", "completed", "complete", "done"];
+const CANCEL_WORDS  = ["ยกเลิก", "cancelled", "canceled", "cancel", "rejected"];
 
-  function normalizeStatus(raw) {
-    const t = String(raw || "").trim().toLowerCase();
-    if (NORATE_WORDS.some(w => t.includes(w))) return "ยังไม่ได้คะแนน";
-    if (CANCEL_WORDS.some(w => t.includes(w))) return "ยกเลิก";
-    if (SUCCESS_WORDS.some(w => t.includes(w))) return "สำเร็จ";
-    return null; // anything else is not part of history list
-  }
+// 2. เพิ่ม "ซ่อมเสร็จ" เข้ามาในกลุ่ม NORATE เพื่อให้ระบบรู้ว่าต้องรอประเมิน
+const NORATE_WORDS  = ["ยังไม่ได้คะแนน", "ยังไม่ให้คะแนน", "not rated", "no rating", "ซ่อมเสร็จ", "รอประเมิน"];
+function normalizeStatus(raw) {
+  const t = String(raw || "").trim().toLowerCase();
+  if (NORATE_WORDS.some(w => t.includes(w))) return "ยังไม่ได้ให้คะแนน";
+  if (CANCEL_WORDS.some(w => t.includes(w))) return "ยกเลิก";
+  if (SUCCESS_WORDS.some(w => t.includes(w))) return "สำเร็จ";
+  return null; 
+}
 
-  function pillClassByNormalized(s) {
-    if (s === "ยังไม่ได้คะแนน") return "pill warn";
-    if (s === "สำเร็จ") return "pill success";
-    if (s === "ยกเลิก") return "pill gray";
-    return "pill gray";
-  }
+function pillClassByNormalized(s) {
+  if (s === "ยังไม่ได้ให้คะแนน") return "pill warn";
+  if (s === "สำเร็จ") return "pill success";
+  if (s === "ยกเลิก") return "pill gray";
+  return "pill gray";
+}
 
   const kebabBtnHTML = (id) => `<button class="kebab" data-id="${id}" title="เพิ่มเติม" aria-label="เพิ่มเติม">⋯</button>`;
 
@@ -311,16 +312,15 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // Feedback only if "ยังไม่ได้คะแนน"
-    if (item._normalizedStatus === "ยังไม่ได้คะแนน") {
+if (item._normalizedStatus === "ยังไม่ได้ให้คะแนน") {
       rmFeedbackBtn?.classList.remove("hidden");
       rmFeedbackBtn.onclick = () => openFeedback(item);
     } else {
       rmFeedbackBtn?.classList.add("hidden");
       rmFeedbackBtn.onclick = null;
     }
-
     reportModal.classList.remove("hidden");
-  }
+}
   rmCloseBtn?.addEventListener("click", () => reportModal.classList.add("hidden"));
   reportModal?.addEventListener("click", (e) => { if (e.target === reportModal) reportModal.classList.add("hidden"); });
 
@@ -367,7 +367,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Show "ประเมินงานซ่อม" ONLY if ยังไม่ได้คะแนน
     const rateBtn = kebabMenuEl.querySelector(".js-more-rate");
-    rateBtn.style.display = item._normalizedStatus === "ยังไม่ได้คะแนน" ? "flex" : "none";
+    rateBtn.style.display = item._normalizedStatus === "ยังไม่ได้ให้คะแนน" ? "flex" : "none";
   }
 
   kebabMenuEl.querySelector(".js-more-detail").addEventListener("click", () => {
@@ -375,11 +375,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const item = rawItems.find(x => String(x.id) === String(__menuForId__));
     hideKebabMenu(); if (item) openDetail(item);
   });
-  kebabMenuEl.querySelector(".js-more-rate").addEventListener("click", () => {
+kebabMenuEl.querySelector(".js-more-rate").addEventListener("click", () => {
     if (!__menuForId__) return;
     const item = rawItems.find(x => String(x.id) === String(__menuForId__));
-    hideKebabMenu(); if (item && item._normalizedStatus === "ยังไม่ได้คะแนน") openFeedback(item);
-  });
+    hideKebabMenu(); 
+    if (item && item._normalizedStatus === "ยังไม่ได้ให้คะแนน") openFeedback(item);
+});
   kebabMenuEl.querySelector(".js-more-report").addEventListener("click", () => {
     if (!__menuForId__) return;
     const item = rawItems.find(x => String(x.id) === String(__menuForId__));

@@ -65,9 +65,12 @@ public class ReportService {
     }
 
     // ---------------- Fetch user reports except ซ่อมเสร็จ ----------------
-    public List<ReportResponse> getUserTrackReports(User user) {
+public List<ReportResponse> getUserTrackReports(User user) {
         return reportRepository.findByReporter(user).stream()
-                .filter(r -> !("ซ่อมเสร็จ".equals(r.getStatus()) || "เสร็จ".equals(r.getStatus())))
+                .filter(r -> !("ซ่อมเสร็จ".equals(r.getStatus()) 
+                            || "เสร็จ".equals(r.getStatus()) 
+                            || "สำเร็จ".equals(r.getStatus())
+                            || "ยกเลิก".equals(r.getStatus())))
                 .map(r -> new ReportResponse(
                         r.getId(),
                         r.getStatus(),
@@ -79,18 +82,19 @@ public class ReportService {
                         r.getReporter().getFullName(),
                         r.getCreatedAt(),
                         r.getCategory()
-
                 ))
                 .toList();
     }
 // ---------------- Fetch user COMPLETED reports for History ----------------
-    public List<RepairRequest> getUserHistoryReports(User user) {
-        return reportRepository.findByReporter(user).stream()
-                .filter(r -> ("ซ่อมเสร็จ".equals(r.getStatus()) 
-                            || "เสร็จ".equals(r.getStatus()) 
-                            || "สำเร็จ".equals(r.getStatus())))
-                .toList();
-    }
+public List<RepairRequest> getUserHistoryReports(User user) {
+    return reportRepository.findByReporter(user).stream()
+            .filter(r -> ("ซ่อมเสร็จ".equals(r.getStatus())
+                        || "เสร็จ".equals(r.getStatus()) 
+                        || "สำเร็จ".equals(r.getStatus())
+                        || "ยกเลิก".equals(r.getStatus())
+                        || "ยังไม่ได้คะแนน".equals(r.getStatus())))
+            .toList();
+}
 
 
     // ---------------- Delete report ----------------
