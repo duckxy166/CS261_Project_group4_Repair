@@ -460,7 +460,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const payload = {
       reportId: __feedbackItem__.id,
       rating: __feedbackScore__,
-      comment: (fbText?.value || "").trim()
+      message: (fbText?.value || "").trim()
     };
     try {
       if (USE_MOCK) {
