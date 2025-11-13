@@ -514,9 +514,12 @@ document.addEventListener("DOMContentLoaded", () => {
 	          reportParts: x.reportParts || "",
 	          reportCost: x.reportCost || ""
 	      };
-	      mapped._normalizedStatus = normalizeStatus(mapped.status);
+mapped._normalizedStatus = normalizeStatus(mapped.status);
 	      return mapped;
-	  }).filter(it => it._normalizedStatus === 'สำเร็จ'); //  only keep "สำเร็จ"
+	  }).filter(it => it._normalizedStatus !== null); // Keep all normalized statuses (สำเร็จ, ยกเลิก, ยังไม่ได้คะแนน)
+
+
+      window.__HISTORY_DATA__ = rawItems;
 
 
       window.__HISTORY_DATA__ = rawItems;
