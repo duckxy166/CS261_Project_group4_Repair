@@ -3,7 +3,6 @@ package com.example.demo.controller;
 import com.example.demo.model.Attachment;
 import com.example.demo.repository.AttachmentRepository;
 import com.example.demo.service.FileStorageService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
@@ -19,17 +18,19 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/files/{requestId}")
-@RequiredArgsConstructor
+//@RequiredArgsConstructor
+
+
 public class AttachmentController {
 
     private final AttachmentRepository attachmentRepo;
     private final FileStorageService storage;
     
-    // Constructor 
     public AttachmentController(AttachmentRepository attachmentRepo, FileStorageService storage) {
         this.attachmentRepo = attachmentRepo;
         this.storage = storage;
     }
+   
     // ---------------- List attachments ----------------
     @GetMapping
     public List<Attachment> list(@PathVariable Long requestId) {

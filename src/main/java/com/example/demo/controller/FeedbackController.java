@@ -42,6 +42,10 @@ public class FeedbackController {
         feedback.setCreatedAt(LocalDateTime.now());
 
         feedbackRepository.save(feedback);
-        return ResponseEntity.ok("Feedback saved");
+
+        report.setStatus("สำเร็จ");
+        reportRepository.save(report);
+        
+        return ResponseEntity.ok("Feedback saved and report status updated");
     }
 }

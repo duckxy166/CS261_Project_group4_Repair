@@ -1,589 +1,109 @@
-/* ================================================
-   สไตล์รวมของหน้าแจ้งซ่อม (index.html)
-   โครงสร้างหลัก:
-   - ส่วนหัวและเมนู
-   - คอนเทนเนอร์และสเต็ปการกรอก
-   - ฟอร์มและส่วนอัปโหลดรูป
-   - มอดอลดูรูปเต็มจอ
-   - ส่วนสำเร็จ (success section) และปุ่ม
-   หมายเหตุ: ปุ่มถูกกำหนดให้ไม่มีเส้นใต้ และไอคอนสำเร็จถูกปรับสมดุล
-   ================================================ */
-/* ตั้งค่าพื้นฐาน */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Prompt', sans-serif;
+/* Use history page as the base */
+@import url("./history.css");
+
+/* ==== Page-specific only (forms, steps, uploader) ==== */
+
+/* Steps */
+.steps{display:flex;align-items:center;gap:12px;margin-bottom:24px;justify-content:center}
+.step{display:flex;flex-direction:column;align-items:center;position:relative}
+.step-number{width:35px;height:35px;border-radius:50%;background:#d1d5db;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;margin-bottom:8px;font-size:16px}
+.step.active .step-number{background:#c41230}
+.step.completed .step-number{background:#22c55e}
+.step-text{font-size:15px;color:#111827;font-weight:500}
+.step-line{flex-grow:1;height:3px;background:#d1d5db;margin:0 24px 14px}
+.step-line.completed{background:#22c55e}
+
+/* Success mini-steps (optional) */
+.success-steps{display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:28px;flex-wrap:nowrap}
+.success-step-single{display:flex;flex-direction:row;align-items:center;gap:8px}
+.success-step-single .tick{width:26px;height:26px;border-radius:50%;background:#22c55e;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700}
+.success-step-single .label{font-size:15px;color:#111827;font-weight:500}
+.success-steps .arrow{width:52px;height:2px;background:#d1d5db;position:relative;margin:0 2px}
+.success-steps .arrow::after{content:'';position:absolute;right:-6px;top:-3px;border-left:6px solid #d1d5db;border-top:4px solid transparent;border-bottom:4px solid transparent}
+
+.success-hero{display:flex;flex-direction:column;align-items:center;gap:20px;max-width:360px;margin:0 auto}
+.success-mark svg{width:140px;height:140px}
+.success-title{font-size:clamp(18px,2vw,22px);font-weight:500;color:#111827;text-align:center;margin-top:6px}
+.success-actions{display:flex;justify-content:center}
+
+/* Form fields — match history inputs (white bg + gray border) */
+.form-group{margin-bottom:18px}
+label{display:block;margin-bottom:8px;font-weight:600;color:#333;font-size:14px}
+.form-control,select.form-control,textarea.form-control{
+  width:100%;padding:12px 14px;border:1px solid #e5e7eb;border-radius:8px;font-size:14px;background:#fff;color:#111;outline:none
+}
+.form-control:focus,select.form-control:focus,textarea.form-control:focus{
+  box-shadow:0 0 0 3px rgba(29,78,216,.12);border-color:#cbd5e1
+}
+textarea.form-control{resize:vertical;min-height:120px}
+
+/* Native select arrow */
+select.form-control{
+  appearance:none;
+  background-image:url('data:image/svg+xml;utf8,<svg fill="%236b7280" height="20" viewBox="0 0 24 24" width="20" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
+  background-repeat:no-repeat;background-position:right 12px center;padding-right:40px
 }
 
-body {
-    background-color: #f5f5f5;
+/* Custom dropdown panels (hidden by default; JS toggles .open) */
+.dropdown{position:relative;width:100%}
+.dropdown-content,.options-panel,.option-list,.select-options{
+  display:none;position:absolute;left:0;right:0;top:calc(100% + 6px);
+  background:#fff;border:1px solid #e5e7eb;border-radius:8px;
+  box-shadow:0 12px 24px rgba(0,0,0,.12);padding:6px 0;z-index:200;max-height:220px;overflow:auto
 }
+.dropdown.open .dropdown-content,
+.dropdown.open .options-panel,
+.dropdown.open .option-list,
+.dropdown.open .select-options{display:block}
+.dropdown-content a,.options-panel a,.option-list a,.select-options a{
+  display:block;padding:10px 12px;color:#111;text-decoration:none;font-size:14px
+}
+.dropdown-content a:hover,.options-panel a:hover,.option-list a:hover,.select-options a:hover{background:#f7f7f7}
 
-/* ส่วนหัว */
-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: #c41230;
-    color: white;
-    padding: 0;
-    height: 64px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+/* Upload box */
+.image-upload-area{
+  border:1px dashed #d1d5db;padding:24px;text-align:center;background:#fafafa;border-radius:8px;
+  display:flex;flex-direction:column;justify-content:center;align-items:center;position:relative;min-height:150px
 }
+.image-icon{margin-bottom:12px;color:#6b7280}
+.upload-btn{background:#f6c94d;color:#111;border:1px solid #f6c94d;border-radius:999px;padding:10px 20px;cursor:pointer;font-weight:700}
+.upload-btn:hover{filter:brightness(.98)}
+.upload-info{font-size:12px;color:#6b7280;margin-top:8px}
+.image-preview{margin-top:12px;width:100%;display:flex;align-items:center;justify-content:center;position:relative}
+.image-preview img{max-width:100%;max-height:220px;border-radius:6px;object-fit:contain;cursor:pointer;background:#fff;border:1px solid #e5e7eb}
+.preview-name{position:absolute;right:8px;bottom:6px;font-size:12px;color:#6b7280}
 
-.logo {
-    font-size: clamp(20px, 2vw, 24px);
-    font-weight: 600;
-    padding: 0 30px;
-    letter-spacing: 1px;
-}
+/* Fullscreen image modal (parity with history modal style) */
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;z-index:1000}
+.modal-content{background:#fff;padding:20px;border-radius:12px;max-width:800px;width:90%;box-shadow:0 12px 40px rgba(0,0,0,.25);display:flex;flex-direction:column;align-items:center;gap:16px;border:1px solid #e5e7eb}
+.modal-content img{max-width:100%;max-height:70vh;object-fit:contain}
+.modal-close{align-self:center}
 
-nav ul {
-    display: flex;
-    list-style: none;
-    height: 100%;
-    gap: 40px; /* ลดระยะห่างเพื่อความสมดุล */
-}
+/* Actions & buttons — reuse history look */
+.form-actions{display:flex;justify-content:center;gap:12px;margin-top:26px;position:relative}
+.btn{padding:10px 22px;border:1px solid transparent;border-radius:999px;font-size:14px;cursor:pointer;font-weight:700;transition:filter .15s ease}
+.btn-primary{background:#C30E2F;border-color:#C30E2F;color:#fff}
+.btn-primary:hover{filter:brightness(.98)}
+.btn-secondary{background:#e5e7eb;border-color:#e5e7eb;color:#374151}
+.btn-secondary:hover{filter:brightness(.98)}
+.clear-link{position:absolute;right:0;top:50%;transform:translateY(-50%);color:#6b7280;text-decoration:none;font-size:14px}
+.clear-link:hover{text-decoration:underline}
 
-nav ul li {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0;
-    height: 100%;
-    text-align: center;
-    transition: background-color 0.3s;
-    min-width: 160px;
-}
+/* Validation */
+.form-control.error{box-shadow:0 0 0 2px #c41230 inset;background:#fdf2f3;border-color:#f5c2c7}
+.error-msg{color:#c41230;font-size:13px;margin-top:6px}
 
-nav ul li a {
-    color: white;
-    text-decoration: none;
-    font-size: clamp(15px, 1.6vw, 17px);
-    line-height: 1.3;
-    font-weight: 600; /* ลดความหนาให้ดูเบาขึ้น */
-    padding: 8px 20px; /* ลด padding ให้บล็อกพอดีขึ้น */
-    width: auto;
-    height: auto;
-    display: inline-block;
-    text-align: center;
-}
+/* Feedback modal bits (if this page uses it) */
+.fb-card{width:min(640px,92vw)}
+.stars{display:flex;gap:10px;margin-top:12px}
+.star-btn{font-size:28px;line-height:1;border:none;background:#fff;cursor:pointer;color:#d1d5db;transition:transform .08s ease,color .15s ease}
+.star-btn:hover{transform:scale(1.06)}
+.stars .star-btn.is-filled{color:#FFD13F}
 
-nav ul li.active { 
-    background-color: transparent; /* ไม่ให้ทั้งบล็อก li เป็นสีเหลือง */
-}
-
-nav ul li.active a {
-    background-color: #e5a63b; /* โทนเหลืองตามภาพ */
-    border-radius: 6px; /* โค้งเล็กน้อยให้เป็นบล็อกสวยงาม */
-    color: #000; /* ข้อความเป็นสีดำตาม UI */
-}
-
-.user-profile {
-    display: flex;
-    align-items: center;
-    padding: 0 30px;
-    gap: clamp(8px, 1vw, 14px);
-}
-
-.profile-pic {
-    width: clamp(32px, 3vw, 38px);
-    height: clamp(32px, 3vw, 38px);
-    border-radius: 50%;
-    background-color: white;
-    margin-right: 10px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: #c41230;
-}
-
-.user-details {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    line-height: 1.2; /* ลดระยะห่างระหว่างบรรทัดของชื่อและอีเมล */
-}
-
-.user-name {
-    color: #fff;
-    font-weight: 400;
-    font-size: clamp(16px, 1.6vw, 18px);
-}
-
-
-.user-email {
-    color: #f0f0f0; /* สีขาวที่สว่างน้อยกว่าเล็กน้อย */
-    font-size: clamp(12px, 1vw, 14px); /* ทำให้ตัวอักษรเล็กกว่าชื่อ */
-    font-weight: 300;
-}
-
-.logout-icon {
-    margin-left: 16px;
-    cursor: pointer;
-    color: white;
-}
-
-/* ปรับขนาดตัวอักษรชื่อผู้ใช้ให้เด่นขึ้นและสมดุลกับความสูงของแถบหัว */
-.user-name {
-    color: #fff;
-    font-weight: 400;
-    font-size: clamp(16px, 1.6vw, 18px);
-}
-
-/* เพิ่มขนาดไอคอนภายในวงกลมโปรไฟล์และไอคอนออกจากระบบให้สมดุล */
-.profile-pic svg {
-    width: clamp(18px, 2vw, 22px);
-    height: clamp(18px, 2vw, 22px);
-}
-.logout-icon svg {
-    width: clamp(18px, 1.8vw, 22px);
-    height: clamp(18px, 1.8vw, 22px);
-}
-
-/* ส่วนหลัก */
-main {
-    padding: 30px;
-}
-
-.container {
-    max-width: 1400px;
-    margin: 0 auto;
-    background-color: white;
-    border-radius: 5px;
-    padding: 30px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-}
-
-/* ขั้นตอน */
-.steps {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 40px;
-}
-
-.step {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    position: relative;
-}
-
-.step-number {
-    width: 35px;
-    height: 35px;
-    border-radius: 50%;
-    background-color: #ccc;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-weight: bold;
-    margin-bottom: 10px;
-    font-size: 16px;
-}
-
-.step.active .step-number {
-    background-color: #c41230;
-}
-
-/* เมื่อสเต็ปทำเสร็จ แสดงวงกลมสีเขียวพร้อมเครื่องหมายถูก */
-.step.completed .step-number {
-    background-color: #22C55E; /* เขียวตาม UI */
-}
-
-.step-text {
-    font-size: 15px;
-    color: #333;
-    font-weight: 500;
-}
-
-.step-line {
-    flex-grow: 1;
-    height: 3px;
-    background-color: #ccc;
-    margin: 0 30px;
-    margin-bottom: 20px;
-    transition: background-color 0.3s ease;
-}
-
-/* เส้นคั่นของขั้นที่ทำสำเร็จ เป็นสีเขียวให้คงเส้นคงวากับวงกลม */
-.step-line.completed {
-    background-color: #22C55E;
-}
-
-/* ===== Success Page Styles ===== */
-.success-steps {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 14px;
-    margin-bottom: 28px;
-    flex-wrap: nowrap;
-}
-.success-step-single {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 8px;
-}
-.success-step-single .tick {
-    width: 26px;
-    height: 26px;
-    border-radius: 50%;
-    background: #22C55E;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #fff;
-    font-weight: 700;
-}
-.success-step-single .label {
-    font-size: 15px;
-    color: #111827;
-    font-weight: 500;
-}
-.success-steps .arrow {
-    width: 52px;
-    height: 2px;
-    background: #D1D5DB; /* เทาอ่อนตามภาพ */
-    position: relative;
-    margin: 0 2px;
-}
-.success-steps .arrow::after {
-    content: '';
-    position: absolute;
-    right: -6px;
-    top: -3px;
-    border-left: 6px solid #D1D5DB;
-    border-top: 4px solid transparent;
-    border-bottom: 4px solid transparent;
-}
-
-.success-hero {
-    /* บล็อกฮีโร่ในส่วนสำเร็จ: รวมไอคอน, หัวข้อ, ปุ่ม */
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 20px;
-    max-width: 360px;
-    margin: 0 auto;
-}
-.success-mark svg {
-    width: 140px;
-    height: 140px;
-}
-.success-title {
-    font-size: clamp(18px, 2vw, 22px);
-    font-weight: 500;
-    color: #111827;
-    text-align: center;
-    margin-top: 6px;
-}
-.success-actions {
-    display: flex;
-    justify-content: center;
-}
-
-/* ฟอร์ม */
-.form-group {
-    margin-bottom: 25px;
-}
-
-label {
-    display: block;
-    margin-bottom: 10px;
-    font-weight: 500;
-    color: #333;
-    font-size: 16px;
-}
-
-.form-control {
-    width: 100%;
-    padding: 12px 15px;
-    border: none;
-    border-radius: 5px;
-    font-size: 16px;
-    background-color: #e9e9e9;
-    color: #333;
-}
-
-.dropdown {
-    position: relative;
-    width: 100%;
-}
-
-.dropdown .form-control {
-    cursor: pointer;
-}
-
-select.form-control {
-    appearance: none;
-    background-image: url('data:image/svg+xml;utf8,<svg fill="%23333333" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
-    background-repeat: no-repeat;
-    background-position: right 15px center;
-    padding-right: 40px;
-    background-color: #e9e9e9;
-}
-
-.dropdown-content {
-    display: none;
-    position: absolute;
-    background-color: #FFECB3;
-    width: 100%;
-    max-height: 200px;
-    overflow-y: auto;
-    z-index: 1;
-    border-radius: 0 0 5px 5px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-}
-
-.dropdown-content a {
-    color: black;
-    padding: 12px 16px;
-    text-decoration: none;
-    display: block;
-    font-size: 14px;
-}
-
-.dropdown-content a:hover {
-    background-color: #FFD54F;
-}
-
-textarea.form-control {
-    resize: vertical;
-    min-height: 120px;
-    font-family: 'Prompt', sans-serif;
-}
-
-.image-upload-area {
-    border: 1px dashed #ccc;
-    padding: 30px;
-    text-align: center;
-    background-color: #e9e9e9;
-    border-radius: 5px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    position: relative;
-    min-height: 150px;
-}
-
-.image-icon {
-    margin-bottom: 15px;
-    color: #666;
-}
-
-.upload-btn {
-    background-color: #e9a93a;
-    color: white;
-    border: none;
-    padding: 10px 25px;
-    border-radius: 25px;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: 500;
-    transition: background-color 0.3s;
-}
-
-.upload-btn:hover {
-    background-color: #d99b2e;
-}
-
-.upload-info {
-    font-size: 12px;
-    color: #666;
-    margin-top: 10px;
-}
-
-/* พรีวิวรูปหลังอัปโหลด */
-.image-preview {
-    margin-top: 12px;
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-}
-.image-preview img {
-    max-width: 100%;
-    max-height: 220px;
-    border-radius: 6px;
-    object-fit: contain;
-    cursor: pointer;
-}
-.preview-name {
-    position: absolute;
-    right: 8px;
-    bottom: 6px;
-    font-size: 12px;
-    color: #666;
-}
-
-/* มอดอลดูรูปเต็มจอ */
-.modal {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.6);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-}
-.modal-content {
-    background: #e9e9e9;
-    padding: 20px;
-    border-radius: 8px;
-    max-width: 800px;
-    width: 90%;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.25);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 16px;
-}
-.modal-content img {
-    max-width: 100%;
-    max-height: 70vh;
-    object-fit: contain;
-}
-.modal-close {
-    align-self: center;
-}
-
-/* ปุ่มดำเนินการ */
-.form-actions {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-    margin-top: 40px;
-    position: relative; /* เพื่อจัดลิงก์ชิดขวา */
-}
-
-/* สไตล์ปุ่มหลัก: ไม่มีเส้นใต้ และจัดวางเป็น inline-block */
-.btn {
-    padding: 10px 30px;
-    border: none;
-    border-radius: 25px;
-    font-size: 16px;
-    cursor: pointer;
-    font-weight: 500;
-    transition: all 0.3s;
-    text-decoration: none;
-    display: inline-block;
-}
-
-.btn-primary {
-    background-color: #c41230;
-    color: white;
-}
-
-.btn-primary:hover {
-    background-color: #a30f28;
-}
-
-.btn-secondary {
-    background-color: #e0e0e0;
-    color: #333;
-}
-
-.btn-secondary:hover {
-    background-color: #d0d0d0;
-}
-
-/* ฟิลด์ที่ซ่อน/แสดงตามเงื่อนไข */
-.hidden {
-    display: none;
-}
-/* สไตล์เมื่อมีข้อผิดพลาดในการกรอก */
-.form-control.error {
-    box-shadow: 0 0 0 2px #c41230 inset;
-    background-color: #fdf2f3; /* อ่อน ๆ เพื่อให้สังเกตง่าย */
-}
-.error-msg {
-    color: #c41230;
-    font-size: 14px;
-    margin-top: 6px;
-}
-
-/* หน้าสำเร็จ */
-.success-view {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 40px 0;
-}
-.success-icon {
-    width: clamp(160px, 28vw, 240px);
-    max-width: 80vw;
-}
-.success-title {
-    font-size: clamp(18px, 2vw, 22px);
-    font-weight: 500;
-    margin-top: 6px;
-    margin-bottom: 12px;
-    color: #111827;
-}
-
-/* ลิงก์ล้างแบบฟอร์มให้เป็นข้อความเทา คล้ายในภาพตัวอย่าง */
-.clear-link {
-    display: inline-block;
-    margin-top: 10px;
-    color: #6B7280; /* เทาเข้มเล็กน้อย */
-    text-decoration: none;
-    font-size: 14px;
-}
-.clear-link:hover {
-    text-decoration: underline;
-}
-
-/* ลิงก์ล้างแบบฟอร์มชิดขวาเมื่ออยู่ใน .form-actions */
-.form-actions .clear-link {
-    position: absolute;
-    right: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    margin-top: 0; /* ตัด margin-top เพื่อจัดกึ่งกลางแนวตั้ง */
-}
-
-/* ปรับระยะสเต็ปเล็กน้อยรองรับ 4 ขั้น */
-.steps {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 24px;
-}
-
-/* การตอบสนอง */
-@media (max-width: 768px) {
-    header {
-        flex-direction: column;
-        height: auto;
-        padding: 10px 0;
-    }
-    
-    nav ul {
-        width: 100%;
-        justify-content: space-around;
-    }
-    
-    .user-profile {
-        margin-top: 10px;
-    }
-    
-    .container {
-        padding: 20px;
-    }
-    
-    .form-actions {
-        flex-direction: column;
-    }
-    
-    .btn {
-        width: 100%;
-    }
+/* Utilities */
+.hidden{display:none}
+@media (max-width:768px){
+  .form-actions{flex-direction:column}
+  .btn{width:100%}
+  .clear-link{position:static;transform:none;margin-top:8px;align-self:flex-end}
 }
