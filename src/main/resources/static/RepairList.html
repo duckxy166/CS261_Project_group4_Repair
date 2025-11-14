@@ -1,89 +1,258 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>รายการซ่อม (Repair List)</title>
-  <link rel="stylesheet" href="history.css">
-  <link rel="stylesheet" href="RepairList.css">
-  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;600;700&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TU REPAIR - รายการซ่อม</title>
+    <link rel="stylesheet" href="RepairList.css">
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
-
 <body>
-  <!-- Header -->
-  <header class="header">
-    <h1>รายการซ่อม<br><span>(Repair List)</span></h1>
-  </header>
+    
+    <header class="tech-header">
+        <div class="logo">TU REPAIR</div>
+        <nav>
+            <div class="nav-button active">
+                รายการซ่อม<br>( Repair List )
+            </div>
+        </nav>
+        <div class="user-profile">
+            <div class="profile-pic">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+            </div>
+            <div class="user-details">
+                <div class="user-name">เอกชัย</div>
+                <div class="user-email">Aekachai@dome.tu.ac.th</div>
+            </div>
+            <div class="logout-icon" id="logoutBtn" aria-label="ออกจากระบบ">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+            </div>
+        </div>
+    </header>
 
-  <!-- Table -->
-  <main class="container">
-    <table>
-      <thead>
-        <tr>
-          <th>วันที่แจ้งซ่อม</th>
-          <th>ชื่อผู้แจ้ง</th>
-          <th>ประเภทงาน</th>
-          <th>รายละเอียดปัญหา</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>DD/MM/YYYY</td>
-          <td>สมชาย</td>
-          <td>ไฟฟ้า</td>
-          <td>
-            <a href="RepairReport.html?id=1" class="detail-link">
-              รายละเอียดปัญหา <span class="material-icons">search</span>
-            </a>
-          </td>
-          <td><button class="delete-btn"><span class="material-icons">delete</span></button></td>
-        </tr>
-        <tr>
-          <td>DD/MM/YYYY</td>
-          <td>ใจดี</td>
-          <td>ประปา</td>
-          <td>
-            <a href="RepairReport.html?id=2" class="detail-link">
-              รายละเอียดปัญหา <span class="material-icons">search</span>
-            </a>
-          </td>
-          <td><button class="delete-btn"><span class="material-icons">delete</span></button></td>
-        </tr>
-      </tbody>
-    </table>
-  </main>
+    <main>
+        <div class="container">
+            <div class="list-header-row">
+                <div class="list-titlegroup">
+                    <h1 class="list-title">รายการซ่อม</h1>
+                    <h2 class="list-sub">( Repair List )</h2>
+                </div>
+                <div class="list-toolbar">
+                    <div class="search-box">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                        <input id="listSearch" type="text" placeholder="ค้นหา...">
+                    </div>
+                    <div class="filter-container">
+                        <button id="filterBtn" class="btn btn-filter">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+                            <span>Filter</span>
+                        </button>
+                        <div id="filterDropdown" class="filter-dropdown">
+                            <label class="filter-option">
+                                <input type="checkbox" id="sortPriority">
+                                <span>เรียงตามความเร่งด่วน</span>
+                            </label>
+                            <label class="filter-option">
+                                <input type="checkbox" id="sortDate">
+                                <span>เรียงตามวันที่แจ้งซ่อมล่าสุด</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-  <!-- Bottom Bar -->
-  <div class="bottom-bar">
-    <div class="menu-btn" id="menu-toggle">
-      <span class="material-icons">menu</span>
+            <div class="list-card">
+                <div class="list-table-wrap">
+                <table class="list-table">
+                    <thead>
+                        <tr>
+                            <th>เรื่องที่แจ้ง</th>
+                            <th>วันที่แจ้งซ่อม</th>
+                            <th>ชื่อผู้แจ้ง</th>
+                            <th>ผู้รับผิดชอบ</th>
+                            <th>ประเภทงาน</th>
+                            <th>ความเร่งด่วน</th>
+                            <th>สถานะการซ่อม</th>
+                            <th>อื่นๆ</th>
+                        </tr>
+                    </thead>
+                    <tbody id="listTbody">
+                        </tbody>
+                </table>
+                </div>
+                <div class="list-pagination" id="listPagination"></div>
+            </div>
+        </div>
+    </main>
+
+    <div id="acceptOverlay" class="modal-overlay" aria-hidden="true"></div>
+    <div id="acceptModal" class="confirm-modal" role="dialog" aria-modal="true" aria-labelledby="acceptTitle" aria-hidden="true">
+        <h3 id="acceptTitle" class="confirm-title">คุณต้องการรับงานซ่อมนี้หรือไม่</h3>
+        <div class="confirm-actions">
+            <button id="acceptConfirmBtn" class="btn btn-success">ยืนยัน</button>
+            <button id="acceptCancelBtn" class="btn btn-secondary">ยกเลิก</button>
+        </div>
     </div>
 
-    <!-- Hidden menu -->
-    <div class="menu-popup" id="menu-popup">
-      <a href="index.html" class="menu-item">
-        <span class="material-icons">home</span> หน้าหลัก
-      </a>
-      <a href="login.html" class="menu-item logout">
-        <span class="material-icons">logout</span> ออกจากระบบ
-      </a>
-    </div>
-  </div>
+    <div id="detailOverlay" class="modal-overlay" aria-hidden="true"></div>
+    
+    <div id="detailModal" class="detail-modal" role="dialog" aria-modal="true" aria-labelledby="detailTitle" aria-hidden="true">
+        
+        <div class="detail-header">
+            <h3 id="detailTitle" class="detail-title">ชื่องานซ่อม</h3>
+            <div class="detail-subtitle">รายละเอียดงานซ่อม</div>
+        </div>
+        
+        <div class="detail-pills">
+            <span id="detailPriority" class="priority-badge"></span>
+            <span id="detailStatus" class="status-badge"></span>
+        </div>
 
-  <!-- Modal -->
-  <div class="modal" id="confirmModal">
-    <div class="modal-content">
-      <button class="close-btn" id="closeModal">×</button>
-      <p>คุณต้องการลบรายการซ่อมนี้หรือไม่</p>
-      <div class="modal-actions">
-        <button class="confirm-btn" id="confirmDelete">ยืนยัน</button>
-        <button class="cancel-btn" id="cancelModal">ยกเลิก</button>
-      </div>
-    </div>
-  </div>
+        <div class="detail-body">
+            <div class="detail-grid">
+                
+                <div class="detail-col">
+                    
+                    <div class="detail-field">
+                        <label class="detail-field-label" for="detailDate">วันที่แจ้งซ่อม :</label>
+                        <span id="detailDate" class="detail-value-box"></span>
+                    </div>
+                    <div class="detail-field">
+                        <label class="detail-field-label" for="detailCategory">ประเภทของงาน :</label>
+                        <span id="detailCategory" class="detail-value-box"></span>
+                    </div>
+                    <div class="detail-field">
+                        <label class="detail-field-label" for="detailLocation">สถานที่ :</label>
+                        <span id="detailLocation" class="detail-value-box"></span>
+                    </div>
+                    
+                    <div class="detail-field">
+                        <label class="detail-field-label hidden-label" for="detailRoom">ห้อง :</label>
+                        <span id="detailRoom" class="detail-value-box"></span>
+                    </div>
+                    </div>
+                
+                <div class="detail-col">
+                    <div class="detail-field-group" id="field-reporter-group">
+                        <div>
+                            <span class="detail-field-label-strong">ชื่อผู้แจ้ง :</span>
+                            <span id="detailReporterName"></span>
+                        </div>
+                        <div>
+                            <span class="detail-field-label-strong">ผู้รับผิดชอบ :</span>
+                            <span id="detailAssigneeName"></span>
+                        </div>
+                    </div>
+                </div>
 
-  <script src="RepairList.js"></script>
+            </div> <div class="detail-field full">
+                <label class="detail-field-label" for="detailDescription">รายละเอียดงาน :</label>
+                <span id="detailDescription" class="detail-value-box large"></span>
+            </div>
+            
+            <div class="detail-field full" id="detailImageContainer">
+                <div id="detailImages" class="detail-images-box">
+                    </div>
+            </div>
+
+        </div>
+
+        <div class="detail-actions">
+            <button id="detailSubmitReportBtn" class="btn">ส่งรายงานการซ่อม</button>
+            <button id="detailBackBtn" class="btn btn-secondary">ย้อนกลับ</button>
+        </div>
+    </div>
+
+
+    <div id="reportOverlay" class="modal-overlay" aria-hidden="true"></div>
+    <div id="reportModal" class="report-modal" role="dialog" aria-modal="true" aria-labelledby="reportTitle" aria-hidden="true">
+        
+        <div class="report-header">
+            <div>
+                <h3 id="reportTitle" class="report-title">ชื่องานซ่อม</h3>
+                <div class="report-subtitle">รายงานการซ่อม</div>
+            </div>
+            <div class="report-pills">
+                <span id="reportPriority" class="priority-badge"></span>
+                <span id="reportStatus" class="status-badge"></span>
+            </div>
+        </div>
+
+        <div class="report-static-info">
+            <div class="report-info-grid">
+                <div class="info-field">
+                    <label>DD/MM/YYYY :</label>
+                    <span id="reportDate">DD/MM/YYYY</span>
+                </div>
+                <div class="info-field">
+                    <label>สถานที่ :</label>
+                    <span id="reportLocation"></span>
+                </div>
+                 <div class="info-field">
+                    <label>ประเภทของงาน :</label>
+                    <span id="reportCategory"></span>
+                </div>
+                <div class="info-field">
+                    <label>ผู้รับผิดชอบ :</label>
+                    <span id="reportAssignee"></span>
+                </div>
+                <div class="info-field">
+                    <label>ผู้แจ้ง :</label>
+                    <span id="reportReporter"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="report-body">
+            <div class="report-form-container">
+                <label>กรอกสาเหตุที่เสีย
+                    <textarea id="reportCause" placeholder="กรอกสาเหตุที่เสีย..."></textarea>
+                </label>
+                <label>กรอกวิธีซ่อม
+                    <textarea id="reportMethod" placeholder="กรอกวิธีซ่อม..."></textarea>
+                </label>
+                <label>กรอกรายละเอียดส่วนที่เปลี่ยน
+                    <textarea id="reportParts" placeholder="กรอกรายละเอียดส่วนที่เปลี่ยน..."></textarea>
+                </label>
+            </div>
+            
+            <div class="report-upload-container">
+                <div class="upload-box">
+                    <div class="upload-icons">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"></polygon><rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect></svg>
+                    </div>
+                    <div>เพิ่มรูปและวิดีโอ</div>
+                    <button id="reportUploadBtn" class="btn btn-upload">อัปโหลด</button>
+                    <input type="file" id="reportUploadInput" multiple accept="image/*,video/*" style="display:none;">
+                </div>
+
+                <div class="file-upload-box">
+                    <span>แนบไฟล์</span>
+                    <button id="reportFileUploadBtn" class="btn btn-file">เพิ่มไฟล์</button>
+                    <input type="file" id="reportFileUploadInput" multiple style="display:none;">
+                </div>
+                </div>
+        </div>
+
+        <div class="report-actions">
+            <button id="reportConfirmBtn" class="btn btn-success">ยืนยันการส่งรายงาน</button>
+            <button id="reportBackBtn" class="btn btn-secondary">ย้อนกลับ</button>
+        </div>
+    </div>
+
+    <div id="successOverlay" class="modal-overlay" aria-hidden="true"></div>
+    <div id="successModal" class="success-modal" role="dialog" aria-modal="true" aria-labelledby="successTitle" aria-hidden="true">
+        <div class="success-icon">
+            <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="50" cy="50" r="46" stroke="#28a745" stroke-width="8"/>
+                <path d="M28 50.5L44 66.5L72 38.5" stroke="#28a745" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </div>
+        <h3 id="successTitle" class="success-title">รายงานการซ่อมสำเร็จ</h3>
+        <button id="successBackToListBtn" class="btn btn-primary">รายการซ่อม</button>
+    </div>
+
+    <script src="RepairList.js"></script>
 </body>
 </html>
