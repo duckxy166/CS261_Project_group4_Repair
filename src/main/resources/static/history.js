@@ -469,7 +469,8 @@ fbSubmit?.addEventListener("click", async () => {
         alert("ขอบคุณสำหรับความคิดเห็นของคุณ!");
         closeFeedback();
         reportModal?.classList.add("hidden");
-  
+        
+        // (ส่วนนี้สำหรับ MOCK ถูกต้องแล้ว)
         const itemToUpdate = rawItems.find(x => x.id === __feedbackItem__.id);
         if (itemToUpdate) {
           itemToUpdate.status = "สำเร็จ";
@@ -481,6 +482,7 @@ fbSubmit?.addEventListener("click", async () => {
         return; 
       }
   
+      // ===== API LOGIC =====
       const res = await fetch("/api/feedback", {
         method:"POST", headers:{ "Content-Type":"application/json" }, body: JSON.stringify(payload)
       });
@@ -490,8 +492,9 @@ fbSubmit?.addEventListener("click", async () => {
       closeFeedback(); 
       reportModal?.classList.add("hidden");
   
-      loadData(); 
-      // ==========================================
+      // ⭐️⭐️⭐️ แก้ไขตรงนี้ครับ: เราจะเรียกฟังก์ชัน loadData() ที่เรากำลังจะสร้างในขั้นที่ 2 ⭐️⭐️⭐️
+      await loadData(); 
+      // ========================================================
   
     } catch (err) {
       console.error(err); alert("เกิดข้อผิดพลาดในการส่งความคิดเห็น");
@@ -501,14 +504,16 @@ fbSubmit?.addEventListener("click", async () => {
   fbCancel?.addEventListener("click", closeFeedback);
   feedbackModal?.addEventListener("click", (e) => { if (e.target === feedbackModal) closeFeedback(); });
 
-  /* ---------- Load Data ---------- */
-  (async () => {
+ /* ---------- Load Data ---------- */
+  // 1. สร้างฟังก์ชันชื่อ async function loadData()
+  async function loadData() {
     try {
       let list;
       if (USE_MOCK) {
         list = MOCK_ITEMS;
       } else {
-        const res = await fetch("/api/requests/user-reports");
+        // 2. เพิ่ม { cache: "no-store" } เพื่อบังคับโหลดใหม่ ไม่ติดแคช
+        const res = await fetch("/api/requests/user-reports", { cache: "no-store" });
         list = res.ok ? await res.json() : [];
       }
 
@@ -535,9 +540,9 @@ fbSubmit?.addEventListener("click", async () => {
 	          reportParts: x.reportParts || "",
 	          reportCost: x.reportCost || ""
 	      };
-mapped._normalizedStatus = normalizeStatus(mapped.status);
+        mapped._normalizedStatus = normalizeStatus(mapped.status);
 	      return mapped;
-	  }).filter(it => it._normalizedStatus !== null); // Keep all normalized statuses (สำเร็จ, ยกเลิก, ยังไม่ได้คะแนน)
+	  }).filter(it => it._normalizedStatus !== null); 
 
 
       window.__HISTORY_DATA__ = rawItems;
@@ -551,5 +556,9 @@ mapped._normalizedStatus = normalizeStatus(mapped.status);
       console.error("Load history fail:", err);
       rawItems = []; viewItems = []; render(1);
     }
-  })();
+  }
+
+  // 3. สั่งให้ฟังก์ชันนี้ทำงานครั้งแรกเมื่อเปิดหน้า
+  loadData();
+
 });
