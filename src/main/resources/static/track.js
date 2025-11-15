@@ -198,24 +198,32 @@ document.addEventListener('DOMContentLoaded', function() {
 	}
 
 	function renderPagination() {
-		const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
-		let html = '';
-		// Prev
-		html += `<button class="page-btn" ${currentPage === 1 ? 'disabled' : ''} data-page="prev">ย้อนกลับ</button>`;
-		// Pages (show up to 7 with ellipsis)
-		const pagesToShow = 7;
-		const start = Math.max(1, currentPage - 3);
-		const end = Math.min(totalPages, start + pagesToShow - 1);
-		for (let p = start; p <= end; p++) {
-			html += `<button class="page-btn ${p === currentPage ? 'active' : ''}" data-page="${p}">${String(p).padStart(2, '0')}</button>`;
-		}
-		if (end < totalPages) {
-			html += `<span class="ellipsis">...</span>`;
-			html += `<button class="page-btn" data-page="${totalPages}">${String(totalPages).padStart(2, '0')}</button>`;
-		}
-		// Next
-		html += `<button class="page-btn" ${currentPage === totalPages ? 'disabled' : ''} data-page="next">หน้าถัดไป</button>`;
-		paginationEl.innerHTML = html;
+	    const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+	    let prevBtn = `<button class="page-btn" ${currentPage === 1 ? 'disabled' : ''} data-page="prev">ย้อนกลับ</button>`;
+	    let pagesHtml = '';
+
+	    const pagesToShow = 7;
+	    const start = Math.max(1, currentPage - 3);
+	    const end = Math.min(totalPages, start + pagesToShow - 1);
+
+	    for (let p = start; p <= end; p++) {
+	        pagesHtml += `<button class="page-btn ${p === currentPage ? 'active' : ''}" data-page="${p}">${String(p).padStart(2, '0')}</button>`;
+	    }
+
+	    if (end < totalPages) {
+	        pagesHtml += `<span class="ellipsis">...</span>`;
+	        pagesHtml += `<button class="page-btn" data-page="${totalPages}">${String(totalPages).padStart(2, '0')}</button>`;
+	    }
+
+	    let nextBtn = `<button class="page-btn" ${currentPage === totalPages ? 'disabled' : ''} data-page="next">หน้าถัดไป</button>`;
+
+	    paginationEl.innerHTML = `
+	        ${prevBtn}
+	        <div class="page-numbers">
+	            ${pagesHtml}
+	        </div>
+	        ${nextBtn}
+	    `;
 	}
 
 	function applySearch() {
