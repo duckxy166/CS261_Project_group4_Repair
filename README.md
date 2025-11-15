@@ -12,6 +12,6 @@ docker-compose up --build <br>
 ## 🧪 ข้อมูลสำหรับทดสอบการเข้าสู่ระบบ <br>
 | Role | Username | Password |
 |------|-----------|-----------|
-| 👤 User | `tuuser` | `1234` |
+| 👤 User | `tuuser` | `tuuser1234` |
 | 🛠️ Admin | `admin` | `admin1234` |
 | 🔧 Technician | `tech` | `tech1234` |

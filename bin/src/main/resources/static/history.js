@@ -439,6 +439,12 @@ document.addEventListener("DOMContentLoaded", () => {
       alert("ขอบคุณสำหรับความคิดเห็นของคุณ!");
       closeFeedback();
       reportModal?.classList.add("hidden");
+      if (__feedbackItem__) {
+        __feedbackItem__.status = "สำเร็จ";
+        __feedbackItem__._normalizedStatus = normalizeStatus("สำเร็จ");
+      }
+      applySearch(); 
+      render();
     } catch (err) {
       console.error(err);
       alert("เกิดข้อผิดพลาดในการส่งความคิดเห็น");
@@ -451,35 +457,54 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // ===== Load Data =====
-  (async () => {
-    try {
-      if (USE_MOCK) {
-        rawItems = MOCK_ITEMS;
-      } else {
-        let list = [];
-        // ===== 1. แก้ไข API ให้เรียก /user-reports =====
-        let res = await fetch("/api/requests/user-reports");
-        
-        if (res.ok) list = await res.json();
-        
-        rawItems = (Array.isArray(list) ? list : []).map((x) => ({
-          id: x.id || x._id,
-          title: x.title || "",
-          reporter: x.reporter || { fullName: x.requesterName || "" },
-          assignee: x.assignee || { fullName: x.technicianName || "" },
-          createdAt: x.createdAt || x.requestDate || x.submittedAt,
-          closedAt: x.closedAt || x.completedAt,
-          status: x.status || x.currentStatus || "",
-          location: x.location || x.locationDetail || "",
-          category: x.category || "",
-          description: x.description || x.problemDescription || "",
-          imageUrl: x.imageUrl || "",
-          reportDate: x.reportDate || x.completedAt || "",
-          reportText: x.reportText || "",
-          reportImageUrl: x.reportImageUrl || ""
-        }));
-      } // <--- สังเกตว่า else { ... } จบตรงนี้
+async function loadData() {
+  try {
+    let list;
+    if (USE_MOCK) {
+      list = MOCK_ITEMS;
+    } else {
+      const res = await fetch("/api/requests/user-reports");
+      list = res.ok ? await res.json() : [];
+    }
 
+    // map & normalize; keep only the 3 states
+    rawItems = (Array.isArray(list) ? list : []).map((x) => {
+        const mapped = {
+            id: x.id || x._id,
+            title: x.title || "",
+            reporter: x.reporter || { fullName: x.requesterName || "" },
+            assignee: x.assignee || { fullName: x.technicianName || "" },
+            createdAt: x.createdAt || x.requestDate || x.submittedAt,
+            closedAt: x.closedAt || x.completedAt,
+            updatedAt: x.updatedAt || x.completedAt,
+            status: x.status || x.currentStatus || "",
+            location: x.location || x.locationDetail || "",
+            category: x.category || "",
+            description: x.description || x.problemDescription || "",
+            imageUrl: x.imageUrl || "",
+            reportDate: x.reportDate || x.completedAt || "",
+            reportText: x.reportText || "",
+            reportImageUrl: x.reportImageUrl || "",
+            reportCause: x.reportCause || "",
+            reportMethod: x.reportMethod || "",
+            reportParts: x.reportParts || "",
+            reportCost: x.reportCost || ""
+        };
+    mapped._normalizedStatus = normalizeStatus(mapped.status);
+        return mapped;
+    }).filter(it => it._normalizedStatus !== null); 
+
+    window.__HISTORY_DATA__ = rawItems;
+    viewItems = [...rawItems];
+    applySort();
+    render(1); // สั่งให้ render หน้า 1 เสมอเมื่อโหลดใหม่
+  } catch (err) {
+    console.error("Load history fail:", err);
+    rawItems = []; viewItems = []; render(1);
+  }
+}
+
+loadData();});
       // ===== 2. กรองข้อมูล (โค้ดส่วนนี้ถูกต้องแล้ว) =====
       // กรองข้อมูลดิบ (rawItems) ให้เหลือเฉพาะสถานะ "สำเร็จ" หรือ "ยกเลิก"
       rawItems = rawItems.filter((item) => {

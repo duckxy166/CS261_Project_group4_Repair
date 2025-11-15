@@ -452,7 +452,7 @@ kebabMenuEl.querySelector(".js-more-rate").addEventListener("click", () => {
 
   fbText?.addEventListener("input", () => { fbCount && (fbCount.textContent = String(fbText.value.length)); });
 
-  fbSubmit?.addEventListener("click", async () => {
+fbSubmit?.addEventListener("click", async () => {
     if (!__feedbackItem__) return;
     if (!__feedbackScore__) {
       alert("กรุณาให้คะแนนเป็นจำนวนดาวก่อนส่ง");
@@ -469,18 +469,35 @@ kebabMenuEl.querySelector(".js-more-rate").addEventListener("click", () => {
         alert("ขอบคุณสำหรับความคิดเห็นของคุณ!");
         closeFeedback();
         reportModal?.classList.add("hidden");
-        return;
+  
+        const itemToUpdate = rawItems.find(x => x.id === __feedbackItem__.id);
+        if (itemToUpdate) {
+          itemToUpdate.status = "สำเร็จ";
+          itemToUpdate._normalizedStatus = normalizeStatus("สำเร็จ");
+        }
+        applySearch(); 
+        render(); // Re-render current page
+        
+        return; 
       }
+  
       const res = await fetch("/api/feedback", {
         method:"POST", headers:{ "Content-Type":"application/json" }, body: JSON.stringify(payload)
       });
       if (!res.ok) throw new Error("ส่งข้อมูลไม่สำเร็จ");
-      //alert("ขอบคุณสำหรับความคิดเห็นของคุณ!");
-      closeFeedback(); reportModal?.classList.add("hidden");
+      
+      alert("ขอบคุณสำหรับความคิดเห็นของคุณ!");
+      closeFeedback(); 
+      reportModal?.classList.add("hidden");
+  
+      loadData(); 
+      // ==========================================
+  
     } catch (err) {
       console.error(err); alert("เกิดข้อผิดพลาดในการส่งความคิดเห็น");
     }
   });
+
   fbCancel?.addEventListener("click", closeFeedback);
   feedbackModal?.addEventListener("click", (e) => { if (e.target === feedbackModal) closeFeedback(); });
 
