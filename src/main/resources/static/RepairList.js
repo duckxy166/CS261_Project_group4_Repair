@@ -1,3 +1,10 @@
+window.addEventListener('pageshow', function(event) {
+  if (event.persisted) {
+    console.log('Page loaded from bfcache. Forcing reload from server...');
+    window.location.reload(); 
+  }
+});
+
 const byId = (id) => document.getElementById(id);
 
 const mockRepairData = [
@@ -210,6 +217,39 @@ document.addEventListener('DOMContentLoaded', () => {
 	const reportConfirmBtn = byId('reportConfirmBtn');
 	const successBackToListBtn = byId('successBackToListBtn');
 	
+	(async () => {
+		    try {
+		        const resp = await fetch('/api/users/current');
+		        if (resp.ok) {
+		            const user = await resp.json();
+		            
+		            // (สมมติว่าใน header มี id="currentUserName")
+		            const nameEl = byId('currentUserName'); 
+		            if (nameEl && user && user.fullName) {
+		                nameEl.textContent = user.fullName;
+		            }
+		            
+		            // (สมมติว่าใน header มี id="currentUserEmail" - เพิ่มให้ตามคำขอ)
+		            const emailEl = byId('currentUserEmail'); 
+		            if (emailEl && user && user.email) {
+		                emailEl.textContent = user.email;
+		            }
+
+		        } else if (resp.status === 401 || resp.status === 403) {
+		            alert('เซสชั่นหมดอายุ กรุณาเข้าสู่ระบบใหม่');
+		            window.location.href = 'login.html?session_expired=true';
+		        } else {
+		            console.warn('ไม่สามารถตรวจสอบผู้ใช้ปัจจุบันได้:', resp.status);
+		            const nameEl = byId('currentUserName');
+		            if(nameEl) nameEl.textContent = "Error";
+		        }
+		    } catch (err) {
+		        console.error('เกิดข้อผิดพลาดระหว่างตรวจสอบผู้ใช้:', err);
+		        const nameEl = byId('currentUserName');
+		        if(nameEl) nameEl.textContent = "Offline";
+		    }
+		})();
+		
 	// ปิด detailModal เมื่อกดปุ่มย้อนกลับ
 	if (detailBackBtn && detailModal && detailOverlay) {
 	    detailBackBtn.addEventListener('click', () => {
@@ -333,61 +373,65 @@ document.addEventListener('DOMContentLoaded', () => {
 	}
 
 	function renderTable() {
-		const start = (currentPage - 1) * PAGE_SIZE;
-		const pageItems = filteredItems.slice(start, start + PAGE_SIZE);
+			const start = (currentPage - 1) * PAGE_SIZE;
+			const pageItems = filteredItems.slice(start, start + PAGE_SIZE);
 
-		if (pageItems.length === 0) {
-			tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding: 20px;">ไม่พบรายการซ่อม</td></tr>`;
-			renderPagination();
-			return;
-		}
-
-		tbody.innerHTML = pageItems.map(item => {
-			const priorityClass = getPriorityClass(item.priority);
-			const statusClass = getStatusClass(item.status);
-
-			const status = item.status || '';
-			let menuItemsHtml = '';
-
-			if (status === 'กำลังดำเนินการ') {
-				menuItemsHtml = `
-			        <button class="menu-item" data-action="accept-job" data-id="${item.id}">
-			            <span class="mi-text">รับงานซ่อม</span>
-			        </button>`;
-			} else if (status === 'อยู่ระหว่างซ่อม' || status === 'อยู่ระหว่างการซ่อม') {
-				menuItemsHtml = `
-			        <button class="menu-item" data-action="submit-report" data-id="${item.id}">
-			            <span class="mi-text">ส่งรายงานซ่อม</span>
-			        </button>`;
-			} else {
-				menuItemsHtml = `
-			        <button class="menu-item" data-action="detail" data-id="${item.id}">
-			            <span class="mi-text">รายละเอียด</span>
-			        </button>`;
+			if (pageItems.length === 0) {
+				tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding: 20px;">ไม่พบรายการซ่อม</td></tr>`;
+				renderPagination();
+				return;
 			}
 
+			tbody.innerHTML = pageItems.map(item => {
+				const priorityClass = getPriorityClass(item.priority);
+				const statusClass = getStatusClass(item.status);
 
-			return `
-                <tr data-id="${item.id}">
-                    <td>${item.subject || '-'}</td>
-                    <td>${formatDate(item.date)}</td>
-                    <td>${item.reporter || '-'}</td>
-                    <td>${item.assignee || '-'}</td>
-                    <td>${item.category || '-'}</td>
-                    <td><span class="priority-badge ${priorityClass}">${item.priority || '-'}</span></td>
-                    <td><span class="status-badge ${statusClass}">${item.status || '-'}</span></td>
-                    <td class="actions-cell">
-                        <button class="more-btn" aria-label="เมนู" data-id="${item.id}">...</button>
-                        <div class="more-menu" id="menu-${item.id}">
-                            ${menuItemsHtml}
-                        </div>
-                    </td>
-                </tr>
-            `;
-		}).join('');
+				const status = item.status || '';
+				
+				let menuItemsHtml = `
+					<button class="menu-item" data-action="detail" data-id="${item.id}">
+						<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0.7;"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+						<span class="mi-text">รายละเอียด</span>
+					</button>
+				`;
 
-		renderPagination();
-	}
+				if (status === 'กำลังดำเนินการ') {
+					menuItemsHtml += `
+						<button class="menu-item" data-action="accept-job" data-id="${item.id}">
+							<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0.7;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+							<span class="mi-text">รับงานซ่อม</span>
+						</button>`;
+				} 
+
+				else if (status === 'อยู่ระหว่างซ่อม' || status === 'อยู่ระหว่างการซ่อม') {
+					menuItemsHtml += `
+						<button class="menu-item" data-action="submit-report" data-id="${item.id}">
+							<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0.7;"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><polyline points="13 2 13 9 20 9"></polyline></svg>
+							<span class="mi-text">ส่งรายงานซ่อม</span>
+						</button>`;
+				}
+
+				return `
+					<tr data-id="${item.id}">
+						<td>${item.subject || '-'}</td>
+						<td>${formatDate(item.date)}</td>
+						<td>${item.reporter || '-'}</td>
+						<td>${item.assignee || '-'}</td>
+						<td>${item.category || '-'}</td>
+						<td><span class="priority-badge ${priorityClass}">${item.priority || '-'}</span></td>
+						<td><span class="status-badge ${statusClass}">${item.status || '-'}</span></td>
+						<td class="actions-cell">
+							<button class="more-btn" aria-label="เมนู" data-id="${item.id}">...</button>
+							<div class="more-menu" id="menu-${item.id}">
+								${menuItemsHtml}
+							</div>
+						</td>
+					</tr>
+				`;
+			}).join('');
+
+			renderPagination();
+		}
 
 	function renderPagination() {
 		const totalPages = Math.max(1, Math.ceil(filteredItems.length / PAGE_SIZE));
@@ -700,12 +744,28 @@ document.addEventListener('DOMContentLoaded', () => {
 		});
 	}
 
-	if (logoutBtn) {
-		logoutBtn.addEventListener('click', () => {
-			console.log('Logout');
-			alert('ออกจากระบบ');
-		});
-	}
+		if (logoutBtn) {
+			logoutBtn.addEventListener('click', async (e) => {
+				e.preventDefault();
+				console.log('Logout');
+				
+				try {
+				    const response = await fetch('/api/logout', { method: 'POST' });
+				    
+				    // ไม่ว่าเซิร์ฟเวอร์จะตอบ OK (200) หรือ 401/403 (ไม่มีสิทธิ์)
+				    // ผลลัพธ์คือต้องไปหน้า login
+				    if (response.ok || response.status === 401 || response.status === 403) {
+				        window.location.href = 'login.html?logout=true';
+				    } else {
+				        alert('ไม่สามารถออกจากระบบได้: ' + response.status);
+				    }
+				} catch (err) {
+				    console.error('Logout error:', err);
+				    // ถ้าเน็ตเวิร์คมีปัญหา ก็ส่งไปหน้า login อยู่ดี
+				    window.location.href = 'login.html?logout_error=true';
+				}
+			});
+		}
 
 
 	function loadData() {
