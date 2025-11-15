@@ -475,8 +475,13 @@ kebabMenuEl.querySelector(".js-more-rate").addEventListener("click", () => {
         method:"POST", headers:{ "Content-Type":"application/json" }, body: JSON.stringify(payload)
       });
       if (!res.ok) throw new Error("ส่งข้อมูลไม่สำเร็จ");
-      //alert("ขอบคุณสำหรับความคิดเห็นของคุณ!");
+      alert("ขอบคุณสำหรับความคิดเห็นของคุณ!");
       closeFeedback(); reportModal?.classList.add("hidden");
+      const itemToUpdate = rawItems.find(x => x.id === __feedbackItem__.id);
+      if (itemToUpdate) {
+        itemToUpdate.status = "สำเร็จ"; // อัปเดต status ดิบ
+        itemToUpdate._normalizedStatus = normalizeStatus("สำเร็จ"); // อัปเดต status ที่จะแสดงผล
+      }
     } catch (err) {
       console.error(err); alert("เกิดข้อผิดพลาดในการส่งความคิดเห็น");
     }
