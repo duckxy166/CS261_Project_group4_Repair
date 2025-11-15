@@ -411,16 +411,16 @@ document.addEventListener("DOMContentLoaded", () => {
     if (fbCount) fbCount.textContent = String(fbText.value.length);
   });
 
-  fbSubmit?.addEventListener("click", async () => {
+fbSubmit?.addEventListener("click", async () => {
     if (!__feedbackItem__) return;
     if (!__feedbackScore__) {
       alert("กรุณาให้คะแนนเป็นจำนวนดาวก่อนส่ง");
       return;
     }
     const payload = {
-      requestId: __feedbackItem__.id,
+      reportId: __feedbackItem__.id,
       rating: __feedbackScore__,
-      comment: (fbText?.value || "").trim()
+      message: (fbText?.value || "").trim()
     };
     try {
       if (USE_MOCK) {
@@ -430,6 +430,7 @@ document.addEventListener("DOMContentLoaded", () => {
         reportModal?.classList.add("hidden");
         return;
       }
+      
       const res = await fetch("/api/feedback", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -460,12 +461,12 @@ document.addEventListener("DOMContentLoaded", () => {
 async function loadData() {
   try {
     let list;
-    if (USE_MOCK) {
-      list = MOCK_ITEMS;
-    } else {
-      const res = await fetch("/api/requests/user-reports");
-      list = res.ok ? await res.json() : [];
-    }
+if (USE_MOCK) {
+        list = MOCK_ITEMS;
+      } else {
+        const res = await fetch("/api/requests/user-reports", { cache: "no-store" });
+        list = res.ok ? await res.json() : [];
+      }
 
     // map & normalize; keep only the 3 states
     rawItems = (Array.isArray(list) ? list : []).map((x) => {

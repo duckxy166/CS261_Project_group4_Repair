@@ -469,7 +469,7 @@ fbSubmit?.addEventListener("click", async () => {
         alert("ขอบคุณสำหรับความคิดเห็นของคุณ!");
         closeFeedback();
         reportModal?.classList.add("hidden");
-  
+        await loadData();
         const itemToUpdate = rawItems.find(x => x.id === __feedbackItem__.id);
         if (itemToUpdate) {
           itemToUpdate.status = "สำเร็จ";
@@ -489,6 +489,7 @@ fbSubmit?.addEventListener("click", async () => {
       alert("ขอบคุณสำหรับความคิดเห็นของคุณ!");
       closeFeedback(); 
       reportModal?.classList.add("hidden");
+      await loadData();
   
       loadData(); 
       // ==========================================
