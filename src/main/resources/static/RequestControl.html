@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TU REPAIR - ควบคุมงานแจ้งซ่อม</title>
+
+  <!-- Fonts & Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons|Material+Icons+Outlined" rel="stylesheet" />
+
+  <link rel="stylesheet" href="RequestControl.css" />
+</head>
+<body>
+  <!-- ===== HEADER ===== -->
+  <header>
+    <div class="logo">TU REPAIR</div>
+
+    <nav>
+      <ul>
+        <li class="active">
+          <a href="RequestControl.html">
+            ควบคุมงานแจ้งซ่อม<br />
+            <span>( Request Control )</span>
+          </a>
+        </li>
+        <li>
+          <a href="Dashboard.html">
+            รายงานภาพรวม<br />
+            <span>( Dashboard )</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+
+    <div class="header-right">
+      <div class="user-chip">
+        <span class="material-icons-outlined avatar">person</span>
+        <div class="user-text">
+          <div class="user-name">Admin A</div>
+          <div class="user-email">AdminA@dome.tu.ac.th</div>
+        </div>
+      </div>
+      <button class="icon-button" title="ออกจากระบบ">
+        <span class="material-icons-outlined">logout</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ===== MAIN ===== -->
+  <main class="page-wrapper">
+    <!-- Title + search / filter -->
+    <section class="page-header">
+      <div class="page-title">
+        <h1>ควบคุมงานแจ้งซ่อม</h1>
+        <p>(Request Control)</p>
+      </div>
+
+      <div class="control-tools">
+        <div class="search-box">
+          <span class="material-icons-outlined search-icon">search</span>
+          <input
+            id="searchInput"
+            type="text"
+            placeholder="ค้นหาคำขอแจ้งซ่อม"
+          />
+        </div>
+
+        <!-- Filter button + dropdown -->
+        <div class="filter-wrapper">
+          <button class="filter-btn" id="filterBtn">
+            <span class="material-icons-outlined">tune</span>
+            <span>Filter</span>
+          </button>
+
+          <div class="filter-panel" id="filterPanel">
+            <ul class="filter-list">
+              <!-- Dates (UI only right now) -->
+              <li class="filter-item">
+                <input type="checkbox" id="dateRequested" />
+                <label for="dateRequested">วันที่แจ้งซ่อม</label>
+              </li>
+              <li class="filter-item">
+                <input type="checkbox" id="dateCompleted" />
+                <label for="dateCompleted">วันที่ซ่อมเสร็จสิ้น</label>
+              </li>
+          
+              <li class="filter-divider"></li>
+          
+              <!-- Urgency -->
+              <li class="filter-caption">เรียงตามความเร่งด่วน</li>
+              <li class="filter-item">
+                <input type="checkbox" id="urgHigh" data-type="urgency" value="high" />
+                <label for="urgHigh">ความเร่งด่วน: High</label>
+              </li>
+              <li class="filter-item">
+                <input type="checkbox" id="urgMedium" data-type="urgency" value="medium" />
+                <label for="urgMedium">ความเร่งด่วน: Medium</label>
+              </li>
+              <li class="filter-item">
+                <input type="checkbox" id="urgLow" data-type="urgency" value="low" />
+                <label for="urgLow">ความเร่งด่วน: Low</label>
+              </li>
+              <li class="filter-item">
+                <input type="checkbox" id="urgNone" data-type="urgency" value="none" />
+                <label for="urgNone">ความเร่งด่วน: None</label>
+              </li>
+          
+              <li class="filter-divider"></li>
+          
+              <!-- Status -->
+              <li class="filter-caption">เรียงตามสถานะ</li>
+              <li class="filter-item">
+                <input type="checkbox" id="stPending" data-type="status" value="pending" />
+                <label for="stPending">สถานะ: รอดำเนินการ</label>
+              </li>
+              <li class="filter-item">
+                <input type="checkbox" id="stInProgress" data-type="status" value="inprogress" />
+                <label for="stInProgress">สถานะ: กำลังดำเนินการ</label>
+              </li>
+              <li class="filter-item">
+                <input type="checkbox" id="stWaiting" data-type="status" value="waiting" />
+                <label for="stWaiting">สถานะ: อยู่ระหว่างซ่อม</label>
+              </li>
+              <li class="filter-item">
+                <input type="checkbox" id="stChecking" data-type="status" value="checking" />
+                <label for="stChecking">สถานะ: กำลังตรวจสอบงานซ่อม</label>
+              </li>
+              <li class="filter-item">
+                <input type="checkbox" id="stWaitFeedback" data-type="status" value="wait_feedback" />
+                <label for="stWaitFeedback">สถานะ: ยังไม่ได้ให้คะแนน</label>
+              </li>
+              <li class="filter-item">
+                <input type="checkbox" id="stSuccess" data-type="status" value="success" />
+                <label for="stSuccess">สถานะ: สำเร็จ</label>
+              </li>
+            </ul>
+          
+            <div class="filter-actions">
+              <button type="button" class="filter-clear" id="filterClear">
+                ล้างตัวกรอง
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- Card with table -->
+    <section class="card">
+      <div class="table-wrapper">
+        <table id="requestTable">
+          <thead>
+            <tr>
+              <th>เรื่องที่แจ้ง</th>
+              <th>วันที่แจ้งซ่อม</th>
+              <th>ชื่อผู้แจ้ง</th>
+              <th>ผู้รับผิดชอบ</th>
+              <th>ประเภทงาน</th>
+              <th>ความเร่งด่วน</th>
+              <th>สถานะการซ่อม</th>
+              <th>อื่นๆ</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Rows will be rendered from mock data in RequestControl.js -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination footer -->
+      <div class="table-footer">
+        <button class="text-link" id="prevBtn">ย้อนกลับ</button>
+
+        <!-- ADD id="pagination" HERE -->
+        <div class="pagination" id="pagination">
+          <button class="page-number active">01</button>
+          <button class="page-number">02</button>
+          <button class="page-number">03</button>
+          <button class="page-number">04</button>
+          <span class="page-dots">...</span>
+          <button class="page-number">10</button>
+          <button class="page-number">11</button>
+        </div>
+
+        <button class="text-link" id="nextBtn">
+          หน้าถัดไป
+          <span class="material-icons-outlined arrow-icon">chevron_right</span>
+        </button>
+      </div>
+    </section>
+  </main>
+
+    <!-- ===== DETAIL MODAL ===== -->
+    <div class="modal-overlay" id="detailOverlay">
+      <div class="detail-modal">
+        <!-- Header -->
+        <div class="detail-header">
+          <div class="detail-title-box">
+            <h2 id="detailTitle">ไฟฟ้าดับ</h2>
+            <p class="detail-subtitle">รายละเอียดงานซ่อม</p>
+          </div>
+        
+          <div class="detail-status-toggle">
+            <!-- None = dropdown เลือกความเร่งด่วน -->
+            <div class="status-dropdown">
+              <button type="button" id="statusDropdownBtn" class="status-main-btn">
+                <span id="statusMainText">None</span>
+                <span class="material-icons-outlined arrow-icon">expand_more</span>
+              </button>
+        
+              <div class="status-dropdown-menu" id="statusDropdownMenu">
+                <button class="status-option high" data-value="high">High</button>
+                <button class="status-option medium" data-value="medium">Medium</button>
+                <button class="status-option low" data-value="low">Low</button>
+              </div>
+            </div>
+        
+            <!-- ปุ่มสถานะงานซ่อม สีเหลือง แบบรูป -->
+            <button type="button" class="status-pill status-pill-active" id="detailStatusPill">
+              รอดำเนินการ
+            </button>
+          </div>
+        </div>
+    
+        <!-- Body -->
+        <div class="detail-body">
+          <!-- LEFT COLUMN -->
+          <div class="detail-col">
+            <div class="form-row">
+              <label>วันที่แจ้งซ่อม :</label>
+              <input type="text" id="detailDate" readonly />
+            </div>
+    
+            <div class="form-row">
+              <label>ประเภทของงาน :</label>
+              <input type="text" id="detailCategory" readonly />
+            </div>
+    
+            <div class="form-row">
+              <label>สถานที่ :</label>
+              <input type="text" id="detailLocation" readonly />
+            </div>
+    
+            <div class="form-row">
+              <label>ห้อง :</label>
+              <input type="text" id="detailRoom" readonly />
+            </div>
+    
+            <div class="form-row">
+              <label>รายละเอียดงาน :</label>
+              <textarea id="detailDescription" rows="3" readonly></textarea>
+            </div>
+          </div>
+    
+          <!-- RIGHT COLUMN -->
+          <div class="detail-col">
+            <div class="form-row">
+              <label>ชื่อผู้แจ้ง :</label>
+              <input type="text" id="detailReporter" readonly />
+            </div>
+    
+            <div class="form-row">
+              <label>ผู้รับผิดชอบ :</label>
+              <input type="text" id="detailTechnician" readonly />
+            </div>
+    
+            <div class="upload-box">
+              <span class="material-icons-outlined upload-icon">image</span>
+              <p>ไม่มีรูปภาพแนบ</p>
+            </div>
+          </div>
+        </div>
+    
+        <!-- Footer -->
+        <div class="detail-footer" id="detailFooter">
+          <!-- โหมดปกติ: ปุ่มซ้าย 2 ปุ่ม -->
+          <div class="left-actions" id="footerNormalActions">
+            <button type="button" class="btn-pill btn-danger" id="footerCancelBtn">
+              ยกเลิกการแจ้งซ่อม
+            </button>
+            <button type="button" class="btn-pill btn-warning" id="footerEditBtn">
+              แก้ไข
+            </button>
+          </div>
+
+
+        
+          <!-- โหมด choose: ปุ่มยืนยัน (ซ้าย) -->
+          <div class="confirm-actions">
+            <button type="button" class="btn-pill btn-success" id="detailConfirmBtn">
+              ยืนยัน
+            </button>
+          </div>
+        
+          <!-- ปุ่มย้อนกลับ (ขวา) -->
+          <button type="button" class="btn-pill btn-gray" id="detailCloseBtn">
+            ย้อนกลับ
+          </button>
+        </div>
+
+
+      </div>
+    </div>
+
+    <!-- ===== REPORT MODAL (รายงานการซ่อม) ===== -->
+    <div class="report-overlay" id="reportOverlay">
+      <div class="report-modal">
+        <!-- Header -->
+        <div class="report-header">
+          <div class="report-title-box">
+            <h2 id="reportTitle">ลิฟต์เสีย</h2>
+            <p class="report-subtitle">รายงานการซ่อม</p>
+          </div>
+
+          <div class="report-header-right">
+            <!-- pill ความเร่งด่วน -->
+            <button type="button" class="report-urgency-pill" id="reportUrgencyPill">
+              Low
+            </button>
+
+            <!-- pill สถานะงาน (สีเขียว) -->
+            <button type="button" class="report-status-pill">
+              กำลังตรวจสอบงานซ่อม
+            </button>
+          </div>
+        </div>
+
+        <!-- Body -->
+        <div class="report-body">
+          <!-- LEFT COLUMN -->
+          <div class="report-col">
+            <div class="report-row">
+              <div class="report-inline">
+                <span class="label-bold">วันที่แจ้งซ่อม :</span>
+                <span id="reportDate">DD/MM/YYYY</span>
+              </div>
+              <div class="report-inline">
+                <span class="label-bold">สถานที่ :</span>
+                <span id="reportLocation">...</span>
+              </div>
+            </div>
+
+            <div class="report-row">
+              <div class="report-inline">
+                <span class="label-bold">ผู้รับผิดชอบ :</span>
+                <span id="reportTechnician">ช่างประวิทย์</span>
+              </div>
+              <div class="report-inline">
+                <span class="label-bold">ชื่อผู้แจ้ง :</span>
+                <span id="reportReporter">Saharat Udomwatthawi</span>
+              </div>
+            </div>
+
+            <div class="report-row">
+              <div class="report-inline">
+                <span class="label-bold">ประเภทของงาน :</span>
+                <span id="reportCategory">อื่นๆ</span>
+              </div>
+            </div>
+
+            <div class="report-textblock">
+              <div class="label-bold">สาเหตุการเสีย :</div>
+              <textarea id="reportCause" rows="3" readonly></textarea>
+            </div>
+
+            <div class="report-textblock">
+              <div class="label-bold">วิธีการซ่อม :</div>
+              <textarea id="reportMethod" rows="3" readonly></textarea>
+            </div>
+
+            <div class="report-textblock">
+              <div class="label-bold">อื่นๆ ที่เปลี่ยน :</div>
+              <textarea id="reportNote" rows="3" readonly></textarea>
+            </div>
+          </div>
+
+          <!-- RIGHT COLUMN = กล่องรูป -->
+          <div class="report-col-right">
+            <div class="report-photo-box">
+              <span class="material-icons-outlined report-photo-icon">image</span>
+              <p>ไม่มีรูปภาพแนบ</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="report-footer">
+          <button type="button" class="btn-pill btn-gray">
+            ไฟล์แนบ
+          </button>
+
+          <button type="button" class="btn-pill btn-gray" id="reportCloseBtn">
+            ย้อนกลับ
+          </button>
+        </div>
+      </div>
+    </div>
+
+        <!-- ===== FEEDBACK MODAL (ดูผลประเมินงานซ่อม) ===== -->
+    <div class="feedback-overlay" id="feedbackOverlay">
+      <div class="feedback-modal">
+        <div class="feedback-header">
+          <h2 id="feedbackTitle">ลิฟต์เสีย</h2>
+          <p class="feedback-subtitle">ประเมินงานซ่อมจากผู้ใช้งาน</p>
+        </div>
+
+        <div class="feedback-info">
+          <span class="label-bold">คะแนนความพึงพอใจ :</span>
+          <span id="feedbackScoreText">-</span>
+        </div>
+
+        <div class="feedback-stars" id="feedbackStars"></div>
+
+        <div class="feedback-comment-box">
+          <div class="label-bold">ความคิดเห็น :</div>
+          <textarea id="feedbackCommentView" rows="4" readonly></textarea>
+        </div>
+
+        <div class="feedback-footer">
+          <button type="button" class="btn-pill btn-gray" id="feedbackCloseBtn">
+            ย้อนกลับ
+          </button>
+        </div>
+      </div>
+    </div>
+
+
+  <script src="RequestControl.js"></script>
+</body>
+</html>
