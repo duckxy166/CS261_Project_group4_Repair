@@ -143,14 +143,17 @@ public class RepairRequest {
 	}
 
 	public void updateStatus(String newStatus, User technicianUser) {
-		// Assign technician only if technicianUser provided and has role "Technician"
-		if (technicianUser != null && "Technician".equalsIgnoreCase(technicianUser.getRole())
-				&& "กำลังดำเนินการ".equals(this.status) && "กำลังซ่อม".equals(newStatus)) {
-			this.technician = technicianUser.getFullName();
-		}
+	    // ให้ผูกชื่อช่างตอนเปลี่ยนจาก "กำลังดำเนินการ" → "อยู่ระหว่างซ่อม"
+	    if (technicianUser != null 
+	            && "Technician".equalsIgnoreCase(technicianUser.getRole())
+	            && "กำลังดำเนินการ".equals(this.status)
+	            && ("อยู่ระหว่างซ่อม".equals(newStatus) || "กำลังซ่อม".equals(newStatus))) {
+	        this.technician = technicianUser.getFullName();
+	    }
 
-		this.status = newStatus;
-		this.updatedAt = LocalDateTime.now();
+	    this.status = newStatus;
+	    this.updatedAt = LocalDateTime.now();
 	}
+
 
 }
