@@ -167,7 +167,7 @@ function getFilteredData() {
     const searchOk =
       !text ||
       item.title.toLowerCase().includes(text) ||
-      item.reporter.toLowerCase().includes(text) ||
+      item.reporter?.fullName.toLowerCase().includes(text) ||
       item.technician.toLowerCase().includes(text) ||
       item.category.toLowerCase().includes(text);
 
@@ -200,8 +200,8 @@ function renderTableAndPagination() {
 
    tr.innerHTML = `
       <td class="title-cell">${item.title}</td>
-      <td>${formatDate(item.dateRequested)}</td>
-      <td>${item.reporter}</td>
+      <td>${formatDate(item.createdAt)}</td>
+      <td>${item.reporter?.fullName ?? "-"}</td>
       <td>${item.technician}</td>
       <td>${item.category}</td>
    <td>${createUrgencyChip(item.priority)}</td>
@@ -303,16 +303,16 @@ function openReportModal(data) {
   if (!reportOverlay) return;
 
   if (reportTitle)      reportTitle.textContent      = data.title || "";
-  if (reportDate)       reportDate.textContent       = formatDate(data.dateRequested);
+  if (reportDate)       reportDate.textContent       = formatDate(data.createdAt);
   if (reportLocation)   reportLocation.textContent   = data.location || "-";
-  if (reportReporter)   reportReporter.textContent   = data.reporter || "-";
+  if (reportReporter)   reportReporter.textContent   = data.reporter?.fullName || "-";
   if (reportTechnician) reportTechnician.textContent = data.technician || "-";
   if (reportCategory)   reportCategory.textContent   = data.category || "-";
 
   // ถ้าไม่มี field cause/method/note แยกใน mock data ก็ใช้ description ยัดใน cause ไว้ก่อน
-  if (reportCause)  reportCause.textContent  = data.cause  || data.description || "";
+  if (reportCause)  reportCause.textContent  = data.cause  || "";
   if (reportMethod) reportMethod.textContent = data.method || "";
-  if (reportNote)   reportNote.textContent   = data.note   || "";
+  if (reportNote)   reportNote.textContent   = data.parts   || "";
 
   reportOverlay.classList.add("show");
 }
@@ -456,12 +456,12 @@ function openDetailModal(data, startInEdit = false) {
 
   // ใส่ข้อมูลพื้นฐาน
   detailTitle.textContent   = data.title;
-  detailDate.value          = formatDate(data.dateRequested);
+  detailDate.value          = formatDate(data.createdAt);
   detailCategory.value      = data.category;
   detailLocation.value      = data.location || "";
-  detailRoom.value          = data.room || "";
+  detailRoom.value          = data.locationDetail || "";
   detailDescription.value   = data.description || "";
-  detailReporter.value      = data.reporter;
+  detailReporter.value      = data.reporter?.fullName;
   detailTechnician.value    = data.technician;
 
   // urgency บนปุ่ม
