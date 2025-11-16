@@ -166,10 +166,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
 			// ส่วนสร้างเมนูจุดสามจุด (คงเดิมตามไฟล์ที่คุณส่งมาล่าสุด)
 			const menuHtml = `
-            <div class="more-menu" role="menu" aria-hidden="true">
+            <div class="more-menu" role="menu" aria-hidden="true" tabindex="-1">
               ${actions.map((a, i) => `
-                ${i > 0 ? '<div class="mi-divider"></div>' : ''}
-                <button class="menu-item ${a.warn ? 'warn' : ''}" data-action="${a.action}" data-id="${escapeHtml(String(id))}">
+                ${i > 0 ? '<div class="mi-divider" role="separator"></div>' : ''}
+                <button class="menu-item ${a.warn ? 'warn' : ''}" data-action="${a.action}" data-id="${escapeHtml(String(id))}" role="menuitem">
                   <span class="mi-icon">${a.action === 'detail' ? '🔎' : a.action === 'edit' ? '✏️' : '🗑️'}</span>
                   <span class="mi-text">${a.text}</span>
                 </button>
@@ -187,7 +187,7 @@ document.addEventListener('DOMContentLoaded', function() {
                   <td>${escapeHtml(category)}</td>
                   <td><span class="status-badge ${statusInfo.cls}">${statusInfo.text}</span></td>
                   <td class="actions-cell">
-                    <button class="more-btn" aria-label="เมนูอื่นๆ" data-id="${escapeHtml(String(id))}">&#8226;&#8226;&#8226;</button>
+                    <button class="more-btn" aria-label="เมนูอื่นๆ" data-id="${escapeHtml(String(id))}" aria-haspopup="true" aria-expanded="false">&#8226;&#8226;&#8226;</button>
                     ${menuHtml}
                   </td>
                 </tr>
@@ -300,9 +300,18 @@ document.addEventListener('DOMContentLoaded', function() {
 			const cell = moreBtn.closest('.actions-cell');
 			const menu = cell && cell.querySelector('.more-menu');
 			if (!menu) return;
-			closeAllMenus();
-			menu.classList.toggle('open');
-			menu.setAttribute('aria-hidden', menu.classList.contains('open') ? 'false' : 'true');
+
+			const isCurrentlyOpen = menu.classList.contains('open');
+			closeAllMenus(); // ปิดทุกเมนูที่เปิดอยู่
+			if (!isCurrentlyOpen) { // ถ้าเมนูที่เพิ่งคลิกไม่ได้เปิดอยู่ก่อนหน้านี้ ให้เปิด
+				menu.classList.add('open');
+				moreBtn.setAttribute('aria-expanded', 'true');
+				menu.setAttribute('aria-hidden', 'false');
+				menu.focus(); // โฟกัสไปที่เมนูเพื่อรับ input จากคีย์บอร์ด
+			} else {
+				// ถ้าเมนูเปิดอยู่แล้ว และถูกคลิกซ้ำ จะถูกปิดโดย closeAllMenus() ไปแล้ว
+				moreBtn.setAttribute('aria-expanded', 'false');
+			}
 			return;
 		}
 
@@ -316,11 +325,51 @@ document.addEventListener('DOMContentLoaded', function() {
 		}
 	});
 
+	tbody.addEventListener('keydown', (e) => {
+		const moreBtn = e.target.closest('.more-btn');
+		const menu = e.target.closest('.more-menu');
+
+		if (moreBtn && (e.key === 'Enter' || e.key === ' ')) {
+			e.preventDefault();
+			moreBtn.click(); // Simulate click to toggle menu
+		}
+
+		if (menu) {
+			const menuItems = Array.from(menu.querySelectorAll('.menu-item'));
+			const currentIndex = menuItems.indexOf(document.activeElement);
+
+			if (e.key === 'ArrowDown') {
+				e.preventDefault();
+				const nextIndex = (currentIndex + 1) % menuItems.length;
+				menuItems[nextIndex].focus();
+			} else if (e.key === 'ArrowUp') {
+				e.preventDefault();
+				const prevIndex = (currentIndex - 1 + menuItems.length) % menuItems.length;
+				menuItems[prevIndex].focus();
+			} else if (e.key === 'Escape') {
+				e.preventDefault();
+				closeAllMenus();
+				moreBtn.focus(); // กลับไปโฟกัสที่ปุ่มที่เปิดเมนู
+			} else if (e.key === 'Enter' || e.key === ' ') {
+				if (document.activeElement.closest('.menu-item')) {
+					document.activeElement.click();
+				}
+			}
+		}
+	});
+
 	document.addEventListener('click', (e) => {
 		if (!e.target.closest('.actions-cell')) {
 			closeAllMenus();
 		}
 	});
+	// เพิ่มการปิดเมนูเมื่อกด ESC ทั่วไปในเอกสาร
+	document.addEventListener('keydown', (e) => {
+	    if (e.key === 'Escape') {
+	        closeAllMenus();
+	    }
+	});
+
 	paginationEl.addEventListener('click', (e) => {
 		const btn = e.target.closest('.page-btn');
 		if (!btn) return;
@@ -339,6 +388,10 @@ document.addEventListener('DOMContentLoaded', function() {
 		document.querySelectorAll('.more-menu.open').forEach(el => {
 			el.classList.remove('open');
 			el.setAttribute('aria-hidden', 'true');
+			const moreBtn = el.previousElementSibling; // Assume more-btn is sibling before menu
+			if (moreBtn && moreBtn.classList.contains('more-btn')) {
+				moreBtn.setAttribute('aria-expanded', 'false');
+			}
 		});
 	}
 
@@ -429,6 +482,10 @@ document.addEventListener('DOMContentLoaded', function() {
 	let currentDetailId = null;
 	let pendingFiles = [];
 
+	// Elements for "รายละเอียดงาน" (work detail)
+    const workLabel = byId('workLabel');
+    const detailWorkInput = byId('detailWork');
+
 	function populateSelect(el, options, selected) {
 		if (!el) return;
 		el.innerHTML = '';
@@ -450,44 +507,129 @@ document.addEventListener('DOMContentLoaded', function() {
 		return Array.from(set);
 	}
 
-	// Searchable combo utilities
+	// Searchable combo utilities - Updated to improve accessibility and keyboard navigation
 	function setupCombo(prefix, values, current) {
 		const combo = document.getElementById(prefix + 'Combo');
-		const valueInput = document.getElementById(prefix + 'Value');
+		const valueInput = document.getElementById(prefix + 'Value'); // This is the visible input field
 		const panel = document.getElementById(prefix + 'Panel');
-		const search = document.getElementById(prefix + 'Search');
+		const searchInput = document.getElementById(prefix + 'Search'); // Renamed to searchInput for clarity
 		const optionsEl = document.getElementById(prefix + 'Options');
-		if (!combo || !valueInput || !panel || !search || !optionsEl) return;
+		if (!combo || !valueInput || !panel || !searchInput || !optionsEl) return {};
+
+		let activeOptionIndex = -1; // For keyboard navigation
+
+		// Callback function to handle value changes (specifically for category combo)
+		let onChangeCallback = null;
+		if (prefix === 'cat') {
+			onChangeCallback = (value) => {
+				if (workLabel && detailWorkInput) {
+					if (value === 'อื่นๆ') { // If category is 'อื่นๆ'
+						workLabel.classList.remove('hidden');
+						detailWorkInput.readOnly = false;
+						detailWorkInput.placeholder = 'กรอกรายละเอียดงาน';
+					} else {
+						workLabel.classList.add('hidden');
+						detailWorkInput.readOnly = true;
+						detailWorkInput.value = ''; // Clear value if not 'อื่นๆ'
+					}
+				}
+			};
+		}
+
 
 		// render options
 		function render(filter = '') {
 			const f = filter.trim().toLowerCase();
 			const list = values.filter(v => !f || String(v).toLowerCase().includes(f));
-			optionsEl.innerHTML = list.map(v => `<div class="combo-option" data-val="${escapeHtml(String(v))}">${escapeHtml(String(v))}</div>`).join('');
+			optionsEl.innerHTML = list.map((v, idx) =>
+				`<div class="combo-option" role="option" id="${prefix}Option-${idx}" data-val="${escapeHtml(String(v))}">${escapeHtml(String(v))}</div>`
+			).join('');
+			activeOptionIndex = -1; // Reset active index on re-render
 		}
 		render('');
 		valueInput.value = current || '';
+		if (onChangeCallback) onChangeCallback(current); // Call on initial setup
 
 		// open/close
-		function open() { combo.classList.add('open'); valueInput.setAttribute('aria-expanded', 'true'); search.value = ''; render(''); search.focus(); }
-		function close() { combo.classList.remove('open'); valueInput.setAttribute('aria-expanded', 'false'); }
+		function open() {
+			panel.classList.add('open');
+			valueInput.setAttribute('aria-expanded', 'true');
+			searchInput.value = '';
+			render('');
+			searchInput.focus(); // Focus on search input when opened
+		}
+		function close() {
+			panel.classList.remove('open');
+			valueInput.setAttribute('aria-expanded', 'false');
+			activeOptionIndex = -1; // Reset active index on close
+		}
 
+		function selectOption(optionElement) {
+			if (!optionElement) return;
+			const val = optionElement.getAttribute('data-val');
+			valueInput.value = val || '';
+			if (onChangeCallback) onChangeCallback(val); // Call callback on selection
+			close();
+			valueInput.focus(); // Return focus to the main input
+		}
+
+		// Event Listeners
 		valueInput.addEventListener('focus', open);
 		valueInput.addEventListener('click', open);
-		search.addEventListener('input', () => render(search.value));
+
+		searchInput.addEventListener('input', () => render(searchInput.value));
+		searchInput.addEventListener('keydown', (e) => {
+			const options = Array.from(optionsEl.querySelectorAll('.combo-option'));
+			if (options.length === 0) return;
+
+			if (e.key === 'ArrowDown') {
+				e.preventDefault();
+				activeOptionIndex = (activeOptionIndex + 1) % options.length;
+				options[activeOptionIndex].focus();
+			} else if (e.key === 'ArrowUp') {
+				e.preventDefault();
+				activeOptionIndex = (activeOptionIndex - 1 + options.length) % options.length;
+				options[activeOptionIndex].focus();
+			} else if (e.key === 'Enter') {
+				e.preventDefault();
+				if (activeOptionIndex !== -1) {
+					selectOption(options[activeOptionIndex]);
+				} else if (options.length === 1 && searchInput.value === options[0].textContent) {
+					// If only one option matches exactly, select it on Enter
+					selectOption(options[0]);
+				}
+			} else if (e.key === 'Escape') {
+				e.preventDefault();
+				close();
+				valueInput.focus();
+			}
+		});
+
 		optionsEl.addEventListener('click', (e) => {
 			const opt = e.target.closest('.combo-option');
 			if (!opt) return;
-			const val = opt.getAttribute('data-val');
-			valueInput.value = val || '';
-			close();
+			selectOption(opt);
 		});
+
+		optionsEl.addEventListener('keydown', (e) => {
+			if (e.key === 'Enter' || e.key === ' ') {
+				e.preventDefault();
+				selectOption(document.activeElement);
+			} else if (e.key === 'Escape') {
+				e.preventDefault();
+				close();
+				valueInput.focus();
+			}
+		});
+
+		// Close when clicking outside
 		document.addEventListener('click', (e) => {
 			if (!combo.contains(e.target)) close();
 		});
 
-		return { getValue: () => valueInput.value };
+		return { getValue: () => valueInput.value, setValue: (val) => { valueInput.value = val; if(onChangeCallback) onChangeCallback(val); } };
 	}
+
 
 	function fillDetailFields(item) {
 		const statusKey = normalizeStatus(item.status);
@@ -514,6 +656,21 @@ document.addEventListener('DOMContentLoaded', function() {
 		if (extraField) {
 			extraField.value = item.locationDetail || '-';
 		}
+
+		// Display "รายละเอียดงาน" if category is "อื่นๆ"
+        if (workLabel && detailWorkInput) {
+            const currentCategory = item.category || item.type || '';
+            if (currentCategory === 'อื่นๆ') {
+                workLabel.classList.remove('hidden');
+                detailWorkInput.value = item.workDetail || '-'; // Set value from item.workDetail
+                detailWorkInput.readOnly = true; // Readonly in view mode
+            } else {
+                workLabel.classList.add('hidden');
+                detailWorkInput.value = ''; // Clear value if not 'อื่นๆ'
+            }
+        }
+
+
 		const cancelBtn = document.getElementById('detailCancelBtn');
 		if (cancelBtn) {
 		  if (item.status === 'รอดำเนินการ') {
@@ -576,8 +733,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	    if (!resp.ok) throw new Error('ไม่สามารถยกเลิกงานได้');
 
 	    alert('ยกเลิกงานเรียบร้อยแล้ว');
-	    dModal.setAttribute('aria-hidden', 'true');
-	    dOverlay.setAttribute('aria-hidden', 'true');
+	    closeDetailModal(); // ใช้ closeDetailModal() แทนการตั้งค่า attribute โดยตรง
 	    location.reload(); // reload after cancel success
 	  } catch (err) {
 	    console.error('Cancel request error:', err);
@@ -589,8 +745,9 @@ document.addEventListener('DOMContentLoaded', function() {
 	    const item = allItems.find(it => String(it.id || it._id) === String(id));
 	    if (!item) return;
 	    currentDetailId = String(item.id || item._id);
-	    fillDetailFields(item);
-	    exitEditMode();
+	    fillDetailFields(item); // Call fillDetailFields first to set initial values and visibility
+
+	    exitEditMode(); // This will re-hide combo boxes and show readonly inputs
 
 	    // --- Hide/Show Cancel Button based on status ---
 		const cancelBtn = document.getElementById('detailCancelBtn');
@@ -631,9 +788,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
 	    // prepare combos with data each time we open
 	    const locValues = uniqueValues('location', ['อาคาร SC', 'อาคาร บร.1', 'อาคาร บร.2', 'อาคาร บร.3']);
-	    const catValues = uniqueValues('category', ['ไฟฟ้า', 'ประปา', 'ประตู/ล็อก', 'เฟอร์นิเจอร์']);
+	    const catValues = uniqueValues('category', ['ไฟฟ้า', 'ประปา', 'ประตู/ล็อก', 'เฟอร์นิเจอร์', 'อื่นๆ']); // Added 'อื่นๆ'
 	    window._locComboCtl = setupCombo('loc', locValues, item.location || item.place || '');
-	    window._catComboCtl = setupCombo('cat', catValues, item.category || item.type || '');
+	    window._catComboCtl = setupCombo('cat', catValues, item.category || item.type || ''); // Pass initial category to setupCombo
 
 	    if (dOverlay) dOverlay.classList.add('show');
 	    if (dModal) dModal.classList.add('show');
@@ -703,14 +860,43 @@ document.addEventListener('DOMContentLoaded', function() {
 		       locationExtra.readOnly = false;
 		       locationExtra.placeholder = "กรอกรายละเอียดเพิ่มเติมของสถานที่ (เช่น บริเวณ/ห้อง/ชั้น)";
 		   }
+
+		// Update Combo Box values with current item's data before showing them
+		// and trigger their onChangeCallback to handle workDetail visibility
+		if (window._locComboCtl) window._locComboCtl.setValue(locInput.value);
+		if (window._catComboCtl) window._catComboCtl.setValue(catInput.value); // This will call the callback
+
 		// toggle controls
 		if (locInput && locCombo) { locInput.classList.add('hidden'); locCombo.classList.remove('hidden'); }
 		if (catInput && catCombo) { catInput.classList.add('hidden'); catCombo.classList.remove('hidden'); }
 		if (desc) { desc.readOnly = false; desc.placeholder = 'กรอกรายละเอียดที่ต้องการแก้ไข'; }
 		if (uploadWrap) uploadWrap.classList.remove('hidden');
+
+        // Ensure work detail input is editable if category is 'อื่นๆ'
+        const currentCategoryValue = (window._catComboCtl ? window._catComboCtl.getValue() : catInput.value) || '';
+        if (currentCategoryValue === 'อื่นๆ' && detailWorkInput) {
+            detailWorkInput.readOnly = false;
+            detailWorkInput.placeholder = 'กรอกรายละเอียดงาน';
+        } else if (detailWorkInput) {
+			detailWorkInput.readOnly = true; // Keep it readonly for other categories
+		}
+
+
 		// init upload handlers
 		pendingFiles = [];
 		function renderPendingPreviews() {
+			// Clear existing placeholders and only show actual files/new uploads
+			const existingFiles = Array.from(previewBox.querySelectorAll('.detail-file img')).map(img => ({ url: img.src }));
+			previewBox.innerHTML = ''; // Clear existing previews
+			existingFiles.forEach(f => { // Re-add existing images
+				const el = document.createElement('div');
+				el.className = 'detail-file';
+				const img = document.createElement('img');
+				img.src = f.url;
+				el.appendChild(img);
+				previewBox.appendChild(el);
+			});
+
 			pendingFiles.forEach(f => {
 				const el = document.createElement('div');
 				el.className = 'detail-file';
@@ -732,8 +918,8 @@ document.addEventListener('DOMContentLoaded', function() {
 			input.addEventListener('change', (e) => handleFiles(e.target.files));
 		}
 		if (drop) {
-			['dragenter', 'dragover'].forEach(ev => drop.addEventListener(ev, (e) => { e.preventDefault(); e.stopPropagation(); uploadWrap.classList.add('dragover'); }));
-			['dragleave', 'drop'].forEach(ev => drop.addEventListener(ev, (e) => { e.preventDefault(); e.stopPropagation(); uploadWrap.classList.remove('dragover'); }));
+			['dragenter', 'dragover'].forEach(ev => drop.addEventListener(ev, (e) => { e.preventDefault(); e.stopPropagation(); drop.classList.add('highlight'); }));
+			['dragleave', 'drop'].forEach(ev => drop.addEventListener(ev, (e) => { e.preventDefault(); e.stopPropagation(); drop.classList.remove('highlight'); }));
 			drop.addEventListener('drop', (e) => handleFiles(e.dataTransfer.files));
 		}
 		// toggle actions
@@ -762,6 +948,15 @@ document.addEventListener('DOMContentLoaded', function() {
 		if (catInput && catCombo) { catInput.classList.remove('hidden'); catCombo.classList.add('hidden'); }
 		if (desc) { desc.readOnly = true; desc.placeholder = '-'; }
 		if (uploadWrap) uploadWrap.classList.add('hidden');
+
+		// Hide work detail input and make it readonly
+        if (workLabel && detailWorkInput) {
+            workLabel.classList.add('hidden');
+            detailWorkInput.readOnly = true;
+            detailWorkInput.value = ''; // Clear its value
+        }
+
+
 		// toggle actions
 		if (dCancel) dCancel.classList.remove('hidden');
 		if (dEdit) dEdit.classList.remove('hidden');
@@ -776,35 +971,46 @@ document.addEventListener('DOMContentLoaded', function() {
 
 	if (dAbort) dAbort.addEventListener('click', () => {
 		exitEditMode();
+		// Re-populate original data after abort
+		const item = allItems.find(it => String(it.id || it._id) === String(currentDetailId));
+		if (item) fillDetailFields(item);
 	});
 
 	if (dSave) dSave.addEventListener('click', async () => {
 		if (!currentDetailId) return;
 
 		try {
-			// ✅ 1. สร้าง FormData object ขึ้นมาก่อน (สำคัญมาก!)
+			
 			const formData = new FormData();
 
-			// ดึงค่าจาก input ต่างๆ
+			
 			const locComboCtl = window._locComboCtl;
-			const catComboCtl = window._catComboCtl;
+			const catComboCtl = window._catComboCtl; 
 			const desc = document.getElementById('detailDesc');
-			// ใช้ ID ใหม่ที่เราเพิ่งแก้ไป
+			
 			const titleInput = document.getElementById('detailTitleInput');
 			const extraDetail = document.getElementById("detailLocationExtra");
 
-			// ✅ 2. เอาค่าใส่ FormData
+			
 			formData.append("title", titleInput ? titleInput.value.trim() : "-");
 			formData.append("location", locComboCtl ? locComboCtl.getValue() : "");
 			formData.append("description", desc ? desc.value : "");
 			formData.append("category", catComboCtl ? catComboCtl.getValue() : "");
 			formData.append("locationDetail", extraDetail ? extraDetail.value.trim() : "");
+            
+            if (catComboCtl && catComboCtl.getValue() === 'อื่นๆ' && detailWorkInput) {
+                formData.append("workDetail", detailWorkInput.value.trim());
+            } else {
+                formData.append("workDetail", ""); 
+            }
 
-			// ค่า attachments (ถ้า backend ต้องการ)
+
+			
+			
 			formData.append("existingAttachments", JSON.stringify([]));
 			formData.append("removedAttachments", JSON.stringify([]));
 
-			// แนบไฟล์ใหม่ที่เพิ่ม (ถ้ามี)
+			
 			if (pendingFiles && pendingFiles.length) {
 				pendingFiles.forEach(f => formData.append("newAttachments", f));
 			}
