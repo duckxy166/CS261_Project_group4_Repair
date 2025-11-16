@@ -469,7 +469,8 @@ fbSubmit?.addEventListener("click", async () => {
         alert("ขอบคุณสำหรับความคิดเห็นของคุณ!");
         closeFeedback();
         reportModal?.classList.add("hidden");
-        await loadData();
+        
+        // (ส่วนนี้สำหรับ MOCK)
         const itemToUpdate = rawItems.find(x => x.id === __feedbackItem__.id);
         if (itemToUpdate) {
           itemToUpdate.status = "สำเร็จ";
@@ -480,7 +481,7 @@ fbSubmit?.addEventListener("click", async () => {
         
         return; 
       }
-  
+
       const res = await fetch("/api/feedback", {
         method:"POST", headers:{ "Content-Type":"application/json" }, body: JSON.stringify(payload)
       });
@@ -489,10 +490,8 @@ fbSubmit?.addEventListener("click", async () => {
       alert("ขอบคุณสำหรับความคิดเห็นของคุณ!");
       closeFeedback(); 
       reportModal?.classList.add("hidden");
-      await loadData();
   
-      loadData(); 
-      // ==========================================
+      await loadData(); 
   
     } catch (err) {
       console.error(err); alert("เกิดข้อผิดพลาดในการส่งความคิดเห็น");
@@ -503,18 +502,18 @@ fbSubmit?.addEventListener("click", async () => {
   feedbackModal?.addEventListener("click", (e) => { if (e.target === feedbackModal) closeFeedback(); });
 
   /* ---------- Load Data ---------- */
-  (async () => {
+async function loadData() {
     try {
       let list;
       if (USE_MOCK) {
         list = MOCK_ITEMS;
       } else {
-        const res = await fetch("/api/requests/user-reports");
+        // 2. เพิ่ม { cache: "no-store" } เพื่อบังคับโหลดใหม่ ไม่ติดแคช
+        const res = await fetch("/api/requests/user-reports", { cache: "no-store" });
         list = res.ok ? await res.json() : [];
       }
 
-      // map & normalize; keep only the 3 states
-	  rawItems = (Array.isArray(list) ? list : []).map((x) => {
+   rawItems = (Array.isArray(list) ? list : []).map((x) => {
 	      const mapped = {
 	          id: x.id || x._id,
 	          title: x.title || "",
@@ -536,21 +535,22 @@ fbSubmit?.addEventListener("click", async () => {
 	          reportParts: x.reportParts || "",
 	          reportCost: x.reportCost || ""
 	      };
-mapped._normalizedStatus = normalizeStatus(mapped.status);
+        mapped._normalizedStatus = normalizeStatus(mapped.status);
 	      return mapped;
-	  }).filter(it => it._normalizedStatus !== null); // Keep all normalized statuses (สำเร็จ, ยกเลิก, ยังไม่ได้คะแนน)
-
-
-      window.__HISTORY_DATA__ = rawItems;
+	  }).filter(it => it._normalizedStatus !== null); 
 
 
       window.__HISTORY_DATA__ = rawItems;
       viewItems = [...rawItems];
       applySort();
-      render(1);
+      render(1); // สั่งให้ render หน้า 1 เสมอ
     } catch (err) {
       console.error("Load history fail:", err);
       rawItems = []; viewItems = []; render(1);
     }
-  })();
+  }
+
+  // 3. สั่งให้ฟังก์ชันนี้ทำงานครั้งแรกเมื่อเปิดหน้า
+  loadData();
+
 });
