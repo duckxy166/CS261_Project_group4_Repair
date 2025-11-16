@@ -485,14 +485,17 @@ async function loadAttachments(requestId) {
         const res = await fetch(`/api/files/${requestId}`);
         const files = await res.json();
 
-        console.log("Files from backend =", files);
-
         const container = document.getElementById("attachmentList");
+        if (!container) {
+            console.warn("No attachmentList element found in DOM");
+            return files; // return files เผื่อใช้งานต่อ
+        }
+
         container.innerHTML = "";
 
         if (files.length === 0) {
             container.innerHTML = `<p style="color:#888">ไม่มีไฟล์แนบ</p>`;
-            return;
+            return [];
         }
 
         files.forEach(file => {
@@ -503,10 +506,15 @@ async function loadAttachments(requestId) {
                 </div>
             `;
         });
+
+        return files;
     } catch (err) {
         console.error("Error loading attachments:", err);
+        return [];
     }
 }
+
+
 //load image
 async function loadPreviewImage(requestId, attachmentId) {
     const previewImg = document.getElementById("previewImage");
@@ -515,9 +523,20 @@ async function loadPreviewImage(requestId, attachmentId) {
 
     try {
         const res = await fetch(`/api/files/${requestId}/${attachmentId}/download`);
-
         if (!res.ok) {
-            console.log("No image found");
+            console.log("No image found or API error", res.status);
+            previewImg.style.display = "none";
+            noImageIcon.style.display = "inline";
+            noImageText.style.display = "block";
+            return;
+        }
+
+        const contentType = res.headers.get("content-type");
+        if (!contentType.startsWith("image/")) {
+            console.log("File is not an image:", contentType);
+            previewImg.style.display = "none";
+            noImageIcon.style.display = "inline";
+            noImageText.style.display = "block";
             return;
         }
 
@@ -528,10 +547,13 @@ async function loadPreviewImage(requestId, attachmentId) {
         previewImg.style.display = "block";
         noImageIcon.style.display = "none";
         noImageText.style.display = "none";
+
+        console.log("Preview image loaded:", url);
     } catch (err) {
         console.error("Error loading preview:", err);
     }
 }
+
 async function openDetailModal(data, startInEdit = false) {
   currentEditingId = data.id;
   isEditMode = false; // เริ่มจากโหมดดูอย่างเดียว

@@ -688,7 +688,8 @@ document.addEventListener('DOMContentLoaded', () => {
 	    for (let f of files) {
 	        const formData = new FormData();
 	        formData.append("file", f);
-
+		const description = `Cause: ${cause}\nMethod: ${method}\nParts: ${parts}`;
+			formData.append("description", description);
 	        await fetch(`/api/files/${currentJobId}`, {
 	            method: "POST",
 	            body: formData
