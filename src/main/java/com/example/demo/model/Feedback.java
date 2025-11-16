@@ -12,7 +12,7 @@ public class Feedback {
 
     private int rating;
 
-    @Column(length = 500)
+    @Column(columnDefinition = "NVARCHAR(500)")
     private String message;
 
     private LocalDateTime createdAt;
