@@ -49,17 +49,20 @@ async function loadReportDetail() {
 
     // Render 
     const container = document.querySelector(".container");
-    container.innerHTML = `
-      <p>วันที่แจ้งซ่อม : ${report.createdAt ? report.createdAt.replace("T", " ").slice(0,16) : "-"}</p>
-      <p>ชื่อผู้แจ้ง : ${report.reporterName || "-"}</p>
-      <p>ผู้รับผิดชอบ : ${report.technician || "-"}</p>
-      <p>ประเภทของงาน : ${report.title || "-"}</p>
-      <p>สถานที่ : ${report.location || "-"}</p>
-	  <p>รายละเอียดสถานที่เพิ่มเติม : ${report.locationDetail || "-"}</p>
-      <p>รายละเอียดงาน : ${report.description || "-"}</p>
-      <p>สถานะการซ่อม : ${report.status || "-"} <span class="dot"></span></p>
+container.innerHTML = `
+  <p>วันที่แจ้งซ่อม : ${report.createdAt ? report.createdAt.replace("T", " ").slice(0,16) : "-"}</p>
+  <p>ชื่อผู้แจ้ง : ${report.reporterName || "-"}</p>
+  <p>ผู้รับผิดชอบ : ${report.technician || "-"}</p>
+  <p>ประเภทของงาน : ${report.title || "-"}</p>
+  <p>สถานที่ : ${report.location || "-"}</p>
+  <p>รายละเอียดสถานที่เพิ่มเติม : ${report.locationDetail || "-"}</p>
+  <p>รายละเอียดงาน : ${report.description || "-"}</p>
+  <p>สถานะการซ่อม : ${report.status || "-"} <span class="dot"></span></p>
 
-      <div class="image-box">${filesHTML}</div>
+  <p>สาเหตุของปัญหา : ${report.cause || "-"}</p>
+  <p>วิธีการซ่อม : ${report.method || "-"}</p>
+  <p>ชิ้นส่วนที่เปลี่ยน : ${report.parts || "-"}</p>
+  <div class="image-box">${filesHTML}</div>
 
       <div class="actions">
         ${report.status === "รอดำเนินการ" ? `<button class="cancel" id="cancelRequest">ยกเลิกการแจ้งซ่อม</button>` : ""}

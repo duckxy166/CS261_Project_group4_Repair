@@ -530,8 +530,8 @@ fbSubmit?.addEventListener("click", async () => {
 	          reportText: x.reportText || "",
 	          reportImageUrl: x.reportImageUrl || "",
 	          reportCause: x.reportCause || "",
-	          reportMethod: x.reportMethod || "",
-	          reportParts: x.reportParts || "",
+reportMethod: x.method || "", // <-- แก้เป็น x.method
+	          reportParts: x.parts || "",   // <-- แก้เป็น x.parts
 	          reportCost: x.reportCost || ""
 	      };
 mapped._normalizedStatus = normalizeStatus(mapped.status);

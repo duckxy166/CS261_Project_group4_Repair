@@ -128,14 +128,49 @@ public class ReportController {
     }
 
     // ---------------- Get report detail ----------------
-    @GetMapping("/{id}")
-    public ReportResponse getReportDetail(@PathVariable Long id, HttpSession session) {
-        User user = (User) session.getAttribute("user");
-        if (user == null) {
-            throw new RuntimeException("Not logged in");
-        }
-        return reportService.getReportDetail(id, user);
+   @GetMapping("/{id}")
+public ResponseEntity<?> getReportDetail(@PathVariable Long id, HttpSession session) {
+    User user = (User) session.getAttribute("user");
+    if (user == null) {
+         return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
+                .body("Not logged in");
     }
+
+    // 1. ดึง Report ต้นทางจาก ID
+    Optional<RepairRequest> optReport = reportRepository.findById(id);
+    if (optReport.isEmpty()) {
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body("Report not found");
+    }
+
+    RepairRequest report = optReport.get();
+
+    // 2. (Optional) ตรวจสอบสิทธิ์ว่า user นี้ดู report นี้ได้หรือไม่
+    // (ข้ามไปก่อนเพื่อความง่าย แต่ service เดิมของคุณอาจจะทำอยู่)
+    
+    // 3. สร้าง Response ที่มีข้อมูลครบถ้วน
+    ReportResponse response = new ReportResponse(
+            report.getId(),
+            report.getStatus(),
+            report.getTechnician(),
+            report.getTitle(),
+            report.getLocation(),
+            report.getLocationDetail(),
+            report.getDescription(),
+            // เพิ่มการตรวจสอบ null ให้ reporter
+            report.getReporter() != null ? report.getReporter().getFullName() : "N/A", 
+            report.getCreatedAt(),
+            report.getCategory(),
+            report.getCause(),     // <-- ข้อมูลมาแล้ว
+            report.getMethod(),    // <-- ข้อมูลมาแล้ว
+            report.getParts()      // <-- ข้อมูลมาแล้ว
+    );
+
+    // 4. ส่ง Response กลับไป
+    return ResponseEntity.ok(response);
+}
 
     // ---------------- Update status by technician ----------------
     @PostMapping("/{id}/update-status")
