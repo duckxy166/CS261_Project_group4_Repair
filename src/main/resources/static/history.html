@@ -8,7 +8,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-  <!-- ===== Header ===== -->
   <header>
     <div class="logo">TU REPAIR</div>
     <nav>
@@ -34,7 +33,6 @@
     </div>
   </header>
 
-  <!-- ===== Main ===== -->
   <main>
     <div class="container history-wrapper">
       <div class="history-head">
@@ -75,8 +73,7 @@
             </tr>
           </thead>
           <tbody id="historyTbody">
-            <!-- rows inserted by JS -->
-          </tbody>
+            </tbody>
         </table>
 
         <div class="empty-state hidden" id="emptyState">ไม่พบข้อมูล</div>
@@ -86,7 +83,7 @@
         <div class="pager-left">
           <button class="text-btn" id="backToTrack">ย้อนกลับ</button>
         </div>
-        <div class="pager-mid" id="pageNumbers"><!-- 01 02 03 ... --></div>
+        <div class="pager-mid" id="pageNumbers"></div>
         <div class="pager-right">
           <button class="text-btn" id="nextPageBtn">หน้าถัดไป</button>
         </div>
@@ -94,7 +91,6 @@
     </div>
   </main>
 
-  <!-- ===== Detail Modal ===== -->
   <div id="detailModal" class="modal hidden" role="dialog" aria-modal="true" aria-label="รายละเอียดงานซ่อม">
     <div class="modal-card modal--history">
       <div class="modal-header">
@@ -156,7 +152,6 @@
     </div>
   </div>
 
-  <!-- ===== Repair Report Modal (REPLACE THIS WHOLE BLOCK) ===== -->
   <div id="reportModal" class="modal hidden" role="dialog" aria-modal="true" aria-label="รายงานการซ่อมจากช่าง">
     <div class="modal-card modal--report">
       <div class="modal-header">
@@ -171,7 +166,6 @@
   
       <div class="modal-body report-body">
         <div class="report-grid">
-          <!-- LEFT -->
           <div class="col-left">
             <div class="report-row">
               <input id="rm-date" class="ro ro--date" type="text" readonly placeholder="DD/MM/YYYY" />
@@ -184,7 +178,6 @@
               <div class="info-inline"><span class="lbl">ชื่อผู้แจ้ง :</span> <span id="rm-reporter">-</span></div>
             </div>
   
-            <!-- 4 text blocks like the mock -->
             <div class="text-block">
               <div class="tb-title">สาเหตุการเสีย :</div>
               <textarea id="rm-cause" class="ro ro--note" readonly placeholder="รายละเอียดสาเหตุ"></textarea>
@@ -199,14 +192,8 @@
               <div class="tb-title">ชิ้นส่วนที่เปลี่ยน :</div>
               <textarea id="rm-parts" class="ro ro--note" readonly placeholder="รายการอะไหล่ / จำนวน"></textarea>
             </div>
-  
-            <div class="text-block">
-              <div class="tb-title">ค่าใช้จ่าย :</div>
-              <textarea id="rm-cost" class="ro ro--note" readonly placeholder="สรุปค่าใช้จ่าย"></textarea>
-            </div>
           </div>
   
-          <!-- RIGHT -->
           <div class="col-right">
             <div class="image-box" id="rm-imageBox">
               <img id="rm-image" alt="รูปหลังซ่อม" />
@@ -231,7 +218,6 @@
     </div>
   </div>
 
-  <!-- ===== Feedback Modal ===== -->
   <div id="feedbackModal" class="modal hidden" role="dialog" aria-modal="true" aria-label="แบบฟอร์มเสนอแนะ">
     <div class="modal-card fb-card">
       <div class="modal-header">
