@@ -34,7 +34,7 @@ public class Attachment {
     private String relativePath;
 
     // คำอธิบายจากช่าง
-    @Column(length = 500)
+    @Column(length = 500, columnDefinition = "NVARCHAR(255)")
     private String description;
     
     @Column(nullable = false, updatable = false)

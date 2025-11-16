@@ -45,14 +45,19 @@ public class ReportService {
         RepairRequest report = reportRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Report not found"));
 
+        // อัปเดต status + technician
         report.updateStatus(status, technician);
 
+        // ถ้ามี priority ให้เซ็ต
         if (priority != null && !priority.isEmpty()) {
             report.setPriority(priority);
         }
 
+        // save แล้ว return ตัว object ใหม่
         return reportRepository.save(report);
     }
+
+
 
 
     // ---------------- Mark report as completed ----------------

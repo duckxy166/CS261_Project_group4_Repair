@@ -18,6 +18,7 @@ import jakarta.servlet.http.HttpSession;
 
 import org.springframework.http.MediaType;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/requests")
@@ -138,37 +139,81 @@ public class ReportController {
 
     // ---------------- Update status by technician ----------------
     @PostMapping("/{id}/update-status")
-    public ResponseEntity<ReportResponse> updateStatus(
+    public ResponseEntity<?> updateStatus(
             @PathVariable Long id,
             @RequestBody ReportUpdateRequest req,
             HttpSession session) {
 
+        // 1️⃣ Check if session has a logged-in user
         User currentUser = (User) session.getAttribute("user");
+        
         if (currentUser == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            return ResponseEntity
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .body("No logged-in user in session");
+        }
+        
+
+        // 2️⃣ Check if user has fullName
+        if (currentUser.getFullName() == null || currentUser.getFullName().isBlank()) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body("Current user does not have a full name");
         }
 
-        User technician = null;
-        if ("self".equals(req.getTechnician())) {
-            technician = currentUser;
+        // 3️⃣ Fetch the report
+        Optional<RepairRequest> optReport = reportRepository.findById(id);
+        if (optReport.isEmpty()) {
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body("Report not found");
         }
 
-        RepairRequest updated = reportService.updateStatus(id, req.getStatus(), technician, req.getPriority());
+        RepairRequest report = optReport.get();
+
+        // 4️⃣ Update status only if provided
+        if (req.getStatus() != null && !req.getStatus().isBlank()) {
+            report.setStatus(req.getStatus());
+        }
+        
+        // 5️⃣ Update technician if 'self'
+        if (req.getTechnician() == null || "self".equals(req.getTechnician())) {
+            report.setTechnician(currentUser.getFullName());
+        } else {
+            report.setTechnician(req.getTechnician());
+        }
+        
+        //report.setTechnician("");
+
+        // 6️⃣ Save to DB
+        reportRepository.save(report);
+
+        // 7️⃣ Return response
         ReportResponse response = new ReportResponse(
-                updated.getId(),
-                updated.getStatus(),
-                updated.getTechnician(),
-                updated.getTitle(),
-                updated.getLocation(),
-                updated.getLocationDetail(),
-                updated.getDescription(),
-                updated.getReporter().getFullName(),
-                updated.getCreatedAt(),
-                updated.getCategory()
+                report.getId(),
+                report.getStatus(),
+                report.getTechnician(),
+                report.getTitle(),
+                report.getLocation(),
+                report.getLocationDetail(),
+                report.getDescription(),
+                report.getReporter().getFullName(),
+                report.getCreatedAt(),
+                report.getCategory()
         );
 
+        
+        System.out.println("==== DEBUG ====");
+        System.out.println("Technician from request: " + req.getTechnician());
+        System.out.println("Current user full name: " + currentUser.getFullName());
+        System.out.println("Technician to save: " + report.getTechnician());
+        System.out.println("================");
+        
         return ResponseEntity.ok(response);
     }
+
+
+
 
     // ---------------- Update (title, location, description, attachments) ----------------
     @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
