@@ -171,8 +171,8 @@ function getFilteredData() {
       item.technician.toLowerCase().includes(text) ||
       item.category.toLowerCase().includes(text);
 
-    const urgOk =
-      urgChecked.length === 0 || urgChecked.includes(item.urgency);
+const urgOk =
+      urgChecked.length === 0 || urgChecked.includes(item.priority);
 
     const statusOk =
       statusChecked.length === 0 || statusChecked.includes(item.status);
@@ -204,7 +204,7 @@ function renderTableAndPagination() {
       <td>${item.reporter}</td>
       <td>${item.technician}</td>
       <td>${item.category}</td>
-      <td>${createUrgencyChip(item.urgency)}</td>
+   <td>${createUrgencyChip(item.priority)}</td>
       <td>${createStatusChip(item.status)}</td>
       <td class="more-cell">
         <button class="more-btn" type="button">
@@ -465,7 +465,7 @@ function openDetailModal(data, startInEdit = false) {
   detailTechnician.value    = data.technician;
 
   // urgency บนปุ่ม
-  setUrgencyOnMainBtn(data.urgency);
+  setUrgencyOnMainBtn(data.priority);
 
   // status pill
   // status pill (use correct color like table)
@@ -612,11 +612,11 @@ if (confirmInspectionBtn) {
   
 
   // ===== ล็อก / ปลดล็อก dropdown ความเร่งด่วน =====
-  canChangeUrgency = !(
-    data.status === "success" ||
-    data.status === "checking" ||
-    data.status === "waiting" ||
-    data.status === "cancelled"
+canChangeUrgency = !(
+    data.status === "สำเร็จ" ||
+    data.status === "กำลังตรวจสอบงานซ่อม" ||
+    data.status === "อยู่ระหว่างซ่อม" ||
+    data.status === "ยกเลิก"
   );
 
   statusDropdownBtn.classList.remove(
@@ -627,7 +627,7 @@ if (confirmInspectionBtn) {
     "urg-low"
   );
 
-  setUrgencyOnMainBtn(data.urgency);
+  setUrgencyOnMainBtn(data.priority);
   applyEditModeUI();
 
   // ถ้าเรียกมาให้เริ่มที่ edit mode (จากเมนู 3 จุด)
@@ -729,35 +729,33 @@ overlay.addEventListener("click", (e) => {
 });
 
 // ปุ่ม "ยืนยัน" ใน detail modal
-detailConfirmBtn.addEventListener("click", async () => { // 1. ตรวจสอบว่ามี async
+detailConfirmBtn.addEventListener("click", async () => { 
   if (!currentEditingId) return;
 
-  const req = allRequests.find((r) => r.id === currentEditingId);
+  // ❗️ 2. ต้องค้นหาจาก allRequests (ข้อมูลจริง)
+  const req = allRequests.find((r) => r.id === currentEditingId); 
   if (!req) return;
 
-  // 2. ดึงค่าใหม่
+  // 3. ดึงค่าใหม่จาก UI
   const newUrgency = statusMainText.textContent.trim().toLowerCase();
-  // (API ของคุณยังไม่รองรับการแก้ description, แต่โค้ดนี้จะเซฟ urgency)
   
-  // ⭐️ [เพิ่ม Logic] ⭐️
-  // 3. ตรวจสอบและอัปเดตสถานะใหม่
-  let newStatus = req.status; // ใช้สถานะเดิมเป็นค่าเริ่มต้น
+  // 4. สร้าง Logic สถานะ (เหมือนที่คุณทำไว้)
+  let newStatus = req.status; 
   if (req.status === "รอดำเนินการ") {
-    newStatus = "กำลังดำเนินการ"; // ถ้าสถานะเดิมคือ "รอดำเนินการ" ให้เปลี่ยนเป็น "กำลังดำเนินการ"
+    newStatus = "กำลังดำเนินการ"; 
   }
-  // (ถ้าสถานะเดิมเป็น "กำลังดำเนินการ" อยู่แล้ว มันก็จะยังเป็น "กำลังดำเนินการ" เหมือนเดิม)
 
-  // 4. สร้าง object ที่จะส่งไป API
+  // ❗️ 5. สร้าง object ที่จะส่งไป API (ส่งทั้ง status และ priority)
   const updateData = {
     id: currentEditingId,
-    status: newStatus,     // ❗️ [แก้ไข] ❗️ ส่งสถานะใหม่ไป
-    priority: newUrgency   // ส่ง priority (urgency) ใหม่
+    status: newStatus,     
+    priority: newUrgency   // <--- ตัวนี้คือความเร่งด่วนที่เลือกใหม่
   };
   
-  console.log("Sending update:", updateData);
+  console.log("Sending update to API:", updateData); // สำหรับ Debug
 
   try {
-    // 5. ยิง API
+    // ❗️ 6. ยิง Fetch API เพื่อบันทึก
     const response = await fetch('/api/requests/update-status', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -766,7 +764,7 @@ detailConfirmBtn.addEventListener("click", async () => { // 1. ตรวจส�
 
     if (!response.ok) throw new Error('API Error');
 
-    // 6. ถ้าสำเร็จ: ปิดโหมดแก้ไข, ดึงข้อมูลใหม่, วาดตารางใหม่
+    // 7. ถ้าสำเร็จ: ปิดโหมดแก้ไข, ดึงข้อมูลใหม่, วาดตารางใหม่
     isEditMode = false;
     if (detailFooter) detailFooter.classList.remove("confirm-mode");
     applyEditModeUI();
@@ -774,11 +772,11 @@ detailConfirmBtn.addEventListener("click", async () => { // 1. ตรวจส�
     await fetchRequests(); // ดึงข้อมูลล่าสุด
     renderTableAndPagination(); // วาดตารางใหม่
 
-    // 7. อัปเดต UI ใน Modal ทันที
+    // 8. อัปเดต UI ใน Modal ทันที
     const updatedReq = allRequests.find((r) => r.id === currentEditingId);
     if(updatedReq) {
       setUrgencyOnMainBtn(updatedReq.priority); // อัปเดตปุ่ม Urgency
-      updateDetailStatusPill(updatedReq.status); // ❗️ [เพิ่ม] ❗️ อัปเดตป้ายสถานะใน Modal
+      updateDetailStatusPill(updatedReq.status); // อัปเดตป้ายสถานะ
     }
 
   } catch (error) {
