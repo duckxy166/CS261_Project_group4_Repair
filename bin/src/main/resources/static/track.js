@@ -80,6 +80,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		'processing': { text: 'กำลังดำเนินการ', cls: 'status-processing' },
 		'assigned': { text: 'อยู่ระหว่างซ่อม', cls: 'status-assigned' },
 		'checking': { text: 'กำลังตรวจสอบ', cls: 'status-checking' },
+		'awaiting_feedback': { text: 'ยังไม่ได้ให้คะแนน', cls: 'status-wait-feedback' },
 		'done': { text: 'สำเร็จ', cls: 'status-success' },
 		'cancelled': { text: 'ยกเลิก', cls: 'status-cancelled' }
 	};
@@ -93,6 +94,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		if (v === 'กำลังดำเนินการ') return 'processing';
 		if (v === 'อยู่ระหว่างซ่อม') return 'assigned';
 		if (v === 'กำลังตรวจสอบงานซ่อม') return 'checking'; // 🔥 ต้องตรงกับ DB ทุกตัวอักษร
+		if (v === 'ยังไม่ได้ให้คะแนน') return 'awaiting_feedback';
 		if (v === 'สำเร็จ') return 'done';
 		if (v === 'ยกเลิก') return 'cancelled';
 
@@ -274,10 +276,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
 			// 2. เพิ่มตัวกรอง
 			// กรองเอาเฉพาะรายการที่ "ไม่ใช่" สถานะ 'done' และ 'cancelled'
-			allItems = rawData.filter((item) => {
-				const statusKey = normalizeStatus(item.status); // ใช้ฟังก์ชัน normalizeStatus ที่มีอยู่แล้ว
-				return statusKey !== 'done' && statusKey !== 'cancelled';
-			});
+allItems = rawData.filter((item) => {
+	const statusKey = normalizeStatus(item.status); // ใช้ฟังก์ชัน normalizeStatus ที่มีอยู่แล้ว
+	return statusKey !== 'done' && statusKey !== 'cancelled' && statusKey !== 'awaiting_feedback';
+});
 			// จบส่วนที่เพิ่ม
 
 			filtered = allItems.slice(); // 3. ส่งข้อมูลที่กรองแล้วไปแสดงผล

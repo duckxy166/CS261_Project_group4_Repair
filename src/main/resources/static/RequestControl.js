@@ -582,9 +582,9 @@ if (confirmInspectionBtn) {
       if (!currentEditingId || data.status !== "กำลังตรวจสอบงานซ่อม") return;
 
       // 2. สร้าง object ที่จะส่งไป API
-      const updateData = {
+const updateData = {
         id: currentEditingId,
-        status: "ยังไม่ได้ให้คะแนน", // <--- 3. ส่งสถานะใหม่เป็นภาษาไทย
+        status: "ซ่อมเสร็จ", // <--- 3. [แก้ไข] เปลี่ยนเป็นคำที่ history.js รู้จัก
         priority: data.priority || "low"
       };
 
@@ -612,11 +612,11 @@ if (confirmInspectionBtn) {
   
 
   // ===== ล็อก / ปลดล็อก dropdown ความเร่งด่วน =====
-canChangeUrgency = !(
-    data.status === "สำเร็จ" ||
-    data.status === "กำลังตรวจสอบงานซ่อม" ||
-    data.status === "อยู่ระหว่างซ่อม" ||
-    data.status === "ยกเลิก"
+  canChangeUrgency = !(
+    data.status === "success" ||
+    data.status === "checking" ||
+    data.status === "waiting" ||
+    data.status === "cancelled"
   );
 
   statusDropdownBtn.classList.remove(
