@@ -7,7 +7,7 @@ public class RequestFormDTO {
 	private String location;
 	private String locationDetail;
 	private String category;
-
+	
 	// getter & setter
 	public String getTitle() {
 		return title;

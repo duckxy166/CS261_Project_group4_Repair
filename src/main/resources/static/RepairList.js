@@ -1,8 +1,8 @@
 window.addEventListener('pageshow', function(event) {
-  if (event.persisted) {
-    console.log('Page loaded from bfcache. Forcing reload from server...');
-    window.location.reload(); 
-  }
+	if (event.persisted) {
+		console.log('Page loaded from bfcache. Forcing reload from server...');
+		window.location.reload();
+	}
 });
 
 const byId = (id) => document.getElementById(id);
@@ -12,7 +12,7 @@ const byId = (id) => document.getElementById(id);
 let currentUserFullName = '';
 document.addEventListener('DOMContentLoaded', () => {
 
-	
+
 	const tbody = byId('listTbody');
 	const paginationEl = byId('listPagination');
 	const searchInput = byId('listSearch');
@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	const acceptModal = byId('acceptModal');
 	const detailOverlay = byId('detailOverlay');
 	const detailModal = byId('detailModal');
-	
+
 	const reportOverlay = byId('reportOverlay');
 	const reportModal = byId('reportModal');
 	const successOverlay = byId('successOverlay');
@@ -36,122 +36,122 @@ document.addEventListener('DOMContentLoaded', () => {
 	const reportBackBtn = byId('reportBackBtn');
 	const reportConfirmBtn = byId('reportConfirmBtn');
 	const successBackToListBtn = byId('successBackToListBtn');
-	
-	
-		
+
+
+
 	async function loadRepairRequests() {
-	        try {
-	            const resp = await fetch('/api/requests', { credentials: 'include' });
-	            if (resp.ok) {
-	                const data = await resp.json();
-	                // Filter only statuses that the technician should see
-	                allItems = data.filter(item => {
-	                    const status = item.status || '';
-	                    return status === 'กำลังดำเนินการ' || status === 'อยู่ระหว่างซ่อม' || status === 'อยู่ระหว่างการซ่อม';
-	                });
-	                applyFilterAndSearch();
-	            } else {
-	                console.error('ไม่สามารถโหลดรายการซ่อมได้', resp.status);
-	                tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:20px;">ไม่สามารถโหลดรายการซ่อมได้</td></tr>`;
-	            }
-	        } catch (err) {
-	            console.error('เกิดข้อผิดพลาดในการเรียก API:', err);
-	            tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:20px;">เกิดข้อผิดพลาดในการเชื่อมต่อ</td></tr>`;
-	        }
-	 }
-	 async function loadDetailImages(id) {
-	     const imagesBox = byId('detailImages');
-	     imagesBox.innerHTML = '';
+		try {
+			const resp = await fetch('/api/requests', { credentials: 'include' });
+			if (resp.ok) {
+				const data = await resp.json();
+				// Filter only statuses that the technician should see
+				allItems = data.filter(item => {
+					const status = item.status || '';
+					return status === 'กำลังดำเนินการ' || status === 'อยู่ระหว่างซ่อม' || status === 'อยู่ระหว่างการซ่อม';
+				});
+				applyFilterAndSearch();
+			} else {
+				console.error('ไม่สามารถโหลดรายการซ่อมได้', resp.status);
+				tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:20px;">ไม่สามารถโหลดรายการซ่อมได้</td></tr>`;
+			}
+		} catch (err) {
+			console.error('เกิดข้อผิดพลาดในการเรียก API:', err);
+			tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:20px;">เกิดข้อผิดพลาดในการเชื่อมต่อ</td></tr>`;
+		}
+	}
+	async function loadDetailImages(id) {
+		const imagesBox = byId('detailImages');
+		imagesBox.innerHTML = '';
 
-	     try {
-	         const res = await fetch(`/api/files/${encodeURIComponent(id)}`, { credentials: 'include' });
-	         if (!res.ok) throw new Error('โหลดไฟล์ไม่สำเร็จ');
+		try {
+			const res = await fetch(`/api/files/${encodeURIComponent(id)}`, { credentials: 'include' });
+			if (!res.ok) throw new Error('โหลดไฟล์ไม่สำเร็จ');
 
-	         const files = await res.json();
-	         console.log('Files from server:', files);
+			const files = await res.json();
+			console.log('Files from server:', files);
 
-	         // Filter only images
-	         const imageFiles = files.filter(f => f.contentType?.startsWith('image/'));
+			// Filter only images
+			const imageFiles = files.filter(f => f.contentType?.startsWith('image/'));
 
-	         if (imageFiles.length) {
-	             imageFiles.forEach(f => {
-	                 const el = document.createElement('div');
-	                 el.className = 'detail-image';
+			if (imageFiles.length) {
+				imageFiles.forEach(f => {
+					const el = document.createElement('div');
+					el.className = 'detail-image';
 
-	                 const img = document.createElement('img');
-	                 img.src = `/api/files/${encodeURIComponent(id)}/${encodeURIComponent(f.id)}/download`;
-	                 img.alt = f.originalFilename || 'image';
+					const img = document.createElement('img');
+					img.src = `/api/files/${encodeURIComponent(id)}/${encodeURIComponent(f.id)}/download`;
+					img.alt = f.originalFilename || 'image';
 
-	                 el.appendChild(img);
-	                 imagesBox.appendChild(el);
-	             });
-	         } else {
-	             imagesBox.innerHTML = '<div class="placeholder">ไม่มีรูปภาพ</div>';
-	         }
+					el.appendChild(img);
+					imagesBox.appendChild(el);
+				});
+			} else {
+				imagesBox.innerHTML = '<div class="placeholder">ไม่มีรูปภาพ</div>';
+			}
 
-	     } catch (err) {
-	         console.error(err);
-	         imagesBox.innerHTML = '<div class="placeholder">เกิดข้อผิดพลาดขณะโหลดรูปภาพ</div>';
-	     }
-	 }
+		} catch (err) {
+			console.error(err);
+			imagesBox.innerHTML = '<div class="placeholder">เกิดข้อผิดพลาดขณะโหลดรูปภาพ</div>';
+		}
+	}
 
 
 
-	 (async () => {
-	     try {
-	         const resp = await fetch('/api/users/current', { credentials: 'include' });
-	         if (resp.ok) {
-	             const user = await resp.json();
-	             currentUserFullName = user.fullName || '';
-	             // update header
-	             const nameEl = byId('currentUserName');
-	             if (nameEl) nameEl.textContent = currentUserFullName;
+	(async () => {
+		try {
+			const resp = await fetch('/api/users/current', { credentials: 'include' });
+			if (resp.ok) {
+				const user = await resp.json();
+				currentUserFullName = user.fullName || '';
+				// update header
+				const nameEl = byId('currentUserName');
+				if (nameEl) nameEl.textContent = currentUserFullName;
 
-	             const emailEl = byId('currentUserEmail');
-	             if (emailEl) emailEl.textContent = user.email || '';
-	         }
-	     } catch (err) {
-	         console.error('Error fetching current user:', err);
-	     }
-	 })();
-		
+				const emailEl = byId('currentUserEmail');
+				if (emailEl) emailEl.textContent = user.email || '';
+			}
+		} catch (err) {
+			console.error('Error fetching current user:', err);
+		}
+	})();
+
 	// ปิด detailModal เมื่อกดปุ่มย้อนกลับ
 	if (detailBackBtn && detailModal && detailOverlay) {
-	    detailBackBtn.addEventListener('click', () => {
-	        hideModal(detailModal, detailOverlay);
-	    });
+		detailBackBtn.addEventListener('click', () => {
+			hideModal(detailModal, detailOverlay);
+		});
 
-	    detailOverlay.addEventListener('click', (e) => {
-	        if (e.target === detailOverlay) {
-	            hideModal(detailModal, detailOverlay);
-	        }
-	    });
+		detailOverlay.addEventListener('click', (e) => {
+			if (e.target === detailOverlay) {
+				hideModal(detailModal, detailOverlay);
+			}
+		});
 	}
 
 	// ปิด reportModal
 	if (reportBackBtn && reportModal && reportOverlay) {
-	    reportBackBtn.addEventListener('click', () => {
-	        hideModal(reportModal, reportOverlay);
-	    });
+		reportBackBtn.addEventListener('click', () => {
+			hideModal(reportModal, reportOverlay);
+		});
 
-	    reportOverlay.addEventListener('click', (e) => {
-	        if (e.target === reportOverlay) {
-	            hideModal(reportModal, reportOverlay);
-	        }
-	    });
+		reportOverlay.addEventListener('click', (e) => {
+			if (e.target === reportOverlay) {
+				hideModal(reportModal, reportOverlay);
+			}
+		});
 	}
 
 	// ปิด successModal
 	if (successBackToListBtn && successModal && successOverlay) {
-	    successBackToListBtn.addEventListener('click', () => {
-	        hideModal(successModal, successOverlay);
-	    });
+		successBackToListBtn.addEventListener('click', () => {
+			hideModal(successModal, successOverlay);
+		});
 
-	    successOverlay.addEventListener('click', (e) => {
-	        if (e.target === successOverlay) {
-	            hideModal(successModal, successOverlay);
-	        }
-	    });
+		successOverlay.addEventListener('click', (e) => {
+			if (e.target === successOverlay) {
+				hideModal(successModal, successOverlay);
+			}
+		});
 	}
 
 	const logoutBtn = byId('logoutBtn');
@@ -164,43 +164,43 @@ document.addEventListener('DOMContentLoaded', () => {
 	let cameFromModal = null;
 
 	async function updateStatusFromTechnician(id, status, technician = "self") {
-	    const body = {
-	        status: status,
-	        technician: technician || "self",
-	        priority: null
-	    };
-		
+		const body = {
+			status: status,
+			technician: technician || "self",
+			priority: null
+		};
+
 		console.log("Sending body:", body);
-		
-	    const res = await fetch(`/api/requests/${id}/update-status`, {
-	        method: "POST",
-	        headers: { "Content-Type": "application/json" },
-	        body: JSON.stringify(body)
-	    });
 
-	    if (!res.ok) {
-	        console.error('Failed to update status', res.status);
-	        return;
-	    }
+		const res = await fetch(`/api/requests/${id}/update-status`, {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify(body)
+		});
 
-	    const data = await res.json();
-	    console.log("Updated report:", data);
-	    return data;
+		if (!res.ok) {
+			console.error('Failed to update status', res.status);
+			return;
+		}
+
+		const data = await res.json();
+		console.log("Updated report:", data);
+		return data;
 	}
 
 
 
 
 	function showModal(modal, overlay) {
-	    if (!modal || !overlay) return;
-	    overlay.classList.add('show');
-	    modal.classList.add('show');
+		if (!modal || !overlay) return;
+		overlay.classList.add('show');
+		modal.classList.add('show');
 	}
 
 	function hideModal(modal, overlay) {
-	    if (!modal || !overlay) return;
-	    overlay.classList.remove('show');
-	    modal.classList.remove('show');
+		if (!modal || !overlay) return;
+		overlay.classList.remove('show');
+		modal.classList.remove('show');
 	}
 
 	function hideAllModals() {
@@ -214,14 +214,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 	function getPriorityClass(priority) {
-	    const p = priority?.toLowerCase();
+		const p = priority?.toLowerCase();
 
-	    if (p === 'high' || p === 'สูง') return 'priority-high';
-	    if (p === 'medium' || p === 'กลาง' || p === 'ปานกลาง') return 'priority-medium';
-	    if (p === 'low' || p === 'ต่ำ') return 'priority-low';
-	    if (p === 'normal' || p === 'ปกติ') return 'priority-low'; // <-- ADD THIS
+		if (p === 'high' || p === 'สูง') return 'priority-high';
+		if (p === 'medium' || p === 'กลาง' || p === 'ปานกลาง') return 'priority-medium';
+		if (p === 'low' || p === 'ต่ำ') return 'priority-low';
+		if (p === 'normal' || p === 'ปกติ') return 'priority-low'; // <-- ADD THIS
 
-	    return '';
+		return '';
 	}
 
 
@@ -246,45 +246,45 @@ document.addEventListener('DOMContentLoaded', () => {
 	}
 
 	function renderTable() {
-			const start = (currentPage - 1) * PAGE_SIZE;
-			const pageItems = filteredItems.slice(start, start + PAGE_SIZE);
+		const start = (currentPage - 1) * PAGE_SIZE;
+		const pageItems = filteredItems.slice(start, start + PAGE_SIZE);
 
-			if (pageItems.length === 0) {
-				tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding: 20px;">ไม่พบรายการซ่อม</td></tr>`;
-				renderPagination();
-				return;
-			}
+		if (pageItems.length === 0) {
+			tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding: 20px;">ไม่พบรายการซ่อม</td></tr>`;
+			renderPagination();
+			return;
+		}
 
-			tbody.innerHTML = pageItems.map(item => {
-				const priorityClass = getPriorityClass(item.priority);
-				const statusClass = getStatusClass(item.status);
-				//console.log("priority =", item.priority, "| class =", priorityClass);
-				const status = item.status || '';
-				
-				let menuItemsHtml = `
+		tbody.innerHTML = pageItems.map(item => {
+			const priorityClass = getPriorityClass(item.priority);
+			const statusClass = getStatusClass(item.status);
+			//console.log("priority =", item.priority, "| class =", priorityClass);
+			const status = item.status || '';
+
+			let menuItemsHtml = `
 					<button class="menu-item" data-action="detail" data-id="${item.id}">
 						<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0.7;"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
 						<span class="mi-text">รายละเอียด</span>
 					</button>
 				`;
 
-				if (status === 'กำลังดำเนินการ') {
-					menuItemsHtml += `
+			if (status === 'กำลังดำเนินการ') {
+				menuItemsHtml += `
 						<button class="menu-item" data-action="accept-job" data-id="${item.id}">
 							<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0.7;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
 							<span class="mi-text">รับงานซ่อม</span>
 						</button>`;
-				} 
+			}
 
-				else if (status === 'อยู่ระหว่างซ่อม' || status === 'อยู่ระหว่างการซ่อม') {
-					menuItemsHtml += `
+			else if (status === 'อยู่ระหว่างซ่อม' || status === 'อยู่ระหว่างการซ่อม') {
+				menuItemsHtml += `
 						<button class="menu-item" data-action="submit-report" data-id="${item.id}">
 							<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0.7;"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><polyline points="13 2 13 9 20 9"></polyline></svg>
 							<span class="mi-text">ส่งรายงานซ่อม</span>
 						</button>`;
-				}
+			}
 
-				return `
+			return `
 					<tr data-id="${item.id}">
 						<td>${item.title || '-'}</td>
 						<td>${formatDate(item.createdAt)}</td>
@@ -301,10 +301,10 @@ document.addEventListener('DOMContentLoaded', () => {
 						</td>
 					</tr>
 				`;
-			}).join('');
+		}).join('');
 
-			renderPagination();
-		}
+		renderPagination();
+	}
 
 	function renderPagination() {
 		const totalPages = Math.max(1, Math.ceil(filteredItems.length / PAGE_SIZE));
@@ -337,7 +337,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 		filteredItems = allItems.filter(it => {
 			const buffer = [
-			    it.title, it.reporter, it.assignee, it.category, it.status, it.location, it.locationDetail
+				it.title, it.reporter, it.assignee, it.category, it.status, it.location, it.locationDetail
 			].join(' ').toLowerCase();
 
 			const matchText = buffer.includes(q);
@@ -462,7 +462,7 @@ document.addEventListener('DOMContentLoaded', () => {
 			applyFilterAndSearch();
 			hideModal(acceptModal, acceptOverlay);
 			currentJobId = null;
-			
+
 			window.location.reload();
 		});
 	}
@@ -471,101 +471,172 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 	function openDetailModal() {
-	    const item = currentItem();
-	    if (!item) return;
-
-	    byId('detailTitle').textContent = item.title;
-	    byId('detailPriority').textContent = item.priority;
-	    byId('detailPriority').className = `priority-badge ${getPriorityClass(item.priority)}`;
-	    byId('detailStatus').textContent = item.status;
-	    byId('detailStatus').className = `status-badge ${getStatusClass(item.status)}`;
-	    byId('detailDate').textContent = formatDate(item.createdAt);
-	    byId('detailReporterName').textContent = item.reporter?.fullName || '-';
-	    byId('detailAssigneeName').textContent = item.technician || '-';
-	    byId('detailCategory').textContent = item.category || '-';
-	    byId('detailLocation').textContent = item.location;
-	    byId('detailRoom').textContent = item.locationDetail || '-';
-	    byId('detailDescription').textContent = item.description || '-';
-
-	    const detailSubmitBtn = byId("detailSubmitReportBtn");
-
-	    // reset state
-	    detailSubmitBtn.style.display = "block";
-	    detailSubmitBtn.onclick = null;
-
-	    // ============ กรณีรับงาน ============
-		if (item.status === "กำลังดำเนินการ") {
-		    detailSubmitBtn.textContent = "รับงานซ่อม";
-		    detailSubmitBtn.onclick = () => {
-		        const item = currentItem();
-		        if (!item) return;
-
-		        if (item.status === "กำลังดำเนินการ") {
-		            showModal(acceptModal, acceptOverlay);
-		        } else if (item.status === "อยู่ระหว่างซ่อม" || item.status === "อยู่ระหว่างการซ่อม") {
-		            hideModal(detailModal, detailOverlay);
-		            openReportModal();
-		        }
-		    };
-		}
-
-	    // ============ กรณีส่งรายงาน ============
-	    else if (item.status === "อยู่ระหว่างซ่อม" || item.status === "อยู่ระหว่างการซ่อม") {
-	        detailSubmitBtn.textContent = "ส่งรายงานซ่อม";
-	        detailSubmitBtn.onclick = () => {
-	            hideModal(detailModal, detailOverlay);
-	            openReportModal();
-	        };
-	    }
-
-	    // ============ สถานะอื่น → ไม่ให้แก้ ============
-	    else {
-	        detailSubmitBtn.style.display = "none";
-	    }
-		loadDetailImages(item.id);
-	    showModal(detailModal, detailOverlay);
-	}
-
-	function openReportModal() {
 		const item = currentItem();
 		if (!item) return;
 
-		byId('reportTitle').textContent = item.title;
-		byId('reportPriority').textContent = item.priority;
-		byId('reportPriority').className = `priority-badge ${getPriorityClass(item.priority)}`;
-		byId('reportStatus').textContent = item.status;
-		byId('reportStatus').className = `status-badge ${getStatusClass(item.status)}`;
+		byId('detailTitle').textContent = item.title;
+		byId('detailPriority').textContent = item.priority;
+		byId('detailPriority').className = `priority-badge ${getPriorityClass(item.priority)}`;
+		byId('detailStatus').textContent = item.status;
+		byId('detailStatus').className = `status-badge ${getStatusClass(item.status)}`;
+		byId('detailDate').textContent = formatDate(item.createdAt);
+		byId('detailReporterName').textContent = item.reporter?.fullName || '-';
+		byId('detailAssigneeName').textContent = item.technician || '-';
+		byId('detailCategory').textContent = item.category || '-';
+		byId('detailLocation').textContent = item.location;
+		byId('detailRoom').textContent = item.locationDetail || '-';
+		byId('detailDescription').textContent = item.description || '-';
 
-		byId('reportDate').textContent = formatDate(item.createdAt);
-		byId('reportLocation').textContent = item.location + (item.locationDetail ? ` (ห้อง ${item.locationDetail})` : '');
-		byId('reportCategory').textContent = item.category;
-		byId('reportAssignee').textContent = item.technician;
-		byId('reportReporter').textContent = item.reporter?.fullName;
+		const detailSubmitBtn = byId("detailSubmitReportBtn");
 
-		byId('reportCause').value = '';
-		byId('reportMethod').value = '';
-		byId('reportParts').value = '';
+		// reset state
+		detailSubmitBtn.style.display = "block";
+		detailSubmitBtn.onclick = null;
 
-		const uploadInput = byId('reportUploadInput');
-		const uploadBtn = byId('reportUploadBtn');
-		if (uploadBtn && uploadInput) {
-			uploadBtn.onclick = () => uploadInput.click();
-			uploadInput.onchange = () => {
-				console.log('ไฟล์รูป/วิดีโอ:', uploadInput.files);
+		// ============ กรณีรับงาน ============
+		if (item.status === "กำลังดำเนินการ") {
+			detailSubmitBtn.textContent = "รับงานซ่อม";
+			detailSubmitBtn.onclick = () => {
+				const item = currentItem();
+				if (!item) return;
+
+				if (item.status === "กำลังดำเนินการ") {
+					showModal(acceptModal, acceptOverlay);
+				} else if (item.status === "อยู่ระหว่างซ่อม" || item.status === "อยู่ระหว่างการซ่อม") {
+					hideModal(detailModal, detailOverlay);
+					openReportModal();
+				}
 			};
 		}
 
-		const fileUploadInput = byId('reportFileUploadInput');
-		const fileUploadBtn = byId('reportFileUploadBtn');
-		if (fileUploadBtn && fileUploadInput) {
-			fileUploadBtn.onclick = () => fileUploadInput.click();
-			fileUploadInput.onchange = () => {
-				console.log('ไฟล์แนบ:', fileUploadInput.files);
+		// ============ กรณีส่งรายงาน ============
+		else if (item.status === "อยู่ระหว่างซ่อม" || item.status === "อยู่ระหว่างการซ่อม") {
+			detailSubmitBtn.textContent = "ส่งรายงานซ่อม";
+			detailSubmitBtn.onclick = () => {
+				hideModal(detailModal, detailOverlay);
+				openReportModal();
 			};
 		}
 
-		showModal(reportModal, reportOverlay);
+		// ============ สถานะอื่น → ไม่ให้แก้ ============
+		else {
+			detailSubmitBtn.style.display = "none";
+		}
+		loadDetailImages(item.id);
+		showModal(detailModal, detailOverlay);
 	}
+
+	function addPreview(file, previewBox) {
+		if (!file || !previewBox) return;
+
+		const url = URL.createObjectURL(file);
+
+		let el;
+		if (file.type.startsWith('image/')) {
+			el = document.createElement('img');
+			el.src = url;
+		} else if (file.type.startsWith('video/')) {
+			el = document.createElement('video');
+			el.src = url;
+			el.controls = true;
+		} else {
+			el = document.createElement('div');
+			el.textContent = file.name;
+			el.style.padding = '4px 8px';
+			el.style.borderRadius = '6px';
+			el.style.border = '1px solid #ddd';
+			el.style.fontSize = '12px';
+		}
+
+		previewBox.appendChild(el);
+	}
+
+	function openReportModal() {
+	    const item = currentItem();
+	    if (!item) return;
+
+	    byId('reportTitle').textContent = item.title;
+	    byId('reportPriority').textContent = item.priority;
+	    byId('reportPriority').className = `priority-badge ${getPriorityClass(item.priority)}`;
+	    byId('reportStatus').textContent = item.status;
+	    byId('reportStatus').className = `status-badge ${getStatusClass(item.status)}`;
+
+	    byId('reportDate').textContent = formatDate(item.createdAt);
+	    byId('reportLocation').textContent = item.location + (item.locationDetail ? ` (ห้อง ${item.locationDetail})` : '');
+	    byId('reportCategory').textContent = item.category;
+	    byId('reportAssignee').textContent = item.technician;
+	    byId('reportReporter').textContent = item.reporter?.fullName;
+
+	    byId('reportCause').value = '';
+	    byId('reportMethod').value = '';
+	    byId('reportParts').value = '';
+
+	    const uploadInput = byId('reportUploadInput');
+	    const uploadBtn = byId('reportUploadBtn');
+	    const fileUploadInput = byId('reportFileUploadInput');
+	    const fileUploadBtn = byId('reportFileUploadBtn');
+	    const previewBox = byId('reportPreview');
+
+	    let selectedFiles = [];
+
+	    previewBox.innerHTML = "";
+
+	    function addPreviewItem(file, index) {
+	        const item = document.createElement("div");
+	        item.className = "preview-item";
+
+	        let media;
+
+	        if (file.type.startsWith("image/")) {
+	            media = document.createElement("img");
+	            media.src = URL.createObjectURL(file);
+	        } else if (file.type.startsWith("video/")) {
+	            media = document.createElement("video");
+	            media.src = URL.createObjectURL(file);
+	            media.controls = true;
+	        }
+
+	        const del = document.createElement("div");
+	        del.className = "preview-delete";
+	        del.textContent = "×";
+
+	        del.onclick = (e) => {
+	            e.stopPropagation();
+	            selectedFiles.splice(index, 1);
+	            renderPreview();
+	        };
+
+	        item.appendChild(media);
+	        item.appendChild(del);
+	        previewBox.appendChild(item);
+	    }
+
+	    function renderPreview() {
+	        previewBox.innerHTML = "";
+	        selectedFiles.forEach((f, i) => addPreviewItem(f, i));
+	    }
+
+	    if (uploadBtn && uploadInput) {
+	        uploadBtn.onclick = () => uploadInput.click();
+	        uploadInput.onchange = () => {
+	            selectedFiles.push(...uploadInput.files);
+	            renderPreview();
+	        };
+	    }
+
+	    if (fileUploadBtn && fileUploadInput) {
+	        fileUploadBtn.onclick = () => fileUploadInput.click();
+	        fileUploadInput.onchange = () => {
+	            selectedFiles.push(...fileUploadInput.files);
+	            renderPreview();
+	        };
+	    }
+
+	    openReportModal.selectedFiles = selectedFiles;
+
+	    showModal(reportModal, reportOverlay);
+	}
+
 
 	if (reportBackBtn) {
 		reportBackBtn.addEventListener('click', () => {
@@ -583,54 +654,60 @@ document.addEventListener('DOMContentLoaded', () => {
 	    const item = currentItem();
 	    if (!item) return;
 
-	    // 1. Get form values
+	    // 1) Read values from input
 	    const cause = byId('reportCause').value.trim();
 	    const method = byId('reportMethod').value.trim();
 	    const parts = byId('reportParts').value.trim();
 
-	    // 2. Combine them into one string
-	    const description = `สาเหตุ: ${cause}\nวิธีซ่อม: ${method}\nรายละเอียดที่เปลี่ยน: ${parts}`;
+	    // Validate (optional)
+	    if (!cause || !method) {
+	        alert("กรุณากรอกข้อมูลให้ครบ");
+	        return;
+	    }
 
-	    console.log(`ยืนยันส่งรายงาน ID: ${currentJobId} ด้วย description:\n${description}`);
+	    console.log("ส่งรายงานใหม่:", { cause, method, parts });
 
-	    // 3. Update UI
-	    item.status = "กำลังตรวจสอบงานซ่อม";
+	    // 2) ส่งข้อมูลรายงาน (ไม่รวมรูป)
+	    const reportData = new FormData();
+	    reportData.append("cause", cause);
+	    reportData.append("method", method);
+	    reportData.append("parts", parts);
 
-	    // 4. Call backend to update status
-	    await updateStatusFromTechnician(currentJobId, "กำลังตรวจสอบงานซ่อม", "self");
+	    const submitRes = await fetch(`/api/requests/${currentJobId}/submit-report`, {
+	        method: "POST",
+	        body: reportData
+	    });
 
-	    // 5. Upload files (images/videos)
-	    const uploadInput = byId('reportUploadInput');
-	    const fileUploadInput = byId('reportFileUploadInput');
+	    if (!submitRes.ok) {
+	        alert("ส่งรายงานไม่สำเร็จ!");
+	        return;
+	    }
 
-	    // Combine all files into one array
-	    const files = [
-	        ...(uploadInput?.files || []),
-	        ...(fileUploadInput?.files || [])
-	    ];
-
+	    // 3) Upload files (images / videos)
+	    const files = openReportModal.selectedFiles || [];
 	    for (let f of files) {
 	        const formData = new FormData();
-	        formData.append('file', f);
-	        formData.append('description', description);
+	        formData.append("file", f);
 
 	        await fetch(`/api/files/${currentJobId}`, {
-	            method: 'POST',
+	            method: "POST",
 	            body: formData
 	        });
 	    }
 
-	    // 6. Remove from list for technician view
+	    // 4) Update UI
+	    item.status = "กำลังตรวจสอบงานซ่อม";
+
+	    // 5) Refresh list
 	    allItems = allItems.filter(it => it.id !== currentJobId);
 	    applyFilterAndSearch();
 
-	    // 7. Close modal & show success
+	    // 6) Close modal + show success
 	    hideModal(reportModal, reportOverlay);
 	    openSuccessModal();
 
 	    currentJobId = null;
 	});
-
 
 
 	function openSuccessModal() {
@@ -643,28 +720,28 @@ document.addEventListener('DOMContentLoaded', () => {
 		});
 	}
 
-		if (logoutBtn) {
-			logoutBtn.addEventListener('click', async (e) => {
-				e.preventDefault();
-				console.log('Logout');
-				
-				try {
-				    const response = await fetch('/api/logout', { method: 'POST' });
-				    
-				    // ไม่ว่าเซิร์ฟเวอร์จะตอบ OK (200) หรือ 401/403 (ไม่มีสิทธิ์)
-				    // ผลลัพธ์คือต้องไปหน้า login
-				    if (response.ok || response.status === 401 || response.status === 403) {
-				        window.location.href = 'login.html?logout=true';
-				    } else {
-				        alert('ไม่สามารถออกจากระบบได้: ' + response.status);
-				    }
-				} catch (err) {
-				    console.error('Logout error:', err);
-				    // ถ้าเน็ตเวิร์คมีปัญหา ก็ส่งไปหน้า login อยู่ดี
-				    window.location.href = 'login.html?logout_error=true';
+	if (logoutBtn) {
+		logoutBtn.addEventListener('click', async (e) => {
+			e.preventDefault();
+			console.log('Logout');
+
+			try {
+				const response = await fetch('/api/logout', { method: 'POST' });
+
+				// ไม่ว่าเซิร์ฟเวอร์จะตอบ OK (200) หรือ 401/403 (ไม่มีสิทธิ์)
+				// ผลลัพธ์คือต้องไปหน้า login
+				if (response.ok || response.status === 401 || response.status === 403) {
+					window.location.href = 'login.html?logout=true';
+				} else {
+					alert('ไม่สามารถออกจากระบบได้: ' + response.status);
 				}
-			});
-		}
+			} catch (err) {
+				console.error('Logout error:', err);
+				// ถ้าเน็ตเวิร์คมีปัญหา ก็ส่งไปหน้า login อยู่ดี
+				window.location.href = 'login.html?logout_error=true';
+			}
+		});
+	}
 
 
 	loadRepairRequests();

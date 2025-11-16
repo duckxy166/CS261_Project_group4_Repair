@@ -3,61 +3,110 @@ package com.example.demo.dto;
 import java.time.LocalDateTime;
 
 public class ReportResponse {
-    private Long id;
-    private String status;
-    private String technician;
-    private String title;
-    private String location;
-    private String description;
-    private String reporterName;
-    private LocalDateTime createdAt;
-    private String category;
-    private String locationDetail;
-    
-    // constructor
-    public ReportResponse(Long id, String status, String technician) {
-        this.id = id;
-        this.status = status;
-        this.technician = technician;
-    }
-    public ReportResponse(Long id, String status, String technician, String title, String location, String reporterName, LocalDateTime createdAt) {
-        this.id = id;
-        this.status = status;
-        this.technician = technician;
-        this.title = title;
-        this.location = location;
-        this.reporterName = reporterName;
-        this.createdAt = createdAt;
-    }
-    public ReportResponse(Long id, String status, String technician, String title,
-            String location, String locationDetail, String description, String reporterName,
-            LocalDateTime createdAt, String category) {
-	this.id = id;
-	this.status = status;
-	this.technician = technician;
-	this.title = title;
-	this.location = location;
-    this.locationDetail = locationDetail;
-	this.description = description;
-	this.reporterName = reporterName;
-	this.createdAt = createdAt;
-	this.category = category;
-	
-    }
-    
-    // getters
-    public Long getId() { return id; }
-    public String getStatus() { return status; }
-    public String getTechnician() { return technician; }
-    public String getTitle() { return title; }
-    public String getLocation() { return location; }
-    public String getLocationDetail() {return locationDetail;}
-    public String getDescription() { return description; }
-    public String getReporterName() { return reporterName; }
-    public LocalDateTime getCreatedAt() { return createdAt; }
-    public String getCategory(){ return category; }
-    
-    public void setLocationDetail(String locationDetail) {
-        this.locationDetail = locationDetail;
-    }
+	private Long id;
+	private String status;
+	private String technician;
+	private String title;
+	private String location;
+	private String description;
+	private String reporterName;
+	private LocalDateTime createdAt;
+	private String category;
+	private String locationDetail;
+	private String cause;
+	private String method;
+	private String parts;
+
+	// constructor
+	public ReportResponse(Long id, String status, String technician) {
+		this.id = id;
+		this.status = status;
+		this.technician = technician;
+	}
+
+	public ReportResponse(Long id, String status, String technician, String title, String location, String reporterName,
+			LocalDateTime createdAt) {
+		this.id = id;
+		this.status = status;
+		this.technician = technician;
+		this.title = title;
+		this.location = location;
+		this.reporterName = reporterName;
+		this.createdAt = createdAt;
+	}
+
+	public ReportResponse(Long id, String status, String technician, String title, String location,
+			String locationDetail, String description, String reporterName, LocalDateTime createdAt, String category,
+			String cause, String method, String parts) {
+		this.id = id;
+		this.status = status;
+		this.technician = technician;
+		this.title = title;
+		this.location = location;
+		this.locationDetail = locationDetail;
+		this.description = description;
+		this.reporterName = reporterName;
+		this.createdAt = createdAt;
+		this.category = category;
+		this.cause = cause;
+		this.method = method;
+		this.parts = parts;
+	}
+
+	// getters
+	public Long getId() {
+		return id;
+	}
+
+	public String getStatus() {
+		return status;
+	}
+
+	public String getTechnician() {
+		return technician;
+	}
+
+	public String getTitle() {
+		return title;
+	}
+
+	public String getLocation() {
+		return location;
+	}
+
+	public String getLocationDetail() {
+		return locationDetail;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public String getReporterName() {
+		return reporterName;
+	}
+
+	public LocalDateTime getCreatedAt() {
+		return createdAt;
+	}
+
+	public String getCategory() {
+		return category;
+	}
+
+	public String getCause() {
+		return cause;
+	}
+
+	public String getMethod() {
+		return method;
+	}
+
+	public String getParts() {
+		return parts;
+	}
+
+	public void setLocationDetail(String locationDetail) {
+		this.locationDetail = locationDetail;
+	}
 }
