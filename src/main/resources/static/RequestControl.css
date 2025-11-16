@@ -1043,6 +1043,9 @@ tbody td {
   justify-content: center;
   gap: 8px;
   color: #777;
+  display: flex;
+  flex-wrap: wrap;
+  padding: 20px 0;
 }
 
 .report-photo-icon {
@@ -1142,3 +1145,4 @@ tbody td {
   caret-color: auto;
   cursor: text;
 }
+

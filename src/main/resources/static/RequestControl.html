@@ -384,12 +384,14 @@
           </div>
 
           <!-- RIGHT COLUMN = กล่องรูป -->
-          <div class="report-col-right">
-            <div class="report-photo-box">
-              <span class="material-icons-outlined report-photo-icon">image</span>
-              <p>ไม่มีรูปภาพแนบ</p>
-            </div>
-          </div>
+		  <div class="report-col-right" id="reportPhotoContainer">
+		      <!--<div id="attachmentList"></div><-->
+		      <div class="report-photo-box">
+		          <span class="material-icons-outlined report-photo-icon" id="noImageIcon">image</span>
+		          <p id="noImageText">ไม่มีรูปภาพแนบ</p>
+		          <img id="previewImage" style="display:none; width:120px; height:auto; border-radius:10px;" />
+		      </div>
+		  </div>
         </div>
 
         <!-- Footer -->
