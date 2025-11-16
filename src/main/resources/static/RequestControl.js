@@ -127,9 +127,9 @@ function createStatusChip(status) {
     "กำลังดำเนินการ":     { text: "กำลังดำเนินการ",     cls: "status-chip status-inprogress" },
     "อยู่ระหว่างซ่อม":     { text: "อยู่ระหว่างซ่อม",     cls: "status-chip status-waiting" },
     "กำลังตรวจสอบงานซ่อม": { text: "กำลังตรวจสอบงานซ่อม", cls: "status-chip status-checking" },
-    "สำเร็จ":             { text: "สำเร็จ",             cls: "status-chip status-success" },
-    "ยังไม่ได้ให้คะแนน":   { text: "ยังไม่ได้ให้คะแนน",   cls: "status-chip status-wait-feedback" },
-    "ยกเลิก":          { text: "ยกเลิกแล้ว",          cls: "status-chip status-cancelled" } // เพิ่ม "ยกเลิก"
+"สำเร็จ":             { text: "สำเร็จ",             cls: "status-chip status-success" },
+    "ซ่อมเสร็จ":          { text: "ยังไม่ได้ให้คะแนน",   cls: "status-chip status-wait-feedback" }, // <--- แก้ไขตรงนี้
+    "ยกเลิก":          { text: "ยกเลิกแล้ว",          cls: "status-chip status-cancelled" }
   };
   // ถ้าไม่เจอสถานะไหนเลย ให้ยึด "รอดำเนินการ" เป็น default
   const data = map[status] || map["รอดำเนินการ"]; 
@@ -154,10 +154,10 @@ function updateDetailStatusPill(status) {
     "รอดำเนินการ":        "status-pending",
     "กำลังดำเนินการ":     "status-inprogress",
     "อยู่ระหว่างซ่อม":     "status-waiting",
-    "กำลังตรวจสอบงานซ่อม": "status-checking",
-    "สำเร็จ":             "status-success",
-    "ยังไม่ได้ให้คะแนน":   "status-wait-feedback",
-    "ยกเลิก":          "status-cancelled" // เพิ่ม "ยกเลิก"
+"กำลังตรวจสอบงานซ่อม": "status-checking",
+"สำเร็จ":             "status-success",
+    "ซ่อมเสร็จ":          "status-wait-feedback", // <--- แก้ไขตรงนี้
+    "ยกเลิก":          "status-cancelled"
   };
 
   const cls = statusClsMap[status];
@@ -233,8 +233,8 @@ function renderTableAndPagination() {
             <span>ดูรายละเอียด</span>
           </button>
 
-          ${
-            ["สำเร็จ", "ยังไม่ได้ให้คะแนน"].includes(item.status)
+         ${
+            ["สำเร็จ", "ซ่อมเสร็จ"].includes(item.status) // <--- แก้ไขตรงนี้
               ? `
               <button class="row-menu-item" data-action="report">
                 <span class="row-menu-item-icon material-icons-outlined">description</span>
@@ -605,8 +605,8 @@ async function openDetailModal(data, startInEdit = false) {
       confirmInspectionBtn.className = "btn-pill btn-success"; 
     }
   
-  } else if (data.status === "ยังไม่ได้ให้คะแนน") {
-    // สถานะ "ยังไม่ได้ให้คะแนน"
+} else if (data.status === "ซ่อมเสร็จ") { // <--- แก้ไขตรงนี้
+    // สถานะ "ยังไม่ได้ให้คะแนน" (ที่จริงคือ "ซ่อมเสร็จ")
     cancelBtn.textContent = "รายงานการซ่อม";
     cancelBtn.className   = "btn-pill btn-primary";
     editBtn.style.display = "none";
@@ -627,21 +627,21 @@ async function openDetailModal(data, startInEdit = false) {
   // ===== การทำงานปุ่มใน footer =====
 cancelBtn.onclick = async () => { // <--- 1. เติม async
     // ถ้าเป็นปุ่ม "กดดูรายงานการซ่อม"
-    if (["กำลังตรวจสอบงานซ่อม", "ยังไม่ได้ให้คะแนน", "สำเร็จ"].includes(data.status)) {
-      openReportModal(data);
-      return;
-    }
+if (["กำลังตรวจสอบงานซ่อม", "ซ่อมเสร็จ", "สำเร็จ"].includes(data.status)) { // <--- ✨✨ แก้ไขเป็น "ซ่อมเสร็จ" ✨✨
+      openReportModal(data);
+      return;
+    }
 
     // สถานะที่ยังยกเลิกได้จริง
     if (["รอดำเนินการ", "กำลังดำเนินการ", "อยู่ระหว่างซ่อม"].includes(data.status)) {
       if (!confirm("คุณต้องการยกเลิกใบแจ้งซ่อมนี้ใช่หรือไม่?")) return;
 
       // 2. สร้าง object ที่จะส่งไป API
-      const updateData = {
-        id: currentEditingId,
-        status: "ยกเลิก", // <--- 3. ส่งสถานะเป็นภาษาไทย
-        priority: data.priority || "low" // ส่ง priority เดิม (หรือค่า default)
-      };
+const updateData = {
+        id: currentEditingId,
+        status: "ยกเลิก", // <--- ✨✨ แก้ไขเป็น "ยกเลิก" ✨✨
+        priority: data.priority || "low"
+      };
 
       try {
         // 4. ยิง API
