@@ -105,16 +105,18 @@ function createUrgencyChip(urgency) {
 }
 
 function createStatusChip(status) {
+  // Map นี้จะใช้ "ภาษาไทย" ที่มาจาก DB เป็นคีย์
   const map = {
-    pending:       { text: "รอดำเนินการ",        cls: "status-chip status-pending" },
-    inprogress:    { text: "กำลังดำเนินการ",     cls: "status-chip status-inprogress" },
-    waiting:       { text: "อยู่ระหว่างซ่อม",     cls: "status-chip status-waiting" },
-    checking:      { text: "กำลังตรวจสอบงานซ่อม", cls: "status-chip status-checking" },
-    success:       { text: "สำเร็จ",             cls: "status-chip status-success" },
-    wait_feedback: { text: "ยังไม่ได้ให้คะแนน",   cls: "status-chip status-wait-feedback" },
-    cancelled:     { text: "ยกเลิกแล้ว",          cls: "status-chip status-cancelled" }
+    "รอดำเนินการ":        { text: "รอดำเนินการ",        cls: "status-chip status-pending" },
+    "กำลังดำเนินการ":     { text: "กำลังดำเนินการ",     cls: "status-chip status-inprogress" },
+    "อยู่ระหว่างซ่อม":     { text: "อยู่ระหว่างซ่อม",     cls: "status-chip status-waiting" },
+    "กำลังตรวจสอบงานซ่อม": { text: "กำลังตรวจสอบงานซ่อม", cls: "status-chip status-checking" },
+    "สำเร็จ":             { text: "สำเร็จ",             cls: "status-chip status-success" },
+    "ยังไม่ได้ให้คะแนน":   { text: "ยังไม่ได้ให้คะแนน",   cls: "status-chip status-wait-feedback" },
+    "ยกเลิก":          { text: "ยกเลิกแล้ว",          cls: "status-chip status-cancelled" } // เพิ่ม "ยกเลิก"
   };
-  const data = map[status] || map.pending;
+  // ถ้าไม่เจอสถานะไหนเลย ให้ยึด "รอดำเนินการ" เป็น default
+  const data = map[status] || map["รอดำเนินการ"]; 
   return `<span class="${data.cls}">${data.text}</span>`;
 }
 
@@ -131,15 +133,15 @@ function updateDetailStatusPill(status) {
   // รีเซ็ต class ก่อน
   detailStatusPill.className = "status-pill";
 
-  // map สถานะ → class สีเหมือนใน table
+  // map สถานะ (คีย์ภาษาไทย) → class สีเหมือนใน table
   const statusClsMap = {
-    pending:       "status-pending",
-    inprogress:    "status-inprogress",
-    waiting:       "status-waiting",
-    checking:      "status-checking",
-    success:       "status-success",
-    wait_feedback: "status-wait-feedback",
-    cancelled:     "status-cancelled"
+    "รอดำเนินการ":        "status-pending",
+    "กำลังดำเนินการ":     "status-inprogress",
+    "อยู่ระหว่างซ่อม":     "status-waiting",
+    "กำลังตรวจสอบงานซ่อม": "status-checking",
+    "สำเร็จ":             "status-success",
+    "ยังไม่ได้ให้คะแนน":   "status-wait-feedback",
+    "ยกเลิก":          "status-cancelled" // เพิ่ม "ยกเลิก"
   };
 
   const cls = statusClsMap[status];
@@ -196,7 +198,7 @@ function renderTableAndPagination() {
     const tr = document.createElement("tr");
     tr.dataset.id = item.id;
 
-    tr.innerHTML = `
+   tr.innerHTML = `
       <td class="title-cell">${item.title}</td>
       <td>${formatDate(item.dateRequested)}</td>
       <td>${item.reporter}</td>
@@ -210,15 +212,13 @@ function renderTableAndPagination() {
         </button>
 
         <div class="row-menu">
-          <!-- ดูรายละเอียด (ทุกสถานะ) -->
           <button class="row-menu-item" data-action="detail">
             <span class="row-menu-item-icon material-icons-outlined">visibility</span>
             <span>ดูรายละเอียด</span>
           </button>
 
-          <!-- รายงานการซ่อม (เฉพาะ success / wait_feedback) -->
           ${
-            ["success", "wait_feedback"].includes(item.status)
+            ["สำเร็จ", "ยังไม่ได้ให้คะแนน"].includes(item.status)
               ? `
               <button class="row-menu-item" data-action="report">
                 <span class="row-menu-item-icon material-icons-outlined">description</span>
@@ -227,10 +227,20 @@ function renderTableAndPagination() {
               `
               : ""
           }
-
-          <!-- แก้ไข (เฉพาะ pending / inprogress) -->
+          
           ${
-            ["pending", "inprogress"].includes(item.status)
+            item.status === "สำเร็จ"
+              ? `
+              <button class="row-menu-item" data-action="feedback">
+                <span class="row-menu-item-icon material-icons-outlined">star_half</span>
+                <span>ประเมินงานซ่อม</span>
+              </button>
+              `
+              : ""
+          }
+
+          ${
+            ["รอดำเนินการ", "กำลังดำเนินการ"].includes(item.status)
               ? `
               <button class="row-menu-item" data-action="edit">
                 <span class="row-menu-item-icon material-icons-outlined">edit</span>
@@ -240,9 +250,8 @@ function renderTableAndPagination() {
               : ""
           }
 
-          <!-- ยกเลิกการแจ้งซ่อม (เฉพาะ pending / inprogress / waiting) -->
           ${
-            ["pending", "inprogress", "waiting"].includes(item.status)
+            ["รอดำเนินการ", "กำลังดำเนินการ", "อยู่ระหว่างซ่อม"].includes(item.status)
               ? `
               <button class="row-menu-item delete" data-action="cancel">
                 <span class="row-menu-item-icon material-icons-outlined">cancel</span>
@@ -254,7 +263,6 @@ function renderTableAndPagination() {
         </div>
       </td>
     `;
-
     tbody.appendChild(tr);
   });
 
@@ -383,11 +391,13 @@ function attachRowMenuHandlers() {
   });
 
   document.querySelectorAll(".row-menu-item").forEach((itemBtn) => {
-    itemBtn.addEventListener("click", () => {
+    // ❗️ ทำให้ event listener เป็น async
+    itemBtn.addEventListener("click", async () => { 
       const action = itemBtn.dataset.action;
       const tr = itemBtn.closest("tr");
       const id = Number(tr.dataset.id);
-      const data = requests.find((r) => r.id === id);
+      
+      const data = allRequests.find((r) => r.id === id);
       if (!data) return;
 
       if (action === "detail") {
@@ -395,11 +405,37 @@ function attachRowMenuHandlers() {
       } else if (action === "edit") {
         openDetailModal(data, true);    // เปิดแบบ edit mode ทันที
       } else if (action === "cancel") {
-        const req = requests.find((r) => r.id === data.id);
-        if (req) req.status = "cancelled";
-        renderTableAndPagination();
+        
+        if (!confirm("คุณต้องการยกเลิกใบแจ้งซ่อมนี้ใช่หรือไม่?")) return;
+        
+        const updateData = {
+          id: data.id,
+          status: "ยกเลิก", // ส่งภาษาไทย
+          priority: data.priority || "low"
+        };
+        
+        try {
+          const response = await fetch('/api/requests/update-status', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(updateData),
+          });
+          if (!response.ok) throw new Error('API Error');
+          
+          await fetchRequests(); // ดึงข้อมูลใหม่
+          renderTableAndPagination(); // วาดตารางใหม่
+
+        } catch (error) {
+          console.error("Failed to cancel request:", error);
+          alert("เกิดข้อผิดพลาดในการยกเลิก");
+        }
+        
       } else if (action === "report") {
         openReportModal(data);
+
+      // ⭐️ [เพิ่มใหม่] ⭐️ เพิ่ม else if สำหรับ feedback
+      } else if (action === "feedback") {
+        openFeedbackModal(data);
       }
 
       closeAllRowMenus();
@@ -410,8 +446,7 @@ function attachRowMenuHandlers() {
     "click",
     () => {
       closeAllRowMenus();
-    },
-    { once: true }
+    }
   );
 }
 
@@ -440,80 +475,100 @@ updateDetailStatusPill(data.status);
   // ===== จัด layout ปุ่ม footer ตามสถานะ =====
   cancelBtn.style.display = "inline-flex";
   editBtn.style.display   = "inline-flex";
-
+  
   if (confirmInspectionBtn) confirmInspectionBtn.style.display = "none";
-
+  
   cancelBtn.textContent = "ยกเลิกการแจ้งซ่อม";
   cancelBtn.className   = "btn-pill btn-danger";
-
+  
   editBtn.textContent   = "แก้ไข";
   editBtn.className     = "btn-pill btn-warning";
 
-  if (data.status === "pending" || data.status === "inprogress") {
+  if (data.status === "รอดำเนินการ" || data.status === "กำลังดำเนินการ") {
     // layout default
-
-    } else if (data.status === "waiting") {
+  
+  } else if (data.status === "อยู่ระหว่างซ่อม") {
     // มีแค่ ยกเลิกการแจ้งซ่อม
     editBtn.style.display = "none";
-} else if (data.status === "checking") {
+  
+  } else if (data.status === "กำลังตรวจสอบงานซ่อม") {
     // สถานะ "กำลังตรวจสอบงานซ่อม"
-    // 1. ปุ่ม "รายงานการซ่อม" (ใช้ปุ่ม cancel เดิม)
     cancelBtn.textContent = "รายงานการซ่อม";
-    cancelBtn.className   = "btn-pill btn-primary"; // สีน้ำเงิน
-    
-    // 2. ซ่อนปุ่ม "แก้ไข"
+    cancelBtn.className   = "btn-pill btn-primary"; 
     editBtn.style.display = "none";
-
-    // 3. !! แสดงปุ่มใหม่ "ยืนยันการตรวจสอบงาน" !!
     if (confirmInspectionBtn) {
       confirmInspectionBtn.style.display = "inline-flex";
-      confirmInspectionBtn.className = "btn-pill btn-success"; // สีเขียว
+      confirmInspectionBtn.className = "btn-pill btn-success"; 
     }
-
-  } else if (data.status === "wait_feedback") {
-    // สถานะ "ยังไม่ได้ให้คะแนน" (เหมือน checking แต่ไม่มีปุ่มยืนยัน)
+  
+  } else if (data.status === "ยังไม่ได้ให้คะแนน") {
+    // สถานะ "ยังไม่ได้ให้คะแนน"
     cancelBtn.textContent = "รายงานการซ่อม";
     cancelBtn.className   = "btn-pill btn-primary";
     editBtn.style.display = "none";
-    // (confirmInspectionBtn จะถูกซ่อนไว้ตามที่ reset)
-
-  } else if (data.status === "success") {
-    // สำเร็จ → ปุ่มซ้าย = รายงาน, ปุ่มขวา = ดูผลประเมินงานซ่อม
+  
+  } else if (data.status === "สำเร็จ") {
+    // สำเร็จ
     cancelBtn.textContent = "รายงานการซ่อม";
     cancelBtn.className   = "btn-pill btn-primary";
-
     editBtn.textContent   = "ประเมินงานซ่อม";
-    editBtn.className     = "btn-pill btn-warning";  // ใช้ปุ่มเหลือง // หรือ btn-warning ตามชอบ
+    editBtn.className     = "btn-pill btn-warning"; 
     editBtn.style.display = "inline-flex";
-
-  } else if (data.status === "cancelled") {
-    // ยกเลิกแล้ว → ไม่ต้องมีปุ่มซ้าย/ขวาแก้ไข
+  
+  } else if (data.status === "ยกเลิก") {
+    // ยกเลิกแล้ว
     cancelBtn.style.display = "none";
     editBtn.style.display   = "none";
   }
-
   // ===== การทำงานปุ่มใน footer =====
-  cancelBtn.onclick = () => {
+cancelBtn.onclick = async () => { // <--- 1. เติม async
     // ถ้าเป็นปุ่ม "กดดูรายงานการซ่อม"
-    if (["checking", "wait_feedback", "success"].includes(data.status)) {
+    if (["กำลังตรวจสอบงานซ่อม", "ยังไม่ได้ให้คะแนน", "สำเร็จ"].includes(data.status)) {
       openReportModal(data);
       return;
     }
 
     // สถานะที่ยังยกเลิกได้จริง
-    if (["pending", "inprogress", "waiting"].includes(data.status)) {
-      const req = requests.find((r) => r.id === data.id);
-      if (req) req.status = "cancelled";
-      closeDetailModal();
-      renderTableAndPagination();
+    if (["รอดำเนินการ", "กำลังดำเนินการ", "อยู่ระหว่างซ่อม"].includes(data.status)) {
+      if (!confirm("คุณต้องการยกเลิกใบแจ้งซ่อมนี้ใช่หรือไม่?")) return;
+
+      // 2. สร้าง object ที่จะส่งไป API
+      const updateData = {
+        id: currentEditingId,
+        status: "ยกเลิก", // <--- 3. ส่งสถานะเป็นภาษาไทย
+        priority: data.priority || "low" // ส่ง priority เดิม (หรือค่า default)
+      };
+
+      try {
+        // 4. ยิง API
+        const response = await fetch('/api/requests/update-status', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(updateData),
+        });
+
+        if (!response.ok) throw new Error('API Error');
+
+        // 5. ถ้าสำเร็จ: ปิด Modal, ดึงข้อมูลใหม่, วาดตารางใหม่
+        closeDetailModal();
+        await fetchRequests();
+        renderTableAndPagination();
+
+      } catch (error) {
+        console.error("Failed to cancel request:", error);
+        alert("เกิดข้อผิดพลาดในการยกเลิก");
+      }
     }
   };
 
-    editBtn.onclick = () => {
-    if (data.status === "success") {
+
+   editBtn.onclick = () => {
+    // ❗️ [แก้ไข] ❗️ เปลี่ยน "success" เป็น "สำเร็จ"
+    if (data.status === "สำเร็จ") {
       // แสดงผลประเมินงานซ่อม (read-only)
       openFeedbackModal(data);
-    } else if (["pending", "inprogress"].includes(data.status)) {
+    // ❗️ [แก้ไข] ❗️ เปลี่ยน "pending", "inprogress" เป็นภาษาไทย
+    } else if (["รอดำเนินการ", "กำลังดำเนินการ"].includes(data.status)) {
       // เข้าโหมดแก้ไขรายละเอียด
       isEditMode = true;
       applyEditModeUI();
@@ -521,19 +576,37 @@ updateDetailStatusPill(data.status);
     }
   };
 
-  if (confirmInspectionBtn) {
-    confirmInspectionBtn.onclick = () => {
+if (confirmInspectionBtn) {
+    confirmInspectionBtn.onclick = async () => { // <--- 1. เติม async
       // ตรวจสอบว่า ID ถูกต้อง และสถานะเป็น checking จริง
-      if (!currentEditingId || data.status !== "checking") return;
+      if (!currentEditingId || data.status !== "กำลังตรวจสอบงานซ่อม") return;
 
-      const req = requests.find((r) => r.id === currentEditingId);
-      if (req) {
-        // !! เปลี่ยนสถานะเป็น "ยังไม่ได้ให้คะแนน" !!
-        req.status = "wait_feedback"; 
+      // 2. สร้าง object ที่จะส่งไป API
+      const updateData = {
+        id: currentEditingId,
+        status: "ยังไม่ได้ให้คะแนน", // <--- 3. ส่งสถานะใหม่เป็นภาษาไทย
+        priority: data.priority || "low"
+      };
+
+      try {
+        // 4. ยิง API
+        const response = await fetch('/api/requests/update-status', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(updateData),
+        });
+
+        if (!response.ok) throw new Error('API Error');
+
+        // 5. ถ้าสำเร็จ: ปิด Modal, ดึงข้อมูลใหม่, วาดตารางใหม่
+        closeDetailModal();
+        await fetchRequests();
+        renderTableAndPagination();
+
+      } catch (error) {
+        console.error("Failed to confirm inspection:", error);
+        alert("เกิดข้อผิดพลาดในการยืนยันงาน");
       }
-      
-      closeDetailModal();
-      renderTableAndPagination();
     };
   }
   
@@ -558,12 +631,11 @@ updateDetailStatusPill(data.status);
   applyEditModeUI();
 
   // ถ้าเรียกมาให้เริ่มที่ edit mode (จากเมนู 3 จุด)
-  if (startInEdit && ["pending", "inprogress"].includes(data.status)) {
+if (startInEdit && ["รอดำเนินการ", "กำลังดำเนินการ"].includes(data.status)) {
     isEditMode = true;
     applyEditModeUI();
     if (detailFooter) detailFooter.classList.add("confirm-mode");
   }
-
   overlay.classList.add("show");
 }
 
@@ -657,28 +729,62 @@ overlay.addEventListener("click", (e) => {
 });
 
 // ปุ่ม "ยืนยัน" ใน detail modal
-detailConfirmBtn.addEventListener("click", () => {
+detailConfirmBtn.addEventListener("click", async () => { // 1. ตรวจสอบว่ามี async
   if (!currentEditingId) return;
-  const req = requests.find((r) => r.id === currentEditingId);
+
+  const req = allRequests.find((r) => r.id === currentEditingId);
   if (!req) return;
 
-  // เซฟความเร่งด่วน
+  // 2. ดึงค่าใหม่
   const newUrgency = statusMainText.textContent.trim().toLowerCase();
-  req.urgency = newUrgency;
+  // (API ของคุณยังไม่รองรับการแก้ description, แต่โค้ดนี้จะเซฟ urgency)
+  
+  // ⭐️ [เพิ่ม Logic] ⭐️
+  // 3. ตรวจสอบและอัปเดตสถานะใหม่
+  let newStatus = req.status; // ใช้สถานะเดิมเป็นค่าเริ่มต้น
+  if (req.status === "รอดำเนินการ") {
+    newStatus = "กำลังดำเนินการ"; // ถ้าสถานะเดิมคือ "รอดำเนินการ" ให้เปลี่ยนเป็น "กำลังดำเนินการ"
+  }
+  // (ถ้าสถานะเดิมเป็น "กำลังดำเนินการ" อยู่แล้ว มันก็จะยังเป็น "กำลังดำเนินการ" เหมือนเดิม)
 
-  // เซฟรายละเอียดงาน
-  req.description = detailDescription.value.trim();
+  // 4. สร้าง object ที่จะส่งไป API
+  const updateData = {
+    id: currentEditingId,
+    status: newStatus,     // ❗️ [แก้ไข] ❗️ ส่งสถานะใหม่ไป
+    priority: newUrgency   // ส่ง priority (urgency) ใหม่
+  };
+  
+  console.log("Sending update:", updateData);
 
-  // ปิดโหมดแก้ไข
-  isEditMode = false;
-  if (detailFooter) detailFooter.classList.remove("confirm-mode");
-  applyEditModeUI();
+  try {
+    // 5. ยิง API
+    const response = await fetch('/api/requests/update-status', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updateData),
+    });
 
-  // refresh ตาราง
-  renderTableAndPagination();
+    if (!response.ok) throw new Error('API Error');
 
-  // update ปุ่ม urgency ใน modal ตามค่าที่เพิ่งเซฟ
-  setUrgencyOnMainBtn(req.urgency);
+    // 6. ถ้าสำเร็จ: ปิดโหมดแก้ไข, ดึงข้อมูลใหม่, วาดตารางใหม่
+    isEditMode = false;
+    if (detailFooter) detailFooter.classList.remove("confirm-mode");
+    applyEditModeUI();
+    
+    await fetchRequests(); // ดึงข้อมูลล่าสุด
+    renderTableAndPagination(); // วาดตารางใหม่
+
+    // 7. อัปเดต UI ใน Modal ทันที
+    const updatedReq = allRequests.find((r) => r.id === currentEditingId);
+    if(updatedReq) {
+      setUrgencyOnMainBtn(updatedReq.priority); // อัปเดตปุ่ม Urgency
+      updateDetailStatusPill(updatedReq.status); // ❗️ [เพิ่ม] ❗️ อัปเดตป้ายสถานะใน Modal
+    }
+
+  } catch (error) {
+    console.error("Failed to update request:", error);
+    alert("เกิดข้อผิดพลาดในการอัปเดตข้อมูล");
+  }
 });
 
 // ===== SEARCH & FILTER EVENTS =====
