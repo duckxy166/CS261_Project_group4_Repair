@@ -1,55 +1,273 @@
+:root {
+  --tu-red: #c30e2f;
+  --tu-yellow: #ffd13f;
+  --bg-gray: #e3e3e3;
+}
 
-  body {
-  font-family: 'Prompt', sans-serif;
-  background-color: #fff;
+/* ===== Base ===== */
+* {
   margin: 0;
   padding: 0;
-  text-align: center;
+  box-sizing: border-box;
+  font-family: "Prompt", sans-serif;
 }
 
-.container {
-  padding: 20px;
+body {
+  background: var(--bg-gray);
+  color: #333;
 }
 
-.title {
-  color: #C3002F;
+/* ===== Header ===== */
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--tu-red);
+  color: #fff;
+  height: 64px;
+  padding: 0 24px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+}
+
+.logo {
+  font-size: clamp(20px, 2vw, 24px);
   font-weight: 700;
-  margin-bottom: 5px;
+  letter-spacing: 1.2px;
 }
 
-.subtitle {
-  color: #555;
-  margin-bottom: 20px;
+nav ul {
+  display: flex;
+  list-style: none;
+  height: 100%;
+  gap: 32px;
 }
 
-.repair-table {
+nav ul li {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  min-width: 170px;
+}
+
+nav ul li a {
+  color: #fff;
+  text-decoration: none;
+  font-size: clamp(14px, 1.3vw, 16px);
+  line-height: 1.3;
+  font-weight: 600;
+  padding: 8px 24px;
+  text-align: center;
+  border-radius: 999px;
+}
+
+nav ul li a span {
+  font-weight: 400;
+}
+
+nav ul li.active a {
+  background: var(--tu-yellow);
+  color: #000;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.35);
+}
+
+/* header right – same as RequestControl */
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.user-chip {
+  display: flex;
+  align-items: center;
+  background: #fff;
+  color: #333;
+  padding: 6px 16px;
+  border-radius: 999px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
+}
+
+.user-chip .avatar {
+  font-size: 26px;
+  margin-right: 8px;
+}
+
+.user-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.user-name {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.user-email {
+  font-size: 11px;
+  opacity: 0.85;
+}
+
+.icon-button {
+  border: none;
+  background: transparent;
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+
+/* ===== Page layout ===== */
+.page-wrapper {
+  max-width: 1100px;
+  margin: 40px auto 40px;
+  padding: 0 24px;
+}
+
+.page-header h1 {
+  font-size: 30px;
+  font-weight: 700;
+}
+
+.page-header p {
+  font-size: 20px;
+  font-weight: 500;
+  margin-top: 4px;
+}
+
+/* ===== Summary cards ===== */
+.summary-grid {
+  margin-top: 32px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+}
+
+.summary-card {
+  border-radius: 28px;
+  padding: 22px 26px;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.summary-card h2 {
+  font-size: 16px;
+  font-weight: 500;
+  margin-bottom: 10px;
+}
+
+.summary-number {
+  font-size: 52px;
+  font-weight: 700;
+}
+
+/* colors like mock */
+.total-card {
+  background: #ffffff;
+}
+
+.done-card {
+  background: #1db25b;
+  color: #ffffff;
+}
+
+.not-done-card {
+  background: #e64158;
+  color: #ffffff;
+}
+
+/* ===== Latest table ===== */
+.latest-section {
+  margin-top: 40px;
+}
+
+.latest-section h2 {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+
+.card.latest-card {
+  background: #ffffff;
+  border-radius: 24px;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+}
+
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+table {
   width: 100%;
   border-collapse: collapse;
+  font-size: 14px;
 }
 
-.repair-table th, .repair-table td {
-  border: 1px solid #ddd;
-  padding: 10px;
+thead th {
+  font-weight: 600;
+  text-align: left;
+  padding: 14px 24px;
+  border-bottom: 2px solid #e0e0e0;
 }
 
-.repair-table th {
-  background-color: #C3002F;
-  color: white;
+tbody tr {
+  border-bottom: 1px solid #eeeeee;
 }
 
-select, button {
-  padding: 6px 10px;
-  border-radius: 5px;
-  border: 1px solid #ccc;
+tbody td {
+  padding: 12px 24px;
+  vertical-align: middle;
 }
 
-button {
-  background-color: #C3002F;
-  color: white;
-  cursor: pointer;
-  border: none;
+/* status chips (reuse style from RequestControl) */
+.status-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 18px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #333;
 }
 
-button:hover {
-  background-color: #C3002F;
-} 
+.status-pending {
+  background: #ffd366;
+}
+
+.status-inprogress {
+  background: #53c8ff;
+}
+
+.status-waiting {
+  background: #ffb55d;
+}
+
+.status-checking {
+  background: #a7f0c2;
+}
+
+.status-success {
+  background: #7ce676;
+}
+
+/* for this page we only need a few statuses, but others kept for reuse */
+.status-wait-feedback {
+  background: #ff7ad6;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 900px) {
+  nav {
+    display: none;
+  }
+
+  .summary-grid {
+    grid-template-columns: 1fr;
+  }
+}

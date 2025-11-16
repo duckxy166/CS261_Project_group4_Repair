@@ -199,7 +199,10 @@ public class ReportController {
                 report.getDescription(),
                 report.getReporter().getFullName(),
                 report.getCreatedAt(),
-                report.getCategory()
+                report.getCategory(),
+                report.getCause(),
+                report.getMethod(),
+                report.getParts()
         );
 
         
@@ -211,9 +214,6 @@ public class ReportController {
         
         return ResponseEntity.ok(response);
     }
-
-
-
 
     // ---------------- Update (title, location, description, attachments) ----------------
     @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -249,5 +249,42 @@ public class ReportController {
 	        e.printStackTrace();
 	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
 	    }
+    }
+    
+    @PostMapping("/{id}/submit-report")
+    public ResponseEntity<?> submitRepairReport(
+            @PathVariable Long id,
+            @RequestParam("cause") String cause,
+            @RequestParam("method") String method,
+            @RequestParam("parts") String parts,
+            HttpSession session
+    ) {
+        User technician = (User) session.getAttribute("user");
+        if (technician == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not logged in");
+        }
+
+        // ดึงงานซ่อม
+        Optional<RepairRequest> opt = reportRepository.findById(id);
+        if (opt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Repair request not found");
+        }
+
+        RepairRequest req = opt.get();
+
+        // บันทึกข้อมูลรายงานตามที่ช่างกรอก
+        req.setCause(cause);
+        req.setMethod(method);
+        req.setParts(parts);
+
+        // อัปเดตคนซ่อม (กันลืม)
+        req.setTechnician(technician.getFullName());
+
+        // อัปเดตสถานะหลังซ่อม
+        req.setStatus("กำลังตรวจสอบงานซ่อม");
+
+        reportRepository.save(req);
+
+        return ResponseEntity.ok("Report submitted successfully");
     }
 }

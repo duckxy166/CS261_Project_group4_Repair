@@ -1,3 +1,32 @@
+async function updateStatusFromTechnician(id, newStatus) {
+    try {
+        const res = await fetch(`/api/requests/${id}/update-status`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify({
+                status: newStatus,
+                technician: "self",
+                priority: null
+            })
+        });
+
+        if (!res.ok) {
+            console.error("API error:", await res.text());
+        }
+    } catch (err) {
+        console.error("Update status failed:", err);
+    }
+}
+
+function normalizeStatus(text) {
+  return text
+    .trim()
+    .replace(/\s+/g, "")            // ลบช่องว่างระหว่างคำ
+    .replace(/ำ/g, "ำ")             // normalize Thai chars
+    .normalize("NFC");              // normalize unicode
+}
+
 document.addEventListener("DOMContentLoaded", async () => {
   // ===== MENU TOGGLE =====
   const toggleBtn = document.getElementById("menu-toggle");
@@ -48,25 +77,56 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const createdAt = new Date(report.createdAt).toLocaleDateString("th-TH");
 
-    container.innerHTML = `
-      <p><strong>วันที่แจ้งซ่อม :</strong> ${createdAt}</p>
-      <p><strong>ชื่อผู้แจ้ง :</strong> ${report.reporterName}</p>
-      <p><strong>ผู้รับผิดชอบ :</strong> ${report.technician || "-"}</p>
-      <p><strong>ประเภทของงาน :</strong> ${report.title}</p>
-      <p><strong>สถานที่ :</strong> ${report.location}</p>
-      <p><strong>รายละเอียดงาน :</strong> ${report.description}</p>
-      <p><strong>สถานะการซ่อม :</strong> ${report.status} <span class="status-dot"></span></p>
-      <div class="repair-image">${filesHTML}</div>
-      <div class="button-group">
-        <a href="RepairReportCRS.html?id=${report.id}" class="card">
-          <button class="btn-report">รายงานการซ่อม</button>
-        </a>
-        <a href="RepairList.html" class="card">
-          <button class="btn-back">ย้อนกลับ</button>
-        </a>
-      </div>
-    `;
+	container.innerHTML = `
+	  <p><strong>วันที่แจ้งซ่อม :</strong> ${createdAt}</p>
+	  <p><strong>ชื่อผู้แจ้ง :</strong> ${report.reporterName}</p>
+	  <p><strong>ผู้รับผิดชอบ :</strong> ${report.technician || "-"}</p>
+	  <p><strong>ประเภทของงาน :</strong> ${report.title}</p>
+	  <p><strong>สถานที่ :</strong> ${report.location}</p>
+	  <p><strong>รายละเอียดงาน :</strong> ${report.description}</p>
+	  <p><strong>สถานะการซ่อม :</strong> ${report.status} <span class="status-dot"></span></p>
+	  <div class="repair-image">${filesHTML}</div>
+	  <div class="button-group">
+	    <a id="goToCrsLink" class="card">
+	      <button id="reportBtn" class="btn-report">รายงานการซ่อม</button>
+	    </a>
+	    <a href="RepairList.html" class="card">
+	      <button class="btn-back">ย้อนกลับ</button>
+	    </a>
+	  </div>
+	`;
+	
+	const goToCrsLink = document.getElementById("goToCrsLink");
+	const reportBtn = document.getElementById("reportBtn");
 
+	// normalize สถานะก่อนเทียบ
+	const status = normalizeStatus(report.status);
+	const sWaiting = normalizeStatus("กำลังดำเนินการ");
+	const sDoing  = normalizeStatus("อยู่ระหว่างซ่อม");
+	const sDoing2 = normalizeStatus("อยู่ระหว่างการซ่อม");
+
+	// กรณี 1: กำลังดำเนินการ -> ปุ่ม = รับงานซ่อม
+	if (status === sWaiting) {
+	  reportBtn.textContent = "รับงานซ่อม";
+	  goToCrsLink.removeAttribute("href");
+
+	  reportBtn.onclick = async () => {
+	    await updateStatusFromTechnician(report.id, "อยู่ระหว่างซ่อม");
+	    alert("รับงานซ่อมสำเร็จ!");
+	    window.location.reload();
+	  };
+	}
+	// กรณี 2: อยู่ระหว่างซ่อม -> ปุ่ม = รายงานการซ่อม (ลิงก์ไปหน้า CRS)
+	else if (status === sDoing || status === sDoing2) {
+	  reportBtn.textContent = "รายงานการซ่อม";
+	  goToCrsLink.href = `RepairReportCRS.html?id=${report.id}`;
+	}
+	// กรณี 3: สถานะอื่น -> ซ่อนปุ่มไปเลย
+	else {
+	  goToCrsLink.style.display = "none";
+	}
+
+	
     // ===== IMAGE MODAL =====
     const modal = document.getElementById("imageModal");
     const modalImg = document.getElementById("modalImg");
@@ -99,26 +159,5 @@ document.addEventListener("DOMContentLoaded", async () => {
   } catch (err) {
     console.error(err);
     container.innerHTML = `<p>เกิดข้อผิดพลาดในการโหลดข้อมูล</p>`;
-  }
-});
-document.addEventListener("DOMContentLoaded", () => {
-  // 🔹 Get request ID from URL
-  const urlParams = new URLSearchParams(window.location.search);
-  const requestId = urlParams.get("id");
-
-  console.log("Repair Request ID:", requestId);
-
-  // Example: maybe fetch details using requestId
-  // fetch(`/api/requests/${requestId}`)
-  //   .then((res) => res.json())
-  //   .then((data) => console.log(data));
-
-  // 🔹 When click to go to RepairReportCRS
-  const goToCRSBtn = document.getElementById("goToCRS");
-  if (goToCRSBtn) {
-    goToCRSBtn.addEventListener("click", () => {
-      // Pass same requestId to RepairReportCRS.html
-      window.location.href = `RepairReportCRS.html?id=${requestId}`;
-    });
   }
 });

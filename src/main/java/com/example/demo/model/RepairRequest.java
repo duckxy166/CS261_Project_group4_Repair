@@ -16,6 +16,12 @@ public class RepairRequest {
 	private String title;
 	@Column(name = "description", columnDefinition = "NVARCHAR(255)")
 	private String description;
+	@Column(name = "cause", columnDefinition = "NVARCHAR(MAX)")
+	private String cause;
+	@Column(name = "method", columnDefinition = "NVARCHAR(MAX)")
+	private String method;
+	@Column(name = "parts", columnDefinition = "NVARCHAR(MAX)")
+	private String parts;
 	@Column(name = "status", columnDefinition = "NVARCHAR(100)")
 	private String status = "รอดำเนินการ";
 	@Column(name = "technician", columnDefinition = "NVARCHAR(255)")
@@ -73,6 +79,30 @@ public class RepairRequest {
 		return description;
 	}
 
+	public String getCause() {
+		return cause;
+	}
+
+	public void setCause(String cause) {
+		this.cause = cause;
+	}
+
+	public String getMethod() {
+		return method;
+	}
+
+	public void setMethod(String method) {
+		this.method = method;
+	}
+
+	public String getParts() {
+		return parts;
+	}
+
+	public void setParts(String parts) {
+		this.parts = parts;
+	}
+
 	public String getStatus() {
 		return status;
 	}
@@ -118,13 +148,13 @@ public class RepairRequest {
 	}
 
 	public String getLocationDetail() {
-	    return locationDetail;
+		return locationDetail;
 	}
 
 	public void setLocationDetail(String locationDetail) {
-	    this.locationDetail = locationDetail;
+		this.locationDetail = locationDetail;
 	}
-	
+
 	@PrePersist
 	protected void onCreate() {
 		this.createdAt = LocalDateTime.now();
@@ -143,25 +173,24 @@ public class RepairRequest {
 	}
 
 	public void updateStatus(String newStatus, User technicianUser) {
-	    System.out.println("=== MODEL updateStatus ===");
-	    System.out.println("New Status = " + newStatus);
-	    System.out.println("TechnicianUser = " + (technicianUser != null ? technicianUser.getFullName() : "NULL"));
-	    System.out.println("=================================");
+		System.out.println("=== MODEL updateStatus ===");
+		System.out.println("New Status = " + newStatus);
+		System.out.println("TechnicianUser = " + (technicianUser != null ? technicianUser.getFullName() : "NULL"));
+		System.out.println("=================================");
 
-	    this.status = newStatus;
-	    if (technicianUser != null) {
-	        this.technician = technicianUser.getFullName() != null ? technicianUser.getFullName() : technicianUser.getUsername();
-	    }
-	    if (technicianUser != null && technicianUser.getFullName() != null) {
-	        System.out.println("SET TECHNICIAN = " + technicianUser.getFullName());
-	        this.technician = technicianUser.getFullName();
-	    } else {
-	        System.out.println("NOT SET TECHNICIAN!");
-	    }
+		this.status = newStatus;
+		if (technicianUser != null) {
+			this.technician = technicianUser.getFullName() != null ? technicianUser.getFullName()
+					: technicianUser.getUsername();
+		}
+		if (technicianUser != null && technicianUser.getFullName() != null) {
+			System.out.println("SET TECHNICIAN = " + technicianUser.getFullName());
+			this.technician = technicianUser.getFullName();
+		} else {
+			System.out.println("NOT SET TECHNICIAN!");
+		}
 
-	    this.updatedAt = LocalDateTime.now();
+		this.updatedAt = LocalDateTime.now();
 	}
-
-
 
 }

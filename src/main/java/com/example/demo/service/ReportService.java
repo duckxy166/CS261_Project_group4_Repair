@@ -87,7 +87,10 @@ public List<ReportResponse> getUserTrackReports(User user) {
                         r.getDescription(),
                         r.getReporter().getFullName(),
                         r.getCreatedAt(),
-                        r.getCategory()
+                        r.getCategory(),
+                        r.getCause(),
+                        r.getMethod(),
+                        r.getParts()
                 ))
                 .toList();
     }
@@ -144,7 +147,10 @@ public List<RepairRequest> getUserHistoryReports(User user) {
                 report.getDescription(),
                 report.getReporter().getFullName(),
                 report.getCreatedAt(),
-                report.getCategory()
+                report.getCategory(),
+                report.getCause(),
+                report.getMethod(),
+                report.getParts()
         );
     }
     
