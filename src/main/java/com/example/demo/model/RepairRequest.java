@@ -7,6 +7,11 @@ import java.time.LocalDateTime;
 //import lombok.NoArgsConstructor;
 //import lombok.AllArgsConstructor;
 
+// 1. เพิ่ม imports ที่จำเป็น
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.Transient;
+
 @Entity
 public class RepairRequest {
 	@Id
@@ -46,7 +51,12 @@ public class RepairRequest {
 	@JoinColumn(name = "reporter_id", nullable = false)
 	private User reporter;
 
-	// getters & setters
+	// 2. เพิ่มความสัมพันธ์ OneToOne ไปยัง Feedback
+	@OneToOne(mappedBy = "report", fetch = FetchType.LAZY)
+	private Feedback feedback;
+
+
+	// getters & setters (ของเดิม)
 	public long getId() {
 		return id;
 	}
@@ -155,6 +165,15 @@ public class RepairRequest {
 		this.locationDetail = locationDetail;
 	}
 
+	// 3. เพิ่ม Getter/Setter สำหรับ feedback
+	public Feedback getFeedback() {
+		return feedback;
+	}
+
+	public void setFeedback(Feedback feedback) {
+		this.feedback = feedback;
+	}
+
 	@PrePersist
 	protected void onCreate() {
 		this.createdAt = LocalDateTime.now();
@@ -193,4 +212,22 @@ public class RepairRequest {
 		this.updatedAt = LocalDateTime.now();
 	}
 
+	// 4. เพิ่ม Transient Getters เพื่อให้ Jackson นำไปใส่ใน JSON
+	// โดยจะดึงข้อมูลมาจาก field feedback ที่เชื่อมกันไว้
+	
+	@Transient
+	public int getFeedbackRating() {
+		if (this.feedback != null) {
+			return this.feedback.getRating();
+		}
+		return 0; // ค่า default หากยังไม่มี feedback
+	}
+
+	@Transient
+	public String getFeedbackComment() {
+		if (this.feedback != null) {
+			return this.feedback.getMessage();
+		}
+		return null; // ค่า default หากยังไม่มี feedback
+	}
 }
