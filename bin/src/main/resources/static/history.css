@@ -128,7 +128,7 @@ main{padding:30px}
 }
 
 /* ===== Feedback Modal ===== */
-/* Theme: red #C30E2F, yellow #FFD13F */
+/* Theme: red #c30e2f, yellow #FFD13F */
 .fb-card{width:min(640px,92vw)}
 .fb-body{display:flex;flex-direction:column;gap:16px}
 .fb-section{background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:14px}

@@ -44,7 +44,7 @@ body {
 /* Title and subtitle */
 .title {
   font-family: 'TUFont-Bold', 'TUFont', 'Prompt', sans-serif;
-  color: #C30E2F;
+  color: #c30e2f;
   font-size: 2rem;
   margin-bottom: 0.2rem;
   transition: opacity 0.3s ease; /* add smooth fade */

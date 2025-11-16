@@ -112,7 +112,7 @@ body {
 .star-button:hover,
 .star-button[data-active="true"] {
   transform: translateY(-2px) scale(1.08);
-  color: #C30E2F; /* same red as header */
+  color: #c30e2f; /* same red as header */
 }
 
 .rating-hint {
