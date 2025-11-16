@@ -143,17 +143,25 @@ public class RepairRequest {
 	}
 
 	public void updateStatus(String newStatus, User technicianUser) {
-	    // ให้ผูกชื่อช่างตอนเปลี่ยนจาก "กำลังดำเนินการ" → "อยู่ระหว่างซ่อม"
-	    if (technicianUser != null 
-	            && "Technician".equalsIgnoreCase(technicianUser.getRole())
-	            && "กำลังดำเนินการ".equals(this.status)
-	            && ("อยู่ระหว่างซ่อม".equals(newStatus) || "กำลังซ่อม".equals(newStatus))) {
-	        this.technician = technicianUser.getFullName();
-	    }
+	    System.out.println("=== MODEL updateStatus ===");
+	    System.out.println("New Status = " + newStatus);
+	    System.out.println("TechnicianUser = " + (technicianUser != null ? technicianUser.getFullName() : "NULL"));
+	    System.out.println("=================================");
 
 	    this.status = newStatus;
+	    if (technicianUser != null) {
+	        this.technician = technicianUser.getFullName() != null ? technicianUser.getFullName() : technicianUser.getUsername();
+	    }
+	    if (technicianUser != null && technicianUser.getFullName() != null) {
+	        System.out.println("SET TECHNICIAN = " + technicianUser.getFullName());
+	        this.technician = technicianUser.getFullName();
+	    } else {
+	        System.out.println("NOT SET TECHNICIAN!");
+	    }
+
 	    this.updatedAt = LocalDateTime.now();
 	}
+
 
 
 }
