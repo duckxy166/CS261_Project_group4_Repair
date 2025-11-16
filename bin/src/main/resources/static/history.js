@@ -549,8 +549,5 @@ async function loadData() {
       rawItems = []; viewItems = []; render(1);
     }
   }
-
-  // 3. สั่งให้ฟังก์ชันนี้ทำงานครั้งแรกเมื่อเปิดหน้า
   loadData();
-
 });

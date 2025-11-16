@@ -123,9 +123,9 @@ document.addEventListener("DOMContentLoaded", () => {
   /* ---------- Status normalization (ONLY 3 labels) ---------- */
 const SUCCESS_WORDS = ["สำเร็จ", "เสร็จสิ้น", "completed", "complete", "done"];
 const CANCEL_WORDS  = ["ยกเลิก", "cancelled", "canceled", "cancel", "rejected"];
+const NORATE_WORDS  = ["ยังไม่ได้คะแนน", "ยังไม่ได้ให้คะแนน", "not rated", "no rating", "ซ่อมเสร็จ", "รอประเมิน"];
 
 // 2. เพิ่ม "ซ่อมเสร็จ" เข้ามาในกลุ่ม NORATE เพื่อให้ระบบรู้ว่าต้องรอประเมิน
-const NORATE_WORDS  = ["ยังไม่ได้คะแนน", "ยังไม่ให้คะแนน", "not rated", "no rating", "ซ่อมเสร็จ", "รอประเมิน"];
 function normalizeStatus(raw) {
   const t = String(raw || "").trim().toLowerCase();
   if (NORATE_WORDS.some(w => t.includes(w))) return "ยังไม่ได้ให้คะแนน";
@@ -133,7 +133,6 @@ function normalizeStatus(raw) {
   if (SUCCESS_WORDS.some(w => t.includes(w))) return "สำเร็จ";
   return null; 
 }
-
 function pillClassByNormalized(s) {
   if (s === "ยังไม่ได้ให้คะแนน") return "pill warn";
   if (s === "สำเร็จ") return "pill success";
@@ -169,7 +168,7 @@ function pillClassByNormalized(s) {
   });
 
   /* ---------- Toolbar ---------- */
-  backToTrack?.addEventListener("click", () =>   {
+    backToTrack?.addEventListener("click", () =>   {
       const total = Math.ceil(viewItems.length / PAGE_SIZE);
       if (currentPage > total) { currentPage--; render(); }
     });
@@ -490,7 +489,7 @@ fbSubmit?.addEventListener("click", async () => {
       closeFeedback(); 
       reportModal?.classList.add("hidden");
   
-      loadData(); 
+      await loadData();
       // ==========================================
   
     } catch (err) {
@@ -502,7 +501,7 @@ fbSubmit?.addEventListener("click", async () => {
   feedbackModal?.addEventListener("click", (e) => { if (e.target === feedbackModal) closeFeedback(); });
 
   /* ---------- Load Data ---------- */
-  (async () => {
+  async function loadData() {
     try {
       let list;
       if (USE_MOCK) {
@@ -551,5 +550,6 @@ mapped._normalizedStatus = normalizeStatus(mapped.status);
       console.error("Load history fail:", err);
       rawItems = []; viewItems = []; render(1);
     }
-  })();
+  }
+loadData();
 });
