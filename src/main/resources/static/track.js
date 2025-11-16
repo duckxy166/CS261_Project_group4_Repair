@@ -274,7 +274,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			// 1. เก็บข้อมูลดิบไว้ในตัวแปรใหม่
 			const rawData = Array.isArray(data) ? data : (data.items || []);
 
-			// 2. เพิ่มตัวกรอง
+			// 2. ★★★ นี่คือตรรกะที่ถูกต้อง (จากโค้ดเก่าของคุณ) ★★★
 			// กรองเอาเฉพาะรายการที่ "ไม่ใช่" สถานะ 'done' และ 'cancelled'
 			allItems = rawData.filter((item) => {
 				const statusKey = normalizeStatus(item.status); // ใช้ฟังก์ชัน normalizeStatus ที่มีอยู่แล้ว
@@ -292,85 +292,140 @@ document.addEventListener('DOMContentLoaded', function() {
 
 	// events
 	searchInput.addEventListener('input', applySearch);
+
+    // --- ★★★ START: FIX 1 - LOGIC แก้ไขเมนู 3 จุดที่โดนตัด ★★★ ---
+    
+    function closeAllMenus() {
+        // 1. Find and remove the active menu from the body
+        const activeMenu = document.getElementById('active-more-menu');
+        if (activeMenu) {
+            activeMenu.remove();
+        }
+
+        // 2. Find any button that is still expanded and collapse it
+        document.querySelectorAll('.more-btn[aria-expanded="true"]').forEach(btn => {
+            btn.setAttribute('aria-expanded', 'false');
+        });
+    }
+
 	// toggle and menu actions
 	tbody.addEventListener('click', (e) => {
 		const moreBtn = e.target.closest('.more-btn');
-		const menuItem = e.target.closest('.menu-item');
 
 		if (moreBtn) {
 			e.preventDefault();
+            
+            // Check if this button's menu is already open
+            const isCurrentlyOpen = moreBtn.getAttribute('aria-expanded') === 'true';
+            
+            // Always close all menus first
+            closeAllMenus();
+
+            if (isCurrentlyOpen) {
+                // Was open, now closed by closeAllMenus(). Just stop.
+                return;
+            }
+
+            // --- Create and show new menu ---
 			const cell = moreBtn.closest('.actions-cell');
-			const menu = cell && cell.querySelector('.more-menu');
-			if (!menu) return;
+			const menuTemplate = cell && cell.querySelector('.more-menu');
+			if (!menuTemplate) return;
 
-			const isCurrentlyOpen = menu.classList.contains('open');
-			closeAllMenus(); // ปิดทุกเมนูที่เปิดอยู่
-			if (!isCurrentlyOpen) { // ถ้าเมนูที่เพิ่งคลิกไม่ได้เปิดอยู่ก่อนหน้านี้ ให้เปิด
-				menu.classList.add('open');
-				moreBtn.setAttribute('aria-expanded', 'true');
-				menu.setAttribute('aria-hidden', 'false');
-				menu.focus(); // โฟกัสไปที่เมนูเพื่อรับ input จากคีย์บอร์ด
-			} else {
-				// ถ้าเมนูเปิดอยู่แล้ว และถูกคลิกซ้ำ จะถูกปิดโดย closeAllMenus() ไปแล้ว
-				moreBtn.setAttribute('aria-expanded', 'false');
-			}
-			return;
-		}
+            // 1. Clone the menu
+            const menu = menuTemplate.cloneNode(true);
+            menu.id = 'active-more-menu'; // Give it an ID to find it
+            menu.classList.add('open');      // Make it visible (display: block)
+            menu.style.position = 'fixed';  // Use fixed positioning to escape overflow
+            menu.style.zIndex = '100';      // Ensure it's on top
+            
+            // 2. Append to body
+            document.body.appendChild(menu);
 
-		if (menuItem) {
-			e.preventDefault();
-			const action = menuItem.getAttribute('data-action');
-			const id = menuItem.getAttribute('data-id');
-			handleAction(action, id);
-			closeAllMenus();
-			return;
+            // 3. Calculate position
+            const btnRect = moreBtn.getBoundingClientRect();
+            const menuRect = menu.getBoundingClientRect(); // Get menu dimensions
+
+            let top = btnRect.bottom + 2; // Default: below button
+            let left = btnRect.right - menuRect.width; // Default: align right edges
+
+            // Check if it goes off-screen (bottom)
+            if (top + menuRect.height > window.innerHeight) {
+                top = btnRect.top - menuRect.height - 2; // Position above button
+            }
+
+            // Check if it goes off-screen (left)
+            if (left < 10) {
+                left = 10; // Pin to 10px from left edge
+            }
+
+            menu.style.top = `${top}px`;
+            menu.style.left = `${left}px`;
+
+            // 4. Set ARIA states and focus
+			moreBtn.setAttribute('aria-expanded', 'true');
+			menu.setAttribute('aria-hidden', 'false');
+			menu.focus(); // Focus the menu itself
+
+            // 5. Add listeners to the *new* menu
+            menu.addEventListener('click', (e_menu) => {
+                const menuItem = e_menu.target.closest('.menu-item');
+                if (menuItem) {
+                    e_menu.preventDefault();
+                    const action = menuItem.getAttribute('data-action');
+                    const id = menuItem.getAttribute('data-id');
+                    handleAction(action, id);
+                    closeAllMenus();
+                }
+            });
+
+            menu.addEventListener('keydown', (e_menu) => {
+                const menuItems = Array.from(menu.querySelectorAll('.menu-item'));
+                const currentIndex = menuItems.indexOf(document.activeElement);
+
+                if (e_menu.key === 'ArrowDown') {
+                    e_menu.preventDefault();
+                    const nextIndex = (currentIndex + 1) % menuItems.length;
+                    menuItems[nextIndex].focus();
+                } else if (e_menu.key === 'ArrowUp') {
+                    e_menu.preventDefault();
+                    const prevIndex = (currentIndex - 1 + menuItems.length) % menuItems.length;
+                    menuItems[prevIndex].focus();
+                } else if (e_menu.key === 'Escape') {
+                    e_menu.preventDefault();
+                    closeAllMenus();
+                    moreBtn.focus(); // Return focus to the button
+                } else if (e_menu.key === 'Enter' || e_menu.key === ' ') {
+                    if (document.activeElement.closest('.menu-item')) {
+                        document.activeElement.click();
+                    }
+                }
+            });
 		}
 	});
 
 	tbody.addEventListener('keydown', (e) => {
 		const moreBtn = e.target.closest('.more-btn');
-		const menu = e.target.closest('.more-menu');
 
 		if (moreBtn && (e.key === 'Enter' || e.key === ' ')) {
 			e.preventDefault();
 			moreBtn.click(); // Simulate click to toggle menu
 		}
-
-		if (menu) {
-			const menuItems = Array.from(menu.querySelectorAll('.menu-item'));
-			const currentIndex = menuItems.indexOf(document.activeElement);
-
-			if (e.key === 'ArrowDown') {
-				e.preventDefault();
-				const nextIndex = (currentIndex + 1) % menuItems.length;
-				menuItems[nextIndex].focus();
-			} else if (e.key === 'ArrowUp') {
-				e.preventDefault();
-				const prevIndex = (currentIndex - 1 + menuItems.length) % menuItems.length;
-				menuItems[prevIndex].focus();
-			} else if (e.key === 'Escape') {
-				e.preventDefault();
-				closeAllMenus();
-				moreBtn.focus(); // กลับไปโฟกัสที่ปุ่มที่เปิดเมนู
-			} else if (e.key === 'Enter' || e.key === ' ') {
-				if (document.activeElement.closest('.menu-item')) {
-					document.activeElement.click();
-				}
-			}
-		}
 	});
 
 	document.addEventListener('click', (e) => {
-		if (!e.target.closest('.actions-cell')) {
+        // If click is NOT on a button and NOT inside the active menu, close it.
+		if (!e.target.closest('.more-btn') && !e.target.closest('#active-more-menu')) {
 			closeAllMenus();
 		}
 	});
-	// เพิ่มการปิดเมนูเมื่อกด ESC ทั่วไปในเอกสาร
+
 	document.addEventListener('keydown', (e) => {
 	    if (e.key === 'Escape') {
 	        closeAllMenus();
 	    }
 	});
+    
+    // --- ★★★ END: FIX 1 ★★★ ---
 
 	paginationEl.addEventListener('click', (e) => {
 		const btn = e.target.closest('.page-btn');
@@ -386,16 +441,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	// init
 	loadData();
 
-	function closeAllMenus() {
-		document.querySelectorAll('.more-menu.open').forEach(el => {
-			el.classList.remove('open');
-			el.setAttribute('aria-hidden', 'true');
-			const moreBtn = el.previousElementSibling; // Assume more-btn is sibling before menu
-			if (moreBtn && moreBtn.classList.contains('more-btn')) {
-				moreBtn.setAttribute('aria-expanded', 'false');
-			}
-		});
-	}
+    // (ลบฟังก์ชัน closeAllMenus() ของเก่าจากตรงนี้ เพราะย้ายไปรวมใน FIX 1)
 
 	async function handleAction(action, id) {
 		if (!id) return;
@@ -438,6 +484,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
 	if (btnNo) btnNo.addEventListener('click', hideDeleteConfirm);
 	if (overlay) overlay.addEventListener('click', hideDeleteConfirm);
+    
+    // (นี่คือ 'btnYes' (ปุ่มยืนยันใน popup) จากโค้ดเก่าของคุณ - ซึ่งทำงานถูกต้อง)
 	if (btnYes) btnYes.addEventListener('click', async () => {
 	    if (!deleteTargetId) return hideDeleteConfirm();
 	    try {
@@ -457,10 +505,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
 	        if (!resp.ok) throw new Error('ไม่สามารถยกเลิกงานได้');
 
-	        const result = await resp.json();
+	        const result = await resp.json(); // (หาก server ไม่ส่ง json กลับมา อาจต้องแก้ตรงนี้)
 	        console.log('Update result:', result);
 	        alert('ยกเลิกงานเรียบร้อยแล้ว');
 
+            // ★★★ นี่คือตรรกะที่ถูกต้อง (จากโค้ดเก่าของคุณ) ★★★
 	        allItems = allItems.filter(it => String(it.id || it._id) !== String(deleteTargetId));
 	        applySearch();
 
@@ -710,7 +759,10 @@ document.addEventListener('DOMContentLoaded', function() {
 			dEdit.style.display = statusKey === 'pending' ? 'inline-block' : 'none';
 		}
 	}
-	// ปุ่มยกเลิกการแจ้งซ่อม
+
+	// --- ★★★ START: FIX 2 - แก้ไขปุ่มยกเลิกใน Modal ★★★ ---
+    // (นี่คือ 'dCancel' (ปุ่มยกเลิกใน Modal) จากโค้ดเก่าของคุณ - ซึ่งทำงานถูกต้อง)
+    // (ปรับปรุงเล็กน้อย: ให้ทำงานเหมือน btnYes คือลบออกจาก Array ทันที แทนการ reload)
 	dCancel.addEventListener('click', async () => {
 	  if (!currentDetailId) {
 	    alert('ไม่พบรหัสคำขอ');
@@ -734,14 +786,22 @@ document.addEventListener('DOMContentLoaded', function() {
 
 	    if (!resp.ok) throw new Error('ไม่สามารถยกเลิกงานได้');
 
+        // (เพิ่ม try/catch เผื่อ server ไม่ส่ง JSON กลับมา)
+        try { await resp.json(); } catch {}
+
 	    alert('ยกเลิกงานเรียบร้อยแล้ว');
-	    closeDetailModal(); // ใช้ closeDetailModal() แทนการตั้งค่า attribute โดยตรง
-	    location.reload(); // reload after cancel success
+	    closeDetailModal(); // ปิด Modal
+
+        // ★★★ นี่คือตรรกะที่ถูกต้อง (เหมือน btnYes) ★★★
+        allItems = allItems.filter(it => String(it.id || it._id) !== String(currentDetailId));
+        applySearch(); // วาดตารางใหม่
+
 	  } catch (err) {
 	    console.error('Cancel request error:', err);
 	    alert('เกิดข้อผิดพลาดขณะยกเลิกงาน');
 	  }
 	});
+    // --- ★★★ END: FIX 2 ★★★ ---
 
 	async function openDetailModal(id) {
 	    const item = allItems.find(it => String(it.id || it._id) === String(id));
@@ -810,39 +870,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
 	if (dClose) dClose.addEventListener('click', closeDetailModal);
 	if (dOverlay) dOverlay.addEventListener('click', closeDetailModal);
-	if (dCancel) 	dCancel.addEventListener('click', async () => {
-	  if (!currentDetailId) {
-	    alert('ไม่พบรหัสคำขอ');
-	    return;
-	  }
-	  try {
-	    const resp = await fetch('/api/requests/update-status', {
-	      method: 'POST',
-	      headers: { 'Content-Type': 'application/json' },
-	      body: JSON.stringify({
-	        id: currentDetailId,
-	        status: 'ยกเลิก',
-	        technicianId: null,
-	        priority: null
-	      }),
-	      credentials: 'include'
-	    });
-	    if (!resp.ok) {
-	      throw new Error('ไม่สามารถยกเลิกงานได้');
-	    }
-	    let result = null;
-	    try {
-	      result = await resp.json();
-	      console.log('Update result:', result);
-	    } catch {
-	      console.warn('Response was not valid JSON (ignored)');
-	    }
-
-	  } catch (err) {
-	    console.error('Cancel request error:', err);
-	    alert('เกิดข้อผิดพลาดขณะยกเลิกงาน');
-	  }
-	});
+    
+    // --- ★★★ START: FIX 3 - ลบ Listener ซ้ำซ้อน ★★★ ---
+    // (ลบ dCancel.addEventListener() ตัวที่สองที่เคยอยู่ตรงนี้ออกไป)
+    // --- ★★★ END: FIX 3 ★★★ ---
 
 	function enterEditMode() {
 		const locInput = document.getElementById('detailLocation');
