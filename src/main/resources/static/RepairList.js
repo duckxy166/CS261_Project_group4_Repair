@@ -1,190 +1,17 @@
+window.addEventListener('pageshow', function(event) {
+	if (event.persisted) {
+		console.log('Page loaded from bfcache. Forcing reload from server...');
+		window.location.reload();
+	}
+});
+
 const byId = (id) => document.getElementById(id);
 
-const mockRepairData = [
-	{
-		id: "R001",
-		subject: "น้ำไม่ไหล",
-		date: "2025-03-31",
-		reporter: "ไอติม",
-		assignee: "ช่างธนกฤต",
-		category: "ประปา",
-		priority: "High",
-		status: "กำลังดำเนินการ",
-		isAccepted: true,
-		location: "ตึก โดม",
-		room: "ห้องน้ำชั้น 2",
-		description: "น้ำไม่ไหลเลยตั้งแต่เช้า ที่ห้องน้ำหญิงชั้น 2 ตึกโดม",
-		images: []
-	},
-	{
-		id: "R002",
-		subject: "ไฟดับ",
-		date: "2025-08-26",
-		reporter: "สมชาย",
-		assignee: "เอกชัย",
-		category: "ไฟฟ้า",
-		priority: "Low",
-		status: "รอดำเนินการ",
-		isAccepted: false,
-		location: "อาคารบร.1",
-		room: "ห้อง 201",
-		description: "ไฟไม่ติดบริเวณโถงอาคารบร.1",
-		images: ["image_placeholder.png"]
-	},
-	{
-		id: "R003",
-		subject: "เก้าอี้เสีย",
-		date: "2025-10-08",
-		reporter: "พิเชษฐ์",
-		assignee: "ช่างอภิเดช",
-		category: "เฟอร์นิเจอร์",
-		priority: "Medium",
-		status: "กำลังตรวจสอบงานซ่อม",
-		isAccepted: true,
-		location: "ตึก พีช",
-		room: "ห้อง 304",
-		description: "ขาเก้าอี้หัก 1 ตัว",
-		images: []
-	},
-	{
-		id: "R004",
-		subject: "แอร์ไม่เย็น",
-		date: "2025-10-10",
-		reporter: "สุชาติ",
-		assignee: "เอกชัย",
-		category: "ไฟฟ้า",
-		priority: "Medium",
-		status: "รอดำเนินการ",
-		isAccepted: false,
-		location: "ตึก SC",
-		room: "ห้อง 501",
-		description: "แอร์มีแต่ลม",
-		images: []
-	},
-	{
-		id: "R005",
-		subject: "ประตูบิด",
-		date: "2025-10-11",
-		reporter: "มานี",
-		assignee: "ช่างอภิเดช",
-		category: "เฟอร์นิเจอร์",
-		priority: "Low",
-		status: "รอดำเนินการ",
-		isAccepted: false,
-		location: "ตึก โดม",
-		room: "ห้อง 101",
-		description: "ลูกบิดประตูเสีย",
-		images: []
-	},
-	{
-		id: "R006",
-		subject: "ท่อตัน",
-		date: "2025-10-12",
-		reporter: "ปิติ",
-		assignee: "ช่างธนกฤต",
-		category: "ประปา",
-		priority: "High",
-		status: "รอดำเนินการ",
-		isAccepted: false,
-		location: "ตึก พีช",
-		room: "ห้องน้ำชั้น 1",
-		description: "ท่อระบายน้ำที่อ่างล้างหน้าตัน",
-		images: []
-	},
-	{
-		id: "R007",
-		subject: "หลอดไฟกระพริบ",
-		date: "2025-10-13",
-		reporter: "ชูใจ",
-		assignee: "เอกชัย",
-		category: "ไฟฟ้า",
-		priority: "Low",
-		status: "รอดำเนินการ",
-		isAccepted: false,
-		location: "อาคารบร.1",
-		room: "ห้อง 202",
-		description: "ไฟกระพริบตลอดเวลา",
-		images: []
-	},
-	{
-		id: "R008",
-		subject: "น้ำรั่ว",
-		date: "2025-10-14",
-		reporter: "สมปอง",
-		assignee: "ช่างธนกฤต",
-		category: "ประปา",
-		priority: "Medium",
-		status: "รอดำเนินการ",
-		isAccepted: false,
-		location: "ตึก SC",
-		room: "ห้อง 303",
-		description: "น้ำหยดจากฝ้าเพดาน",
-		images: []
-	},
-	{
-		id: "R009",
-		subject: "โต๊ะหัก",
-		date: "2025-10-15",
-		reporter: "วิชัย",
-		assignee: "ช่างอภิเดช",
-		category: "เฟอร์นิเจอร์",
-		priority: "High",
-		status: "รอดำเนินการ",
-		isAccepted: false,
-		location: "ตึก โดม",
-		room: "ห้อง 102",
-		description: "ขาโต๊ะหัก",
-		images: []
-	},
-	{
-		id: "R010",
-		subject: "ปลั๊กไฟไหม้",
-		date: "2025-10-16",
-		reporter: "อารี",
-		assignee: "เอกชัย",
-		category: "ไฟฟ้า",
-		priority: "High",
-		status: "กำลังดำเนินการ",
-		isAccepted: true,
-		location: "ตึก พีช",
-		room: "ห้อง 404",
-		description: "มีรอยไหม้ที่ปลั๊กไฟ",
-		images: []
-	},
-	{
-		id: "R011",
-		subject: "หน้าต่างแตก",
-		date: "2025-10-17",
-		reporter: "สมคิด",
-		assignee: "ช่างอภิเดช",
-		category: "เฟอร์นิเจอร์",
-		priority: "Medium",
-		status: "รอดำเนินการ",
-		isAccepted: false,
-		location: "อาคารบร.1",
-		room: "ห้อง 301",
-		description: "กระจกหน้าต่างแตก",
-		images: []
-	},
-	{
-		id: "R012",
-		subject: "ก๊อกน้ำเสีย",
-		date: "2025-10-18",
-		reporter: "มานะ",
-		assignee: "ช่างธนกฤต",
-		category: "ประปา",
-		priority: "Low",
-		status: "รอดำเนินการ",
-		isAccepted: false,
-		location: "ตึก SC",
-		room: "ห้องน้ำชั้น 2",
-		description: "ก๊อกน้ำปิดไม่สนิท",
-		images: []
-	}
-];
 
 
+let currentUserFullName = '';
 document.addEventListener('DOMContentLoaded', () => {
+
 
 	const tbody = byId('listTbody');
 	const paginationEl = byId('listPagination');
@@ -196,7 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	const acceptModal = byId('acceptModal');
 	const detailOverlay = byId('detailOverlay');
 	const detailModal = byId('detailModal');
-	
+
 	const reportOverlay = byId('reportOverlay');
 	const reportModal = byId('reportModal');
 	const successOverlay = byId('successOverlay');
@@ -209,44 +36,122 @@ document.addEventListener('DOMContentLoaded', () => {
 	const reportBackBtn = byId('reportBackBtn');
 	const reportConfirmBtn = byId('reportConfirmBtn');
 	const successBackToListBtn = byId('successBackToListBtn');
-	
+
+
+
+	async function loadRepairRequests() {
+		try {
+			const resp = await fetch('/api/requests', { credentials: 'include' });
+			if (resp.ok) {
+				const data = await resp.json();
+				// Filter only statuses that the technician should see
+				allItems = data.filter(item => {
+					const status = item.status || '';
+					return status === 'กำลังดำเนินการ' || status === 'อยู่ระหว่างซ่อม' || status === 'อยู่ระหว่างการซ่อม';
+				});
+				applyFilterAndSearch();
+			} else {
+				console.error('ไม่สามารถโหลดรายการซ่อมได้', resp.status);
+				tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:20px;">ไม่สามารถโหลดรายการซ่อมได้</td></tr>`;
+			}
+		} catch (err) {
+			console.error('เกิดข้อผิดพลาดในการเรียก API:', err);
+			tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:20px;">เกิดข้อผิดพลาดในการเชื่อมต่อ</td></tr>`;
+		}
+	}
+	async function loadDetailImages(id) {
+		const imagesBox = byId('detailImages');
+		imagesBox.innerHTML = '';
+
+		try {
+			const res = await fetch(`/api/files/${encodeURIComponent(id)}`, { credentials: 'include' });
+			if (!res.ok) throw new Error('โหลดไฟล์ไม่สำเร็จ');
+
+			const files = await res.json();
+			console.log('Files from server:', files);
+
+			// Filter only images
+			const imageFiles = files.filter(f => f.contentType?.startsWith('image/'));
+
+			if (imageFiles.length) {
+				imageFiles.forEach(f => {
+					const el = document.createElement('div');
+					el.className = 'detail-image';
+
+					const img = document.createElement('img');
+					img.src = `/api/files/${encodeURIComponent(id)}/${encodeURIComponent(f.id)}/download`;
+					img.alt = f.originalFilename || 'image';
+
+					el.appendChild(img);
+					imagesBox.appendChild(el);
+				});
+			} else {
+				imagesBox.innerHTML = '<div class="placeholder">ไม่มีรูปภาพ</div>';
+			}
+
+		} catch (err) {
+			console.error(err);
+			imagesBox.innerHTML = '<div class="placeholder">เกิดข้อผิดพลาดขณะโหลดรูปภาพ</div>';
+		}
+	}
+
+
+
+	(async () => {
+		try {
+			const resp = await fetch('/api/users/current', { credentials: 'include' });
+			if (resp.ok) {
+				const user = await resp.json();
+				currentUserFullName = user.fullName || '';
+				// update header
+				const nameEl = byId('currentUserName');
+				if (nameEl) nameEl.textContent = currentUserFullName;
+
+				const emailEl = byId('currentUserEmail');
+				if (emailEl) emailEl.textContent = user.email || '';
+			}
+		} catch (err) {
+			console.error('Error fetching current user:', err);
+		}
+	})();
+
 	// ปิด detailModal เมื่อกดปุ่มย้อนกลับ
 	if (detailBackBtn && detailModal && detailOverlay) {
-	    detailBackBtn.addEventListener('click', () => {
-	        hideModal(detailModal, detailOverlay);
-	    });
+		detailBackBtn.addEventListener('click', () => {
+			hideModal(detailModal, detailOverlay);
+		});
 
-	    detailOverlay.addEventListener('click', (e) => {
-	        if (e.target === detailOverlay) {
-	            hideModal(detailModal, detailOverlay);
-	        }
-	    });
+		detailOverlay.addEventListener('click', (e) => {
+			if (e.target === detailOverlay) {
+				hideModal(detailModal, detailOverlay);
+			}
+		});
 	}
 
 	// ปิด reportModal
 	if (reportBackBtn && reportModal && reportOverlay) {
-	    reportBackBtn.addEventListener('click', () => {
-	        hideModal(reportModal, reportOverlay);
-	    });
+		reportBackBtn.addEventListener('click', () => {
+			hideModal(reportModal, reportOverlay);
+		});
 
-	    reportOverlay.addEventListener('click', (e) => {
-	        if (e.target === reportOverlay) {
-	            hideModal(reportModal, reportOverlay);
-	        }
-	    });
+		reportOverlay.addEventListener('click', (e) => {
+			if (e.target === reportOverlay) {
+				hideModal(reportModal, reportOverlay);
+			}
+		});
 	}
 
 	// ปิด successModal
 	if (successBackToListBtn && successModal && successOverlay) {
-	    successBackToListBtn.addEventListener('click', () => {
-	        hideModal(successModal, successOverlay);
-	    });
+		successBackToListBtn.addEventListener('click', () => {
+			hideModal(successModal, successOverlay);
+		});
 
-	    successOverlay.addEventListener('click', (e) => {
-	        if (e.target === successOverlay) {
-	            hideModal(successModal, successOverlay);
-	        }
-	    });
+		successOverlay.addEventListener('click', (e) => {
+			if (e.target === successOverlay) {
+				hideModal(successModal, successOverlay);
+			}
+		});
 	}
 
 	const logoutBtn = byId('logoutBtn');
@@ -258,39 +163,44 @@ document.addEventListener('DOMContentLoaded', () => {
 	let currentJobId = null;
 	let cameFromModal = null;
 
-	async function updateStatusFromTechnician(id, newStatus) {
-		if (!id) return;
+	async function updateStatusFromTechnician(id, status, technician = "self") {
+		const body = {
+			status: status,
+			technician: technician || "self",
+			priority: null
+		};
 
-		try {
-			const res = await fetch(`/api/requests/${id}/update-status`, {
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				credentials: "include",
-				body: JSON.stringify({
-					status: newStatus,
-					technician: "self",   // ให้ backend ผูกช่างจาก session ปัจจุบัน
-					priority: null
-				})
-			});
+		console.log("Sending body:", body);
 
-			if (!res.ok) {
-				console.error("อัปเดตสถานะไม่สำเร็จ:", await res.text());
-			}
-		} catch (err) {
-			console.error("เรียก API อัปเดตสถานะไม่ได้:", err);
+		const res = await fetch(`/api/requests/${id}/update-status`, {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify(body)
+		});
+
+		if (!res.ok) {
+			console.error('Failed to update status', res.status);
+			return;
 		}
+
+		const data = await res.json();
+		console.log("Updated report:", data);
+		return data;
 	}
 
+
+
+
 	function showModal(modal, overlay) {
-	    if (!modal || !overlay) return;
-	    overlay.classList.add('show');
-	    modal.classList.add('show');
+		if (!modal || !overlay) return;
+		overlay.classList.add('show');
+		modal.classList.add('show');
 	}
 
 	function hideModal(modal, overlay) {
-	    if (!modal || !overlay) return;
-	    overlay.classList.remove('show');
-	    modal.classList.remove('show');
+		if (!modal || !overlay) return;
+		overlay.classList.remove('show');
+		modal.classList.remove('show');
 	}
 
 	function hideAllModals() {
@@ -304,13 +214,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 	function getPriorityClass(priority) {
-		switch (priority?.toLowerCase()) {
-			case 'high': return 'priority-high';
-			case 'medium': return 'priority-medium';
-			case 'low': return 'priority-low';
-			default: return '';
-		}
+		const p = priority?.toLowerCase();
+
+		if (p === 'high' || p === 'สูง') return 'priority-high';
+		if (p === 'medium' || p === 'กลาง' || p === 'ปานกลาง') return 'priority-medium';
+		if (p === 'low' || p === 'ต่ำ') return 'priority-low';
+		if (p === 'normal' || p === 'ปกติ') return 'priority-low'; // <-- ADD THIS
+
+		return '';
 	}
+
 
 	function getStatusClass(status) {
 		if (!status) return 'status-pending';
@@ -345,45 +258,49 @@ document.addEventListener('DOMContentLoaded', () => {
 		tbody.innerHTML = pageItems.map(item => {
 			const priorityClass = getPriorityClass(item.priority);
 			const statusClass = getStatusClass(item.status);
-
+			//console.log("priority =", item.priority, "| class =", priorityClass);
 			const status = item.status || '';
-			let menuItemsHtml = '';
+
+			let menuItemsHtml = `
+					<button class="menu-item" data-action="detail" data-id="${item.id}">
+						<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0.7;"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+						<span class="mi-text">รายละเอียด</span>
+					</button>
+				`;
 
 			if (status === 'กำลังดำเนินการ') {
-				menuItemsHtml = `
-			        <button class="menu-item" data-action="accept-job" data-id="${item.id}">
-			            <span class="mi-text">รับงานซ่อม</span>
-			        </button>`;
-			} else if (status === 'อยู่ระหว่างซ่อม' || status === 'อยู่ระหว่างการซ่อม') {
-				menuItemsHtml = `
-			        <button class="menu-item" data-action="submit-report" data-id="${item.id}">
-			            <span class="mi-text">ส่งรายงานซ่อม</span>
-			        </button>`;
-			} else {
-				menuItemsHtml = `
-			        <button class="menu-item" data-action="detail" data-id="${item.id}">
-			            <span class="mi-text">รายละเอียด</span>
-			        </button>`;
+				menuItemsHtml += `
+						<button class="menu-item" data-action="accept-job" data-id="${item.id}">
+							<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0.7;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+							<span class="mi-text">รับงานซ่อม</span>
+						</button>`;
 			}
 
+			else if (status === 'อยู่ระหว่างซ่อม' || status === 'อยู่ระหว่างการซ่อม') {
+				menuItemsHtml += `
+						<button class="menu-item" data-action="submit-report" data-id="${item.id}">
+							<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0.7;"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><polyline points="13 2 13 9 20 9"></polyline></svg>
+							<span class="mi-text">ส่งรายงานซ่อม</span>
+						</button>`;
+			}
 
 			return `
-                <tr data-id="${item.id}">
-                    <td>${item.subject || '-'}</td>
-                    <td>${formatDate(item.date)}</td>
-                    <td>${item.reporter || '-'}</td>
-                    <td>${item.assignee || '-'}</td>
-                    <td>${item.category || '-'}</td>
-                    <td><span class="priority-badge ${priorityClass}">${item.priority || '-'}</span></td>
-                    <td><span class="status-badge ${statusClass}">${item.status || '-'}</span></td>
-                    <td class="actions-cell">
-                        <button class="more-btn" aria-label="เมนู" data-id="${item.id}">...</button>
-                        <div class="more-menu" id="menu-${item.id}">
-                            ${menuItemsHtml}
-                        </div>
-                    </td>
-                </tr>
-            `;
+					<tr data-id="${item.id}">
+						<td>${item.title || '-'}</td>
+						<td>${formatDate(item.createdAt)}</td>
+						<td>${item.reporter?.fullName || '-'}</td>
+						<td>${item.technician || '-'}</td>
+						<td>${item.category || '-'}</td>
+						<td><span class="priority-badge ${priorityClass}">${item.priority || '-'}</span></td>
+						<td><span class="status-badge ${statusClass}">${item.status || '-'}</span></td>
+						<td class="actions-cell">
+							<button class="more-btn" aria-label="เมนู" data-id="${item.id}">...</button>
+							<div class="more-menu" id="menu-${item.id}">
+								${menuItemsHtml}
+							</div>
+						</td>
+					</tr>
+				`;
 		}).join('');
 
 		renderPagination();
@@ -420,7 +337,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 		filteredItems = allItems.filter(it => {
 			const buffer = [
-				it.subject, it.reporter, it.assignee, it.category, it.status, it.location, it.room
+				it.title, it.reporter, it.assignee, it.category, it.status, it.location, it.locationDetail
 			].join(' ').toLowerCase();
 
 			const matchText = buffer.includes(q);
@@ -525,7 +442,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	});
 
 
-	const currentItem = () => allItems.find(item => item.id === currentJobId);
+	const currentItem = () => allItems.find(item => item.id == currentJobId);
 
 	function openAcceptModal() {
 		showModal(acceptModal, acceptOverlay);
@@ -535,7 +452,8 @@ document.addEventListener('DOMContentLoaded', () => {
 			console.log(`ยืนยันรับงาน ID: ${currentJobId}`);
 			const item = currentItem();
 			if (item) {
-				item.status = "อยู่ระหว่างซ่อม";  // 🔁 เปลี่ยนสถานะใน UI
+				item.status = "กำลังดำเนินการ";  // 🔁 เปลี่ยนสถานะใน UI
+				item.technician = currentUserFullName;
 			}
 
 			// 🔁 ยิง API ให้ backend เปลี่ยนสถานะ + ผูกช่าง
@@ -544,6 +462,8 @@ document.addEventListener('DOMContentLoaded', () => {
 			applyFilterAndSearch();
 			hideModal(acceptModal, acceptOverlay);
 			currentJobId = null;
+
+			window.location.reload();
 		});
 	}
 
@@ -551,112 +471,172 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 	function openDetailModal() {
-	    const item = currentItem();
-	    if (!item) return;
-
-	    byId('detailTitle').textContent = item.subject;
-	    byId('detailPriority').textContent = item.priority;
-	    byId('detailPriority').className = `priority-badge ${getPriorityClass(item.priority)}`;
-	    byId('detailStatus').textContent = item.status;
-	    byId('detailStatus').className = `status-badge ${getStatusClass(item.status)}`;
-	    byId('detailDate').textContent = formatDate(item.date);
-	    byId('detailReporterName').textContent = item.reporter || '-';
-	    byId('detailAssigneeName').textContent = item.assignee || '-';
-	    byId('detailCategory').textContent = item.category || '-';
-	    byId('detailLocation').textContent = item.location;
-	    byId('detailRoom').textContent = item.room || '-';
-	    byId('detailDescription').textContent = item.description || '-';
-
-	    const detailSubmitBtn = byId("detailSubmitReportBtn");
-
-	    // reset state
-	    detailSubmitBtn.style.display = "block";
-	    detailSubmitBtn.onclick = null;
-
-	    // ============ กรณีรับงาน ============
-	    if (item.status === "กำลังดำเนินการ") {
-
-	        detailSubmitBtn.textContent = "รับงานซ่อม";
-
-			detailSubmitBtn.onclick = () => {
-
-			    // ปิดหน้าต่าง detail ก่อน
-			    hideModal(detailModal, detailOverlay);
-
-			    // แสดง popup ยืนยันรับงาน
-			    showModal(acceptModal, acceptOverlay);
-
-			    acceptConfirmBtn.onclick = async () => {
-			        item.status = "อยู่ระหว่างซ่อม";
-			        await updateStatusFromTechnician(currentJobId, "อยู่ระหว่างซ่อม");
-
-			        applyFilterAndSearch();
-			        hideModal(acceptModal, acceptOverlay);
-			    };
-
-			    acceptCancelBtn.onclick = () => {
-			        hideModal(acceptModal, acceptOverlay);
-			    };
-			};
-	    }
-
-	    // ============ กรณีส่งรายงาน ============
-	    else if (item.status === "อยู่ระหว่างซ่อม" || item.status === "อยู่ระหว่างการซ่อม") {
-	        detailSubmitBtn.textContent = "ส่งรายงานซ่อม";
-	        detailSubmitBtn.onclick = () => {
-	            hideModal(detailModal, detailOverlay);
-	            openReportModal();
-	        };
-	    }
-
-	    // ============ สถานะอื่น → ไม่ให้แก้ ============
-	    else {
-	        detailSubmitBtn.style.display = "none";
-	    }
-
-	    showModal(detailModal, detailOverlay);
-	}
-
-	function openReportModal() {
 		const item = currentItem();
 		if (!item) return;
 
-		byId('reportTitle').textContent = item.subject;
-		byId('reportPriority').textContent = item.priority;
-		byId('reportPriority').className = `priority-badge ${getPriorityClass(item.priority)}`;
-		byId('reportStatus').textContent = item.status;
-		byId('reportStatus').className = `status-badge ${getStatusClass(item.status)}`;
+		byId('detailTitle').textContent = item.title;
+		byId('detailPriority').textContent = item.priority;
+		byId('detailPriority').className = `priority-badge ${getPriorityClass(item.priority)}`;
+		byId('detailStatus').textContent = item.status;
+		byId('detailStatus').className = `status-badge ${getStatusClass(item.status)}`;
+		byId('detailDate').textContent = formatDate(item.createdAt);
+		byId('detailReporterName').textContent = item.reporter?.fullName || '-';
+		byId('detailAssigneeName').textContent = item.technician || '-';
+		byId('detailCategory').textContent = item.category || '-';
+		byId('detailLocation').textContent = item.location;
+		byId('detailRoom').textContent = item.locationDetail || '-';
+		byId('detailDescription').textContent = item.description || '-';
 
-		byId('reportDate').textContent = formatDate(item.date);
-		byId('reportLocation').textContent = item.location + (item.room ? ` (ห้อง ${item.room})` : '');
-		byId('reportCategory').textContent = item.category;
-		byId('reportAssignee').textContent = item.assignee;
-		byId('reportReporter').textContent = item.reporter;
+		const detailSubmitBtn = byId("detailSubmitReportBtn");
 
-		byId('reportCause').value = '';
-		byId('reportMethod').value = '';
-		byId('reportParts').value = '';
+		// reset state
+		detailSubmitBtn.style.display = "block";
+		detailSubmitBtn.onclick = null;
 
-		const uploadInput = byId('reportUploadInput');
-		const uploadBtn = byId('reportUploadBtn');
-		if (uploadBtn && uploadInput) {
-			uploadBtn.onclick = () => uploadInput.click();
-			uploadInput.onchange = () => {
-				console.log('ไฟล์รูป/วิดีโอ:', uploadInput.files);
+		// ============ กรณีรับงาน ============
+		if (item.status === "กำลังดำเนินการ") {
+			detailSubmitBtn.textContent = "รับงานซ่อม";
+			detailSubmitBtn.onclick = () => {
+				const item = currentItem();
+				if (!item) return;
+
+				if (item.status === "กำลังดำเนินการ") {
+					showModal(acceptModal, acceptOverlay);
+				} else if (item.status === "อยู่ระหว่างซ่อม" || item.status === "อยู่ระหว่างการซ่อม") {
+					hideModal(detailModal, detailOverlay);
+					openReportModal();
+				}
 			};
 		}
 
-		const fileUploadInput = byId('reportFileUploadInput');
-		const fileUploadBtn = byId('reportFileUploadBtn');
-		if (fileUploadBtn && fileUploadInput) {
-			fileUploadBtn.onclick = () => fileUploadInput.click();
-			fileUploadInput.onchange = () => {
-				console.log('ไฟล์แนบ:', fileUploadInput.files);
+		// ============ กรณีส่งรายงาน ============
+		else if (item.status === "อยู่ระหว่างซ่อม" || item.status === "อยู่ระหว่างการซ่อม") {
+			detailSubmitBtn.textContent = "ส่งรายงานซ่อม";
+			detailSubmitBtn.onclick = () => {
+				hideModal(detailModal, detailOverlay);
+				openReportModal();
 			};
 		}
 
-		showModal(reportModal, reportOverlay);
+		// ============ สถานะอื่น → ไม่ให้แก้ ============
+		else {
+			detailSubmitBtn.style.display = "none";
+		}
+		loadDetailImages(item.id);
+		showModal(detailModal, detailOverlay);
 	}
+
+	function addPreview(file, previewBox) {
+		if (!file || !previewBox) return;
+
+		const url = URL.createObjectURL(file);
+
+		let el;
+		if (file.type.startsWith('image/')) {
+			el = document.createElement('img');
+			el.src = url;
+		} else if (file.type.startsWith('video/')) {
+			el = document.createElement('video');
+			el.src = url;
+			el.controls = true;
+		} else {
+			el = document.createElement('div');
+			el.textContent = file.name;
+			el.style.padding = '4px 8px';
+			el.style.borderRadius = '6px';
+			el.style.border = '1px solid #ddd';
+			el.style.fontSize = '12px';
+		}
+
+		previewBox.appendChild(el);
+	}
+
+	function openReportModal() {
+	    const item = currentItem();
+	    if (!item) return;
+
+	    byId('reportTitle').textContent = item.title;
+	    byId('reportPriority').textContent = item.priority;
+	    byId('reportPriority').className = `priority-badge ${getPriorityClass(item.priority)}`;
+	    byId('reportStatus').textContent = item.status;
+	    byId('reportStatus').className = `status-badge ${getStatusClass(item.status)}`;
+
+	    byId('reportDate').textContent = formatDate(item.createdAt);
+	    byId('reportLocation').textContent = item.location + (item.locationDetail ? ` (ห้อง ${item.locationDetail})` : '');
+	    byId('reportCategory').textContent = item.category;
+	    byId('reportAssignee').textContent = item.technician;
+	    byId('reportReporter').textContent = item.reporter?.fullName;
+
+	    byId('reportCause').value = '';
+	    byId('reportMethod').value = '';
+	    byId('reportParts').value = '';
+
+	    const uploadInput = byId('reportUploadInput');
+	    const uploadBtn = byId('reportUploadBtn');
+	    const fileUploadInput = byId('reportFileUploadInput');
+	    const fileUploadBtn = byId('reportFileUploadBtn');
+	    const previewBox = byId('reportPreview');
+
+	    let selectedFiles = [];
+
+	    previewBox.innerHTML = "";
+
+	    function addPreviewItem(file, index) {
+	        const item = document.createElement("div");
+	        item.className = "preview-item";
+
+	        let media;
+
+	        if (file.type.startsWith("image/")) {
+	            media = document.createElement("img");
+	            media.src = URL.createObjectURL(file);
+	        } else if (file.type.startsWith("video/")) {
+	            media = document.createElement("video");
+	            media.src = URL.createObjectURL(file);
+	            media.controls = true;
+	        }
+
+	        const del = document.createElement("div");
+	        del.className = "preview-delete";
+	        del.textContent = "×";
+
+	        del.onclick = (e) => {
+	            e.stopPropagation();
+	            selectedFiles.splice(index, 1);
+	            renderPreview();
+	        };
+
+	        item.appendChild(media);
+	        item.appendChild(del);
+	        previewBox.appendChild(item);
+	    }
+
+	    function renderPreview() {
+	        previewBox.innerHTML = "";
+	        selectedFiles.forEach((f, i) => addPreviewItem(f, i));
+	    }
+
+	    if (uploadBtn && uploadInput) {
+	        uploadBtn.onclick = () => uploadInput.click();
+	        uploadInput.onchange = () => {
+	            selectedFiles.push(...uploadInput.files);
+	            renderPreview();
+	        };
+	    }
+
+	    if (fileUploadBtn && fileUploadInput) {
+	        fileUploadBtn.onclick = () => fileUploadInput.click();
+	        fileUploadInput.onchange = () => {
+	            selectedFiles.push(...fileUploadInput.files);
+	            renderPreview();
+	        };
+	    }
+
+	    openReportModal.selectedFiles = selectedFiles;
+
+	    showModal(reportModal, reportOverlay);
+	}
+
 
 	if (reportBackBtn) {
 		reportBackBtn.addEventListener('click', () => {
@@ -668,26 +648,66 @@ document.addEventListener('DOMContentLoaded', () => {
 		});
 	}
 
-	if (reportConfirmBtn) {
-		reportConfirmBtn.addEventListener('click', async () => {
-			const cause = byId('reportCause').value;
-			console.log(`ยืนยันส่งรายงาน ID: ${currentJobId} ด้วยสาเหตุ: ${cause}`);
+	reportConfirmBtn.addEventListener('click', async () => {
+	    if (!currentJobId) return;
 
-			const item = currentItem();
-			if (item) {
-				item.status = "กำลังตรวจสอบงานซ่อม";  // 🔁 สถานะใหม่ให้แอดมินตรวจ
-			}
+	    const item = currentItem();
+	    if (!item) return;
 
-			await updateStatusFromTechnician(currentJobId, "กำลังตรวจสอบงานซ่อม");
+	    // 1) Read values from input
+	    const cause = byId('reportCause').value.trim();
+	    const method = byId('reportMethod').value.trim();
+	    const parts = byId('reportParts').value.trim();
 
-			// เอาออกจาก list หน้าช่าง (เหลือฝั่งแอดมิน)
-			allItems = allItems.filter(it => it.id !== currentJobId);
-			applyFilterAndSearch();
+	    // Validate (optional)
+	    if (!cause || !method) {
+	        alert("กรุณากรอกข้อมูลให้ครบ");
+	        return;
+	    }
 
-			hideModal(reportModal, reportOverlay);
-			openSuccessModal();
-		});
-	}
+	    console.log("ส่งรายงานใหม่:", { cause, method, parts });
+
+	    // 2) ส่งข้อมูลรายงาน (ไม่รวมรูป)
+	    const reportData = new FormData();
+	    reportData.append("cause", cause);
+	    reportData.append("method", method);
+	    reportData.append("parts", parts);
+
+	    const submitRes = await fetch(`/api/requests/${currentJobId}/submit-report`, {
+	        method: "POST",
+	        body: reportData
+	    });
+
+	    if (!submitRes.ok) {
+	        alert("ส่งรายงานไม่สำเร็จ!");
+	        return;
+	    }
+
+	    // 3) Upload files (images / videos)
+	    const files = openReportModal.selectedFiles || [];
+	    for (let f of files) {
+	        const formData = new FormData();
+	        formData.append("file", f);
+
+	        await fetch(`/api/files/${currentJobId}`, {
+	            method: "POST",
+	            body: formData
+	        });
+	    }
+
+	    // 4) Update UI
+	    item.status = "กำลังตรวจสอบงานซ่อม";
+
+	    // 5) Refresh list
+	    allItems = allItems.filter(it => it.id !== currentJobId);
+	    applyFilterAndSearch();
+
+	    // 6) Close modal + show success
+	    hideModal(reportModal, reportOverlay);
+	    openSuccessModal();
+
+	    currentJobId = null;
+	});
 
 
 	function openSuccessModal() {
@@ -701,17 +721,28 @@ document.addEventListener('DOMContentLoaded', () => {
 	}
 
 	if (logoutBtn) {
-		logoutBtn.addEventListener('click', () => {
+		logoutBtn.addEventListener('click', async (e) => {
+			e.preventDefault();
 			console.log('Logout');
-			alert('ออกจากระบบ');
+
+			try {
+				const response = await fetch('/api/logout', { method: 'POST' });
+
+				// ไม่ว่าเซิร์ฟเวอร์จะตอบ OK (200) หรือ 401/403 (ไม่มีสิทธิ์)
+				// ผลลัพธ์คือต้องไปหน้า login
+				if (response.ok || response.status === 401 || response.status === 403) {
+					window.location.href = 'login.html?logout=true';
+				} else {
+					alert('ไม่สามารถออกจากระบบได้: ' + response.status);
+				}
+			} catch (err) {
+				console.error('Logout error:', err);
+				// ถ้าเน็ตเวิร์คมีปัญหา ก็ส่งไปหน้า login อยู่ดี
+				window.location.href = 'login.html?logout_error=true';
+			}
 		});
 	}
 
 
-	function loadData() {
-		allItems = mockRepairData;
-		applyFilterAndSearch();
-	}
-
-	loadData();
+	loadRepairRequests();
 });

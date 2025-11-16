@@ -36,8 +36,8 @@
   </div>
 
   <div class="button-group">
-    <a href="RepairReportCRS.html?id=${report.id}" class="card">
-    <button class="btn-report" id="goToCRS">รายงานการซ่อม</button> </a>
+	<a id="goToCrsLink" class="card">
+    <button class="btn-report">รายงานการซ่อม</button> </a>
     <a href="RepairList.html" class="card">
     <button class="btn-back">ย้อนกลับ</button></a>
   </div>
@@ -70,15 +70,14 @@
   </div>
 
   <!-- Modal -->
-  <div class="modal" id="confirmModal">
-    <div class="modal-content">
-      <button class="close-btn" id="closeModal">×</button>
-      <p>คุณต้องการลบรายการซ่อมนี้หรือไม่</p>
-      <div class="modal-actions">
-        <button class="confirm-btn" id="confirmDelete">ยืนยัน</button>
-        <button class="cancel-btn" id="cancelModal">ยกเลิก</button>
+  <div id="confirmAcceptOverlay" class="modal-overlay">
+      <div id="confirmAcceptModal" class="modal">
+          <p>คุณต้องการรับงานซ่อมนี้หรือไม่?</p>
+          <div class="modal-buttons">
+              <button id="confirmAcceptYes">ยืนยัน</button>
+              <button id="confirmAcceptNo">ยกเลิก</button>
+          </div>
       </div>
-    </div>
   </div>
 
   <script src="RepairReport.js"></script>

@@ -27,8 +27,8 @@
 				</svg>
 			</div>
 			<div class="user-details">
-				<div class="user-name">เอกชัย</div>
-				<div class="user-email">Aekachai@dome.tu.ac.th</div>
+				<div class="user-name" id="currentUserName">Loading...</div>
+				<div class="user-email" id="currentUserEmail"></div>
 			</div>
 			<div class="logout-icon" id="logoutBtn" aria-label="ออกจากระบบ">
 				<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
@@ -85,13 +85,13 @@
 					<table class="list-table">
 						<thead>
 							<tr>
-								<th>เรื่องที่แจ้ง</th>
-								<th>วันที่แจ้งซ่อม</th>
-								<th>ชื่อผู้แจ้ง</th>
-								<th>ผู้รับผิดชอบ</th>
-								<th>ประเภทงาน</th>
-								<th>ความเร่งด่วน</th>
-								<th>สถานะการซ่อม</th>
+								<th>เรื่องที่แจ้ง</th> <!--title from RepairReques table-->
+								<th>วันที่แจ้งซ่อม</th><!--createdAt from RepairReques table-->
+								<th>ชื่อผู้แจ้ง</th><!--full_name of report_id from RepairReques table-->
+								<th>ผู้รับผิดชอบ</th><!--technician from RepairReques table-->
+								<th>ประเภทงาน</th><!--category from RepairReques table-->
+								<th>ความเร่งด่วน</th><!--priority from RepairReques table-->
+								<th>สถานะการซ่อม</th><!--status from RepairReques table-->
 								<th>อื่นๆ</th>
 							</tr>
 						</thead>
@@ -104,15 +104,7 @@
 		</div>
 	</main>
 
-	<div id="acceptOverlay" class="modal-overlay" aria-hidden="true"></div>
-	<div id="acceptModal" class="confirm-modal" role="dialog" aria-modal="true" aria-labelledby="acceptTitle"
-		aria-hidden="true">
-		<h3 id="acceptTitle" class="confirm-title">คุณต้องการรับงานซ่อมนี้หรือไม่</h3>
-		<div class="confirm-actions">
-			<button id="acceptConfirmBtn" class="btn btn-success">ยืนยัน</button>
-			<button id="acceptCancelBtn" class="btn btn-secondary">ยกเลิก</button>
-		</div>
-	</div>
+
 
 	<div id="detailOverlay" class="modal-overlay" aria-hidden="true"></div>
 
@@ -185,6 +177,7 @@
 		</div>
 	</div>
 
+	
 
 	<div id="reportOverlay" class="modal-overlay" aria-hidden="true"></div>
 	<div id="reportModal" class="report-modal" role="dialog" aria-modal="true" aria-labelledby="reportTitle"
@@ -229,7 +222,7 @@
 		<div class="report-body">
 			<div class="report-form-container">
 				<label>กรอกสาเหตุที่เสีย
-					<textarea id="reportCause" placeholder="กรอกสาเหตุที่เสีย..."></textarea>
+					<textarea id="reportCause" placeholder="กรอกสาเหตุที่เสีย..."></textarea><!---->
 				</label>
 				<label>กรอกวิธีซ่อม
 					<textarea id="reportMethod" placeholder="กรอกวิธีซ่อม..."></textarea>
@@ -241,6 +234,7 @@
 
 			<div class="report-upload-container">
 				<div class="upload-box">
+					<div id="reportPreview" class="preview-overlay"></div>
 					<div class="upload-icons">
 						<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none"
 							stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -258,6 +252,7 @@
 					<button id="reportUploadBtn" class="btn btn-upload">อัปโหลด</button>
 					<input type="file" id="reportUploadInput" multiple accept="image/*,video/*" style="display:none;">
 				</div>
+				
 
 				<div class="file-upload-box">
 					<span>แนบไฟล์</span>
@@ -272,7 +267,15 @@
 			<button id="reportBackBtn" class="btn btn-secondary">ย้อนกลับ</button>
 		</div>
 	</div>
-
+	<div id="acceptOverlay" class="modal-overlay" aria-hidden="true"></div>
+		<div id="acceptModal" class="confirm-modal" role="dialog" aria-modal="true" aria-labelledby="acceptTitle"
+			aria-hidden="true">
+			<h3 id="acceptTitle" class="confirm-title">คุณต้องการรับงานซ่อมนี้หรือไม่</h3>
+			<div class="confirm-actions">
+				<button id="acceptConfirmBtn" class="btn btn-success">ยืนยัน</button>
+				<button id="acceptCancelBtn" class="btn btn-secondary">ยกเลิก</button>
+			</div>
+	</div>
 	<div id="successOverlay" class="modal-overlay" aria-hidden="true"></div>
 	<div id="successModal" class="success-modal" role="dialog" aria-modal="true" aria-labelledby="successTitle"
 		aria-hidden="true">

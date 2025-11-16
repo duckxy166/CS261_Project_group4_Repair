@@ -22,6 +22,7 @@ public class ReportService {
     private final FileStorageService fileStorageService; 
     private final ObjectMapper mapper = new ObjectMapper();
 
+    
     // Constructor
     public ReportService(ReportRepository reportRepository, FileStorageService fileStorageService) {
         this.reportRepository = reportRepository;
@@ -45,14 +46,19 @@ public class ReportService {
         RepairRequest report = reportRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Report not found"));
 
+        // อัปเดต status + technician
         report.updateStatus(status, technician);
 
+        // ถ้ามี priority ให้เซ็ต
         if (priority != null && !priority.isEmpty()) {
             report.setPriority(priority);
         }
 
+        // save แล้ว return ตัว object ใหม่
         return reportRepository.save(report);
     }
+
+
 
 
     // ---------------- Mark report as completed ----------------
@@ -81,7 +87,10 @@ public List<ReportResponse> getUserTrackReports(User user) {
                         r.getDescription(),
                         r.getReporter().getFullName(),
                         r.getCreatedAt(),
-                        r.getCategory()
+                        r.getCategory(),
+                        r.getCause(),
+                        r.getMethod(),
+                        r.getParts()
                 ))
                 .toList();
     }
@@ -138,7 +147,10 @@ public List<RepairRequest> getUserHistoryReports(User user) {
                 report.getDescription(),
                 report.getReporter().getFullName(),
                 report.getCreatedAt(),
-                report.getCategory()
+                report.getCategory(),
+                report.getCause(),
+                report.getMethod(),
+                report.getParts()
         );
     }
     
