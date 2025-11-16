@@ -1,3 +1,12 @@
+window.addEventListener('pageshow', function(event) {
+  // event.persisted จะเป็น true เมื่อหน้าเว็บถูกดึงมาจาก bfcache (เช่นการกด Back)
+  if (event.persisted) {
+    console.log('Page loaded from bfcache. Forcing reload from server...');
+    // สั่งให้โหลดหน้าเว็บใหม่จากเซิร์ฟเวอร์
+    window.location.reload(); 
+  }
+});
+
 /**************************************************
  * Status chip helper
  **************************************************/
@@ -110,7 +119,53 @@ async function loadDashboard() {
  * Startup
  **************************************************/
 document.addEventListener("DOMContentLoaded", async () => {
-  try {
+	(async () => {
+	      try {
+	          const resp = await fetch('/api/users/current');
+	          if (resp.ok) {
+	              const user = await resp.json();
+	              
+	              const nameEl = document.getElementById('currentUserName'); 
+	              if (nameEl && user && user.fullName) {
+	                  nameEl.textContent = user.fullName;
+	              }
+	              
+	              const emailEl = document.getElementById('currentUserEmail'); 
+	              if (emailEl && user && user.email) {
+	                  emailEl.textContent = user.email;
+	              }
+
+	          } else if (resp.status === 401 || resp.status === 403) {
+	              alert('เซสชั่นหมดอายุ กรุณาเข้าสู่ระบบใหม่');
+	              window.location.href = 'login.html?session_expired=true';
+	          } else {
+	              console.warn('ไม่สามารถตรวจสอบผู้ใช้ปัจจุบันได้:', resp.status);
+	          }
+	      } catch (err) {
+	          console.error('เกิดข้อผิดพลาดระหว่างตรวจสอบผู้ใช้:', err);
+	      }
+	  })();
+
+	  const logoutBtn = document.getElementById('logoutBtn');
+	  if (logoutBtn) {
+	      logoutBtn.addEventListener('click', async (e) => {
+	          e.preventDefault();
+	          try {
+	              const response = await fetch('/api/logout', { method: 'POST' });
+	              
+	              if (response.ok || response.status === 401 || response.status === 403) {
+	                  window.location.href = 'login.html?logout=true';
+	              } else {
+	                  alert('ไม่สามารถออกจากระบบได้: ' + response.status);
+	              }
+	          } catch (err) {
+	              console.error('Logout error:', err);
+	              window.location.href = 'login.html?logout_error=true';
+	          }
+	      });
+	  }
+	
+	try {
     await loadDashboard();         
   } catch (e) {
     console.warn("Backend failed, using mock data");
