@@ -214,13 +214,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 	function getPriorityClass(priority) {
-		switch (priority?.toLowerCase()) {
-			case 'high': return 'priority-high';
-			case 'medium': return 'priority-medium';
-			case 'low': return 'priority-low';
-			default: return '';
-		}
+	    const p = priority?.toLowerCase();
+
+	    if (p === 'high' || p === 'สูง') return 'priority-high';
+	    if (p === 'medium' || p === 'กลาง' || p === 'ปานกลาง') return 'priority-medium';
+	    if (p === 'low' || p === 'ต่ำ') return 'priority-low';
+	    if (p === 'normal' || p === 'ปกติ') return 'priority-low'; // <-- ADD THIS
+
+	    return '';
 	}
+
 
 	function getStatusClass(status) {
 		if (!status) return 'status-pending';
@@ -255,7 +258,7 @@ document.addEventListener('DOMContentLoaded', () => {
 			tbody.innerHTML = pageItems.map(item => {
 				const priorityClass = getPriorityClass(item.priority);
 				const statusClass = getStatusClass(item.status);
-
+				//console.log("priority =", item.priority, "| class =", priorityClass);
 				const status = item.status || '';
 				
 				let menuItemsHtml = `

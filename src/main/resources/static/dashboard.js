@@ -44,7 +44,7 @@ function renderLatestTable(requests) {
     tr.innerHTML = `
       <td>${r.title}</td>
       <td>${r.createdAt}</td>
-      <td>${r.reporter}</td>
+      <td>${r.reporter?.fullName ?? "-"}</td>
       <td>${r.technician}</td>
       <td>${r.category}</td>
       <td>${getStatusChip(r.status)}</td>
