@@ -313,41 +313,101 @@ function renderTableAndPagination() {
   prevBtn.classList.toggle("hidden-keep-space", isFirst);
   nextBtn.classList.toggle("disabled", isLast);
 }
+// ===== Render images (all inside a single box) =====
+async function renderReportImagesWithDescription(requestId) {
+    const container = document.getElementById("reportPhotoContainer");
+    if (!container) return;
+
+    try {
+        const res = await fetch(`/api/files/${requestId}`);
+        const files = await res.json();
+
+        // Filter only image files that have description
+        const imageFiles = files.filter(f => 
+            f.description && f.description.trim() !== "" &&
+            f.contentType && f.contentType.startsWith("image/")
+        );
+
+        // Clear container first
+        container.innerHTML = "";
+
+        if (imageFiles.length === 0) {
+            container.innerHTML = `
+                <div class="report-photo-box">
+                    <span class="material-icons-outlined report-photo-icon">image</span>
+                    <p>ไม่มีรูปภาพแนบ</p>
+                </div>
+            `;
+            return;
+        }
+
+        // Create a single report-photo-box to hold all images
+        const box = document.createElement("div");
+        box.className = "report-photo-box";
+        box.style.display = "flex";
+        box.style.gap = "10px";
+        box.style.flexWrap = "wrap";
+
+        // Append all images into the single box
+        imageFiles.forEach(file => {
+            const img = document.createElement("img");
+            img.src = `/api/files/${requestId}/${file.id}/download`;
+            img.style.width = "120px";
+            img.style.borderRadius = "10px";
+            img.style.objectFit = "cover";
+            box.appendChild(img);
+        });
+
+        container.appendChild(box);
+
+        console.log("Rendered all images inside a single report-photo-box:", imageFiles);
+
+    } catch (err) {
+        console.error("Error rendering images:", err);
+        container.innerHTML = `
+            <div class="report-photo-box">
+                <span class="material-icons-outlined report-photo-icon">image</span>
+                <p>ไม่สามารถโหลดรูปภาพได้</p>
+            </div>
+        `;
+    }
+}
 
 // ===== REPORT MODAL =====
-function openReportModal(data) {
-	console.log("🟦 openDetailModal CALLED with:", data);
-  if (!reportOverlay) return;
+async function openReportModal(data) {
+    console.log("🟦 openReportModal CALLED with:", data);
+    if (!reportOverlay) return;
 
-  if (reportTitle)      reportTitle.textContent      = data.title || "";
-  if (reportDate)       reportDate.textContent       = formatDate(data.createdAt);
-  if (reportLocation)   reportLocation.textContent   = data.location || "-";
-  if (reportReporter)   reportReporter.textContent   = data.reporter?.fullName || "-";
-  if (reportTechnician) reportTechnician.textContent = data.technician || "-";
-  if (reportCategory)   reportCategory.textContent   = data.category || "-";
+    if (reportTitle)      reportTitle.textContent      = data.title || "";
+    if (reportDate)       reportDate.textContent       = formatDate(data.createdAt);
+    if (reportLocation)   reportLocation.textContent   = data.location || "-";
+    if (reportReporter)   reportReporter.textContent   = data.reporter?.fullName || "-";
+    if (reportTechnician) reportTechnician.textContent = data.technician || "-";
+    if (reportCategory)   reportCategory.textContent   = data.category || "-";
 
-  // ถ้าไม่มี field cause/method/note แยกใน mock data ก็ใช้ description ยัดใน cause ไว้ก่อน
-  if (reportCause)  reportCause.textContent  = data.cause  || "";
-  if (reportMethod) reportMethod.textContent = data.method || "";
-  if (reportNote)   reportNote.textContent   = data.parts   || "";
+    if (reportCause)  reportCause.textContent  = data.cause  || "";
+    if (reportMethod) reportMethod.textContent = data.method || "";
+    if (reportNote)   reportNote.textContent   = data.parts  || "";
 
-  reportOverlay.classList.add("show");
+    reportOverlay.classList.add("show");
+
+    // Render images inside reportPhotoContainer
+    await renderReportImagesWithDescription(data.id);
 }
 
 function closeReportModal() {
-  if (!reportOverlay) return;
-  reportOverlay.classList.remove("show");
+    if (!reportOverlay) return;
+    reportOverlay.classList.remove("show");
 }
 
 if (reportCloseBtn) {
-  reportCloseBtn.addEventListener("click", closeReportModal);
+    reportCloseBtn.addEventListener("click", closeReportModal);
 }
 if (reportOverlay) {
-  reportOverlay.addEventListener("click", (e) => {
-    if (e.target === reportOverlay) closeReportModal();
-  });
+    reportOverlay.addEventListener("click", (e) => {
+        if (e.target === reportOverlay) closeReportModal();
+    });
 }
-
 function openFeedbackModal(data) {
   if (!feedbackOverlay) return;
 
