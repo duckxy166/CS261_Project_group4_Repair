@@ -1,82 +1,120 @@
+/**************************************************
+ * Status chip helper
+ **************************************************/
+function getStatusChip(status) {
+  switch (status) {
+    case "รอดำเนินการ":
+      return '<span class="status-chip status-pending">รอดำเนินการ</span>';
+    case "กำลังดำเนินการ":
+      return '<span class="status-chip status-inprogress">กำลังดำเนินการ</span>';
+    case "อยู่ระหว่างซ่อม":
+      return '<span class="status-chip status-waiting">อยู่ระหว่างซ่อม</span>';
+    case "กำลังตรวจสอบงานซ่อม":
+      return '<span class="status-chip status-checking">กำลังตรวจสอบงานซ่อม</span>';
+    case "สำเร็จ":
+      return '<span class="status-chip status-success">สำเร็จ</span>';
+    default:
+      return "";
+  }
+}
+
+/**************************************************
+ * Render summary cards
+ **************************************************/
+function renderSummary(data) {
+  document.getElementById("totalJobs").textContent = data.total;
+  document.getElementById("completedJobs").textContent = data.completed;
+  document.getElementById("pendingJobs").textContent = data.notCompleted;
+}
+
+/**************************************************
+ * Render latest table
+ **************************************************/
+function renderLatestTable(requests) {
+  const tbody = document.querySelector("#latestTable tbody");
+  tbody.innerHTML = "";
+
+  // 1. ⭐ กรองสถานะ "สำเร็จ", "ยังไม่ได้ให้คะแนน" และ "ยกเลิก" ออก
+  const filtered = requests.filter(
+    (r) =>
+      r.status !== "สำเร็จ" &&
+      r.status !== "ยังไม่ได้ให้คะแนน" && // <--- แก้ไขตามที่แจ้งครับ
+      r.status !== "ยกเลิก"
+  );
+
+  // 2. เรียงลำดับตาม updatedAt (ล่าสุดก่อน)
+  const sorted = filtered.sort(
+    (a, b) => new Date(b.updatedAt) - new Date(a.updatedAt)
+  );
+
+  // 3. จำกัดให้แสดงผล 10 รายการล่าสุด
+  const latest10 = sorted.slice(0, 10);
+
+  // 4. วนลูปเพื่อสร้างแถวในตาราง
+  latest10.forEach((r) => {
+    const tr = document.createElement("tr");
+
+    // 5. ทำให้แถวคลิกได้ และไปยังหน้า RequestControl.html
+    tr.style.cursor = "pointer";
+    tr.onclick = () => {
+      window.location.href = `RequestControl.html?id=${r.id}`;
+    };
+
+    // 6. ตัดข้อความ Title ให้สั้นลง (ไม่เกิน 25 ตัวอักษร)
+    const title = r.title ?? "";
+    const shortTitle =
+      title.length > 25 ? title.substring(0, 25) + "..." : title;
+
+    // 7. ตัดนามสกุลผู้แจ้ง (แสดงเฉพาะชื่อ)
+    const fullName = r.reporter?.fullName ?? "-";
+    const displayName = fullName.split(" ")[0]; // เอาเฉพาะส่วนแรกของชื่อ
+
+    // 8. จัดรูปแบบวันที่ (YYYY-MM-DD)
+    const shortDate = r.createdAt ? r.createdAt.split("T")[0] : "-";
+
+    // 9. สร้าง HTML ของแถว
+    tr.innerHTML = `
+      <td>${shortTitle}</td>
+      <td>${shortDate}</td>
+      <td>${displayName}</td>
+      <td>${r.technician ?? "-"}</td>
+      <td>${r.category ?? "-"}</td>
+      <td>${getStatusChip(r.status)}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+/**************************************************
+ * Load data from backend
+ **************************************************/
+async function loadDashboard() {
+  const res = await fetch("/api/requests");
+  const reports = await res.json();
+
+  // Compute summary
+  const total = reports.length;
+  const completed = reports.filter(r => r.status === "สำเร็จ").length;
+  const notCompleted = reports.filter(
+    r => r.status !== "สำเร็จ" && r.status !== "ยกเลิก"
+  ).length;
+
+  const summary = { total, completed, notCompleted };
+  renderSummary(summary);
+
+  // ⭐ Show ALL RepairRequest in the table
+  renderLatestTable(reports);
+}
+
+
+/**************************************************
+ * Startup
+ **************************************************/
 document.addEventListener("DOMContentLoaded", async () => {
-  const tableBody = document.querySelector(".repair-table tbody");
-
-  // Fetch all repair requests
-  async function fetchReports() {
-    try {
-      const response = await fetch("/api/requests", { credentials: "include" });
-      if (!response.ok) throw new Error("Failed to fetch reports");
-      const reports = await response.json();
-      renderTable(reports);
-    } catch (err) {
-      console.error("Error fetching reports:", err);
-      tableBody.innerHTML = `<tr><td colspan="7">ไม่สามารถโหลดข้อมูลได้</td></tr>`;
-    }
+  try {
+    await loadDashboard();         
+  } catch (e) {
+    console.warn("Backend failed, using mock data");
+    renderSummary(summary);
+    renderLatestTable(dashboardMock.latestRequests);
   }
-
-  function renderTable(reports) {
-    tableBody.innerHTML = "";
-    reports.forEach(report => {
-      const row = document.createElement("tr");
-
-      row.innerHTML = `
-        <td>${report.id}</td>
-        <td>${report.reporter ? report.reporter.fullName : "ไม่ทราบ"}</td>
-        <td>${report.location || "-"}</td>
-        <td>${report.description || "-"}</td>
-
-        <td>
-          <select class="priority-select">
-            ${["ปกติ", "ปานกลาง", "เร่งด่วน"].map(level => `
-              <option value="${level}" ${report.priority === level ? "selected" : ""}>${level}</option>
-            `).join("")}
-          </select>
-        </td>
-
-<td>
-          <select class="status-select">
-            ${["รอดำเนินการ", "กำลังดำเนินการ", "อยู่ระหว่างซ่อม", "กำลังตรวจสอบงานซ่อม","ยังไม่ให้คะแนน", "สำเร็จ", "ยกเลิก"].map(status => `
-              <option value="${status}" ${report.status === status ? "selected" : ""}>${status}</option>
-            `).join("")}
-          </select>
-        </td>
-
-        <td>
-          <button class="update-btn">บันทึก</button>
-        </td>
-      `;
-
-      // Add event listener for update
-      row.querySelector(".update-btn").addEventListener("click", async () => {
-        const newPriority = row.querySelector(".priority-select").value;
-        const newStatus = row.querySelector(".status-select").value;
-        await updateReport(report.id, newStatus, newPriority);
-      });
-
-      tableBody.appendChild(row);
-    });
-  }
-
-  async function updateReport(id, status, priority) {
-    try {
-      const response = await fetch("/api/requests/update-status", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ id, status, priority })
-      });
-
-      if (!response.ok) throw new Error("Failed to update report");
-
-      const updated = await response.json();
-      alert(`✅ อัปเดตรายการ ${updated.id} สำเร็จ!`);
-      await fetchReports();
-    } catch (err) {
-      console.error("Update failed:", err);
-      alert("❌ อัปเดตไม่สำเร็จ");
-    }
-  }
-
-  // Initial load
-  fetchReports();
 });
