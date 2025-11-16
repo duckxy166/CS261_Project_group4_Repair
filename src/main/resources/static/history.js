@@ -259,9 +259,68 @@ function pillClassByNormalized(s) {
       pageNumbers.appendChild(btn);
     }
   }
-
+async function loadDetailImages(requestId, imgElement, placeholderElement) {
+    try {
+      const res = await fetch(`/api/files/${requestId}`);
+      if (!res.ok) throw new Error('Cannot fetch files');
+      
+      const files = await res.json();
+      
+      // หาไฟล์ที่เป็นรูปภาพไฟล์แรก
+      const firstImage = files.find(f => f.contentType && f.contentType.startsWith("image/"));
+      
+      if (firstImage) {
+        const downloadUrl = `/api/files/${requestId}/${firstImage.id}/download`;
+        imgElement.src = downloadUrl;
+        imgElement.style.display = "block";
+        placeholderElement.style.display = "none";
+      } else {
+        // ไม่มีรูปภาพ
+        imgElement.removeAttribute("src");
+        imgElement.style.display = "none";
+        placeholderElement.style.display = "flex";
+      }
+    } catch (err) {
+      console.error("Error loading detail image:", err);
+      imgElement.removeAttribute("src");
+      imgElement.style.display = "none";
+      placeholderElement.style.display = "flex";
+    }
+  }
+// ===== [เพิ่มใหม่] ฟังก์ชันโหลดรูปภาพสำหรับ Report Modal =====
+  async function loadReportImage(requestId, imgElement, placeholderElement) {
+    try {
+      const res = await fetch(`/api/files/${requestId}`);
+      if (!res.ok) throw new Error('Cannot fetch files');
+      
+      const files = await res.json();
+      
+      // หาไฟล์รูปภาพ "หลังซ่อม" (คือไฟล์ที่มี description)
+      const reportImage = files.find(f => 
+        f.contentType && f.contentType.startsWith("image/") && 
+        f.description && f.description.trim() !== ""
+      );
+      
+      if (reportImage) {
+        const downloadUrl = `/api/files/${requestId}/${reportImage.id}/download`;
+        imgElement.src = downloadUrl;
+        imgElement.style.display = "block";
+        placeholderElement.style.display = "none";
+      } else {
+        // ไม่มีรูปภาพรายงาน
+        imgElement.removeAttribute("src");
+        imgElement.style.display = "none";
+        placeholderElement.style.display = "flex";
+      }
+    } catch (err) {
+      console.error("Error loading report image:", err);
+      imgElement.removeAttribute("src");
+      imgElement.style.display = "none";
+      placeholderElement.style.display = "flex";
+    }
+  }
   /* ---------- Detail Modal ---------- */
-  function openDetail(item) {
+ async  function openDetail(item) {
     dmTitle.textContent = item.title || "-";
     dmStatus.className = pillClassByNormalized(item._normalizedStatus);
     dmStatus.textContent = item._normalizedStatus || "-";
@@ -273,20 +332,16 @@ function pillClassByNormalized(s) {
     dmCategory.textContent = item.category || "-";
     dmDesc.value = item.description || "";
 
-    if (item.imageUrl) {
-      dmImage.src = item.imageUrl; dmImage.style.display = "block"; dmImgPh.style.display = "none";
-    } else {
-      dmImage.removeAttribute("src"); dmImage.style.display = "none"; dmImgPh.style.display = "flex";
-    }
+  await loadDetailImages(item.id, dmImage, dmImgPh);
 
-    dmReportBtn.onclick = () => openReport(item);
+    dmReportBtn.onclick = async () => openReport(item);
     dmCloseBtn.onclick = () => detailModal.classList.add("hidden");
     detailModal.classList.remove("hidden");
   }
   detailModal?.addEventListener("click", (e) => { if (e.target === detailModal) detailModal.classList.add("hidden"); });
 
   /* ---------- Report Modal (UPDATED to fill 4 blocks) ---------- */
-  function openReport(item) {
+  async function openReport(item) {
     rmTitle.textContent = item.title || "-";
     rmStatus.className = pillClassByNormalized(item._normalizedStatus);
     rmStatus.textContent = item._normalizedStatus || "-";
@@ -304,11 +359,7 @@ function pillClassByNormalized(s) {
     if (rmParts)  rmParts.value  = item.reportParts  || "";
     if (rmCost)   rmCost.value   = item.reportCost   || "";
 
-    if (item.reportImageUrl) {
-      rmImage.src = item.reportImageUrl; rmImage.style.display = "block"; rmImgPh.style.display = "none";
-    } else {
-      rmImage.removeAttribute("src"); rmImage.style.display = "none"; rmImgPh.style.display = "flex";
-    }
+    await loadReportImage(item.id, rmImage, rmImgPh);
 
     // Feedback only if "ยังไม่ได้คะแนน"
 if (item._normalizedStatus === "ยังไม่ได้ให้คะแนน") {
@@ -369,10 +420,10 @@ if (item._normalizedStatus === "ยังไม่ได้ให้คะแน
     rateBtn.style.display = item._normalizedStatus === "ยังไม่ได้ให้คะแนน" ? "flex" : "none";
   }
 
-  kebabMenuEl.querySelector(".js-more-detail").addEventListener("click", () => {
+  kebabMenuEl.querySelector(".js-more-detail").addEventListener("click", async () => {
     if (!__menuForId__) return;
     const item = rawItems.find(x => String(x.id) === String(__menuForId__));
-    hideKebabMenu(); if (item) openDetail(item);
+    hideKebabMenu(); if (item) await openDetail(item);
   });
 kebabMenuEl.querySelector(".js-more-rate").addEventListener("click", () => {
     if (!__menuForId__) return;
@@ -380,10 +431,10 @@ kebabMenuEl.querySelector(".js-more-rate").addEventListener("click", () => {
     hideKebabMenu(); 
     if (item && item._normalizedStatus === "ยังไม่ได้ให้คะแนน") openFeedback(item);
 });
-  kebabMenuEl.querySelector(".js-more-report").addEventListener("click", () => {
+  kebabMenuEl.querySelector(".js-more-report").addEventListener("click", async () => {
     if (!__menuForId__) return;
     const item = rawItems.find(x => String(x.id) === String(__menuForId__));
-    hideKebabMenu(); if (item) openReport(item);
+    hideKebabMenu(); if (item) await openReport(item);
   });
 
   document.addEventListener("click", (e) => {
@@ -395,7 +446,7 @@ kebabMenuEl.querySelector(".js-more-rate").addEventListener("click", () => {
   window.addEventListener("resize", hideKebabMenu);
 
   /* ---------- Row interactions ---------- */
-  tbody.addEventListener("click", (e) => {
+  tbody.addEventListener("click",async (e) =>  {
     const kebabBtn = e.target.closest(".kebab");
     if (kebabBtn) {
       const row = kebabBtn.closest("tr"); if (!row) return;
@@ -409,15 +460,15 @@ kebabMenuEl.querySelector(".js-more-rate").addEventListener("click", () => {
     if (!row) return;
     const id = row.getAttribute("data-id");
     const item = rawItems.find((x) => String(x.id) === String(id));
-    if (item) openDetail(item);
+    if (item) await openDetail(item);
   });
 
-  tbody.addEventListener("keydown", (e) => {
+  tbody.addEventListener("keydown", async (e) => {
     if (e.key !== "Enter") return;
     const row = e.target.closest("tr"); if (!row) return;
     const id = row.getAttribute("data-id");
     const item = rawItems.find((x) => String(x.id) === String(id));
-    if (item) openDetail(item);
+    if (item) await openDetail(item);
   });
 
   /* ---------- Feedback ---------- */
