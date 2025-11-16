@@ -1,64 +1,17 @@
 /**************************************************
- * MOCK DATA (you can replace with backend later)
- **************************************************/
-const dashboardMock = {
-  total: 278,
-  completed: 131,
-  notCompleted: 147,
-  latestRequests: [
-    {
-      id: 1,
-      title: "ไฟฟ้าดับ",
-      date: "03/12/2025",
-      reporter: "สมชาย",
-      technician: "-",
-      category: "ไฟฟ้า",
-      status: "pending" // รอดำเนินการ
-    },
-    {
-      id: 2,
-      title: "น้ำไม่ไหล",
-      date: "03/12/2025",
-      reporter: "ใจดี",
-      technician: "ช่างธนกฤต",
-      category: "ประปา",
-      status: "inprogress" // กำลังดำเนินการ
-    },
-    {
-      id: 3,
-      title: "โต๊ะหัก",
-      date: "03/12/2025",
-      reporter: "พิเชษฐ์",
-      technician: "ช่างอดิศร",
-      category: "เฟอร์นิเจอร์",
-      status: "waiting" // อยู่ระหว่างซ่อม
-    },
-    {
-      id: 4,
-      title: "ประตูเสีย",
-      date: "03/12/2025",
-      reporter: "เปมิกา",
-      technician: "ช่างวีรฉัต",
-      category: "ประตู/ล็อก",
-      status: "checking" // กำลังตรวจสอบงานซ่อม
-    }
-  ]
-};
-
-/**************************************************
  * Status chip helper
  **************************************************/
 function getStatusChip(status) {
   switch (status) {
-    case "pending":
+    case "รอดำเนินการ":
       return '<span class="status-chip status-pending">รอดำเนินการ</span>';
-    case "inprogress":
+    case "กำลังดำเนินการ":
       return '<span class="status-chip status-inprogress">กำลังดำเนินการ</span>';
-    case "waiting":
+    case "อยู่ระหว่างซ่อม":
       return '<span class="status-chip status-waiting">อยู่ระหว่างซ่อม</span>';
-    case "checking":
+    case "กำลังตรวจสอบงานซ่อม":
       return '<span class="status-chip status-checking">กำลังตรวจสอบงานซ่อม</span>';
-    case "success":
+    case "สำเร้จ":
       return '<span class="status-chip status-success">สำเร็จ</span>';
     default:
       return "";
@@ -81,11 +34,16 @@ function renderLatestTable(requests) {
   const tbody = document.querySelector("#latestTable tbody");
   tbody.innerHTML = "";
 
-  requests.forEach((r) => {
+  // ⭐ Sort by updatedAt descending (latest first)
+  const sorted = [...requests].sort(
+    (a, b) => new Date(b.updatedAt) - new Date(a.updatedAt)
+  );
+
+  sorted.forEach((r) => {
     const tr = document.createElement("tr");
     tr.innerHTML = `
       <td>${r.title}</td>
-      <td>${r.date}</td>
+      <td>${r.createdAt}</td>
       <td>${r.reporter}</td>
       <td>${r.technician}</td>
       <td>${r.category}</td>
@@ -96,20 +54,36 @@ function renderLatestTable(requests) {
 }
 
 /**************************************************
- * Later: load data from backend instead of mock
+ * Load data from backend
  **************************************************/
-// async function loadDashboard() {
-//   const res = await fetch('/api/dashboard');
-//   const data = await res.json();
-//   renderSummary(data);
-//   renderLatestTable(data.latestRequests);
-// }
+async function loadDashboard() {
+  const res = await fetch("/api/requests");
+  const reports = await res.json();
 
-document.addEventListener("DOMContentLoaded", () => {
-  // for now use mock
-  renderSummary(dashboardMock);
-  renderLatestTable(dashboardMock.latestRequests);
+  // Compute summary
+  const total = reports.length;
+  const completed = reports.filter(r => r.status === "สำเร็จ").length;
+  const notCompleted = reports.filter(
+    r => r.status !== "สำเร็จ" && r.status !== "ยกเลิก"
+  ).length;
 
-  // when backend ready:
-  // loadDashboard();
+  const summary = { total, completed, notCompleted };
+  renderSummary(summary);
+
+  // ⭐ Show ALL RepairRequest in the table
+  renderLatestTable(reports);
+}
+
+
+/**************************************************
+ * Startup
+ **************************************************/
+document.addEventListener("DOMContentLoaded", async () => {
+  try {
+    await loadDashboard();         
+  } catch (e) {
+    console.warn("Backend failed, using mock data");
+    renderSummary(summary);
+    renderLatestTable(dashboardMock.latestRequests);
+  }
 });
