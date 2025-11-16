@@ -1,6 +1,26 @@
 document.addEventListener("DOMContentLoaded", async () => {
   const tableBody = document.querySelector(".repair-table tbody");
 
+  // --- กำหนดค่าคงที่สำหรับ Dropdowns ---
+  // นี่คือรายการสถานะทั้งหมดในระบบ
+  // ซึ่งสอดคล้องกับตรรกะที่พบใน dashboard.js (รวมทั้งจาก getStatusChip และ filter)
+  const ALL_STATUSES = [
+    "รอดำเนินการ",
+    "กำลังดำเนินการ",
+    "อยู่ระหว่างซ่อม",
+    "กำลังตรวจสอบงานซ่อม",
+    "ยังไม่ได้ให้คะแนน",
+    "สำเร็จ",
+    "ยกเลิก"
+  ];
+
+  const ALL_PRIORITIES = [
+    "ปกติ",
+    "ปานกลาง",
+    "เร่งด่วน"
+  ];
+  // -------------------------------------
+
   // Fetch all repair requests
   async function fetchReports() {
     try {
@@ -16,8 +36,20 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   function renderTable(reports) {
     tableBody.innerHTML = "";
+
+    // Helper function สำหรับสร้าง <option>
+    const createOptions = (list, selectedValue) => {
+      return list.map(item => `
+        <option value="${item}" ${item === selectedValue ? "selected" : ""}>${item}</option>
+      `).join("");
+    };
+
     reports.forEach(report => {
       const row = document.createElement("tr");
+
+      // สร้าง HTML ของ options จากค่าคงที่
+      const priorityOptions = createOptions(ALL_PRIORITIES, report.priority);
+      const statusOptions = createOptions(ALL_STATUSES, report.status);
 
       row.innerHTML = `
         <td>${report.id}</td>
@@ -27,17 +59,13 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         <td>
           <select class="priority-select">
-            ${["ปกติ", "ปานกลาง", "เร่งด่วน"].map(level => `
-              <option value="${level}" ${report.priority === level ? "selected" : ""}>${level}</option>
-            `).join("")}
+            ${priorityOptions}
           </select>
         </td>
 
-<td>
+        <td>
           <select class="status-select">
-            ${["รอดำเนินการ", "กำลังดำเนินการ", "อยู่ระหว่างซ่อม", "กำลังตรวจสอบงานซ่อม","ยังไม่ให้คะแนน", "สำเร็จ", "ยกเลิก"].map(status => `
-              <option value="${status}" ${report.status === status ? "selected" : ""}>${status}</option>
-            `).join("")}
+            ${statusOptions}
           </select>
         </td>
 

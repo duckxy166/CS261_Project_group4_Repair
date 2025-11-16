@@ -95,15 +95,35 @@ public class SecurityConfig {
                                 "/login.js",
                                 "/api/login",
                                 "/api/logout",
+                                "/logout",
                                 "/api/webhook",  
                                 "/error",
                                 "/history.css"        
                         ).permitAll()
                         
-                        .requestMatchers("/dashboard.html", "/dashboard.css", "/dashboard.js").hasAuthority("admin")
+                        .requestMatchers(
+                        		"/dashboard.html", 
+                        		"/dashboard.css", 
+                        		"/dashboard.js",
+                        		"/RequestControl.html", 
+                        		"/RequestControl.css",
+                        		"/RequestControl.js",
+                        		"/api/requests/update-status"
+                        ).hasAuthority("admin")
 
-                        .requestMatchers("/RepairList.html", "/RepairList.css", "/RepairList.js", "/RepairReportCRS.html", "/RepairReportCRS.css", "/RepairReportCRS.js"
-                                ).hasAuthority("tech")
+                        .requestMatchers(
+                        		"/RepairList.html", 
+                        		"/RepairList.css", 
+                        		"/RepairList.js", 
+                        		"/RepairReport.html", 
+                                "/RepairReport.css",  
+                                "/RepairReport.js",   
+                        		"/RepairReportCRS.html", 
+                        		"/RepairReportCRS.css", 
+                        		"/RepairReportCRS.js",
+                        		"/api/requests/*/update-status",
+                        		"/api/requests/*/submit-report"
+                        ).hasAuthority("tech")
                         
                         .requestMatchers(
                                 "/index.html", 
@@ -114,15 +134,20 @@ public class SecurityConfig {
                                 "/track.html", 
                                 "/track.css", 
                                 "/track.js", 
+                                "/track_detail.html", 
+                                "/track_detail.css",  
+                                "/track_detail.js",
                                 "/history.html",
-                                "/history.js"
-                        ).hasAnyAuthority("Student", "Staff")
+                                "/history.js",
+                                "/feedback"
+                        ).hasAnyAuthority("Student", "Staff", "student", "staff", "User", "user")
 
                         .requestMatchers(
                                 "/api/requests/**", 
                                 "/api/files/**", 
                                 "/api/users/current", 
-                                "/api/profile"
+                                "/api/profile",
+                                "/api/feedback"
                         ).authenticated()
 
                         .anyRequest().authenticated()
