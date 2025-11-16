@@ -266,10 +266,11 @@
               <input type="text" id="detailTechnician" readonly />
             </div>
     
-            <div class="upload-box">
-              <span class="material-icons-outlined upload-icon">image</span>
-              <p>ไม่มีรูปภาพแนบ</p>
-            </div>
+			<div class="upload-box" id="imagePreviewBox">
+			    <span class="material-icons-outlined upload-icon" id="noImageIcon">image</span>
+			    <p id="noImageText">ไม่มีรูปภาพแนบ</p>
+			    <img id="previewImage" style="display:none; width:120px; height:auto; border-radius:10px;" />
+			</div>
           </div>
         </div>
     

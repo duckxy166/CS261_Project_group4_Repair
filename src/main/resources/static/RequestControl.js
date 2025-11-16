@@ -87,11 +87,18 @@ const feedbackCloseBtn    = document.querySelector("#feedbackCloseBtn");
 
 
 // ===== UTIL =====
-function formatDate(iso) {
-  if (!iso) return "-";
-  const [y, m, d] = iso.split("-");
-  return `${d}/${m}/${y}`;
+function formatDate(dateStr) {
+  if (!dateStr) return "-";
+
+  const d = new Date(dateStr);
+
+  const day = String(d.getDate()).padStart(2, "0");
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const year = d.getFullYear();
+
+  return `${day}/${month}/${year}`;
 }
+
 
 function createUrgencyChip(urgency) {
   const map = {
@@ -212,7 +219,7 @@ function renderTableAndPagination() {
         </button>
 
         <div class="row-menu">
-          <button class="row-menu-item" data-action="detail">
+          <button class="row-menu-item" data-action="detail" onclick="openDetailModal(${item.id})">
             <span class="row-menu-item-icon material-icons-outlined">visibility</span>
             <span>ดูรายละเอียด</span>
           </button>
@@ -300,6 +307,7 @@ function renderTableAndPagination() {
 
 // ===== REPORT MODAL =====
 function openReportModal(data) {
+	console.log("🟦 openDetailModal CALLED with:", data);
   if (!reportOverlay) return;
 
   if (reportTitle)      reportTitle.textContent      = data.title || "";
@@ -449,8 +457,73 @@ function attachRowMenuHandlers() {
     }
   );
 }
+//renderAttachment
+function renderAttachments(files) {
+    const box = document.getElementById("attachmentBox");
+    if (!box) return;
 
-function openDetailModal(data, startInEdit = false) {
+    box.innerHTML = files.map(f => `
+        <div class="file-item">
+            <a href="/api/requests/attachments/${f.id}/download" target="_blank">
+                📄 ${f.fileName}
+            </a>
+        </div>
+    `).join("");
+}
+//function laod file
+async function loadAttachments(requestId) {
+    try {
+        const res = await fetch(`/api/files/${requestId}`);
+        const files = await res.json();
+
+        console.log("Files from backend =", files);
+
+        const container = document.getElementById("attachmentList");
+        container.innerHTML = "";
+
+        if (files.length === 0) {
+            container.innerHTML = `<p style="color:#888">ไม่มีไฟล์แนบ</p>`;
+            return;
+        }
+
+        files.forEach(file => {
+            container.innerHTML += `
+                <div class="file-item">
+                    <span>${file.originalFilename}</span>
+                    <a href="/api/files/${requestId}/${file.id}/download" target="_blank">ดาวน์โหลด</a>
+                </div>
+            `;
+        });
+    } catch (err) {
+        console.error("Error loading attachments:", err);
+    }
+}
+//load image
+async function loadPreviewImage(requestId, attachmentId) {
+    const previewImg = document.getElementById("previewImage");
+    const noImageIcon = document.getElementById("noImageIcon");
+    const noImageText = document.getElementById("noImageText");
+
+    try {
+        const res = await fetch(`/api/files/${requestId}/${attachmentId}/download`);
+
+        if (!res.ok) {
+            console.log("No image found");
+            return;
+        }
+
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+
+        previewImg.src = url;
+        previewImg.style.display = "block";
+        noImageIcon.style.display = "none";
+        noImageText.style.display = "none";
+    } catch (err) {
+        console.error("Error loading preview:", err);
+    }
+}
+async function openDetailModal(data, startInEdit = false) {
   currentEditingId = data.id;
   isEditMode = false; // เริ่มจากโหมดดูอย่างเดียว
 
@@ -469,7 +542,7 @@ function openDetailModal(data, startInEdit = false) {
 
   // status pill
   // status pill (use correct color like table)
-updateDetailStatusPill(data.status);
+  updateDetailStatusPill(data.status);
 
 
   // ===== จัด layout ปุ่ม footer ตามสถานะ =====
@@ -626,7 +699,13 @@ const updateData = {
     "urg-medium",
     "urg-low"
   );
+  const attachments = await loadAttachments(data.id);
 
+      if (!attachments || attachments.length === 0) {
+          console.log("No attachments");
+      } else {
+          renderAttachments(attachments);
+      }
   setUrgencyOnMainBtn(data.priority);
   applyEditModeUI();
 
@@ -637,6 +716,17 @@ if (startInEdit && ["รอดำเนินการ", "กำลังดำ�
     if (detailFooter) detailFooter.classList.add("confirm-mode");
   }
   overlay.classList.add("show");
+  console.log("Request ID =", data.id);
+  console.log("Attachment ID =", data.attachmentId);
+
+   if (!attachments || attachments.length === 0) {
+      console.log("No attachments");
+  } else {
+      renderAttachments(attachments);
+      if (attachments.length > 0) {
+          loadPreviewImage(data.id, attachments[0].id);
+      }
+  }
 }
 
 // set สี + label ของปุ่ม urgency
