@@ -323,6 +323,7 @@ const statusDropdownMenu = document.querySelector("#statusDropdownMenu");
 const statusMainText = document.querySelector("#statusMainText");
 const detailStatusPill = document.querySelector("#detailStatusPill");
 const detailConfirmBtn = document.querySelector("#detailConfirmBtn");
+const confirmInspectionBtn = document.querySelector("#footerConfirmInspectionBtn");
 
 // ===== DOM: REPORT MODAL =====
 const reportOverlay    = document.querySelector("#reportOverlay");
@@ -701,6 +702,8 @@ updateDetailStatusPill(data.status);
   cancelBtn.style.display = "inline-flex";
   editBtn.style.display   = "inline-flex";
 
+  if (confirmInspectionBtn) confirmInspectionBtn.style.display = "none";
+
   cancelBtn.textContent = "ยกเลิกการแจ้งซ่อม";
   cancelBtn.className   = "btn-pill btn-danger";
 
@@ -713,12 +716,27 @@ updateDetailStatusPill(data.status);
     } else if (data.status === "waiting") {
     // มีแค่ ยกเลิกการแจ้งซ่อม
     editBtn.style.display = "none";
+} else if (data.status === "checking") {
+    // สถานะ "กำลังตรวจสอบงานซ่อม"
+    // 1. ปุ่ม "รายงานการซ่อม" (ใช้ปุ่ม cancel เดิม)
+    cancelBtn.textContent = "รายงานการซ่อม";
+    cancelBtn.className   = "btn-pill btn-primary"; // สีน้ำเงิน
+    
+    // 2. ซ่อนปุ่ม "แก้ไข"
+    editBtn.style.display = "none";
 
-  } else if (data.status === "checking" || data.status === "wait_feedback") {
-    // แสดงเฉพาะ "รายงานการซ่อม" ไม่ต้องมีปุ่มประเมิน
+    // 3. !! แสดงปุ่มใหม่ "ยืนยันการตรวจสอบงาน" !!
+    if (confirmInspectionBtn) {
+      confirmInspectionBtn.style.display = "inline-flex";
+      confirmInspectionBtn.className = "btn-pill btn-success"; // สีเขียว
+    }
+
+  } else if (data.status === "wait_feedback") {
+    // สถานะ "ยังไม่ได้ให้คะแนน" (เหมือน checking แต่ไม่มีปุ่มยืนยัน)
     cancelBtn.textContent = "รายงานการซ่อม";
     cancelBtn.className   = "btn-pill btn-primary";
     editBtn.style.display = "none";
+    // (confirmInspectionBtn จะถูกซ่อนไว้ตามที่ reset)
 
   } else if (data.status === "success") {
     // สำเร็จ → ปุ่มซ้าย = รายงาน, ปุ่มขวา = ดูผลประเมินงานซ่อม
@@ -764,6 +782,22 @@ updateDetailStatusPill(data.status);
     }
   };
 
+  if (confirmInspectionBtn) {
+    confirmInspectionBtn.onclick = () => {
+      // ตรวจสอบว่า ID ถูกต้อง และสถานะเป็น checking จริง
+      if (!currentEditingId || data.status !== "checking") return;
+
+      const req = requests.find((r) => r.id === currentEditingId);
+      if (req) {
+        // !! เปลี่ยนสถานะเป็น "ยังไม่ได้ให้คะแนน" !!
+        req.status = "wait_feedback"; 
+      }
+      
+      closeDetailModal();
+      renderTableAndPagination();
+    };
+  }
+  
 
   // ===== ล็อก / ปลดล็อก dropdown ความเร่งด่วน =====
   canChangeUrgency = !(
