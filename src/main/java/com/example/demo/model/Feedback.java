@@ -3,6 +3,9 @@ package com.example.demo.model;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
+// 1. เพิ่ม import JsonIgnore
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 public class Feedback {
 
@@ -24,6 +27,7 @@ public class Feedback {
 
     @ManyToOne
     @JoinColumn(name = "report_id")
+    @JsonIgnore // 2. เพิ่ม @JsonIgnore ตรงนี้
     private RepairRequest report;
 
     @Transient
