@@ -2,291 +2,30 @@
 const PAGE_SIZE = 7;
 let currentEditingId = null;
 
-const requests = [
-  {
-    id: 1,
-    title: "ไฟฟ้าดับ",
-    dateRequested: "2025-12-01",
-    reporter: "สมชาย",
-    technician: "ช่างเอกชัย",
-    category: "ไฟฟ้า",
-    urgency: "none",
-    status: "pending",
-    location: "ตึกอาคารเรียน 2",
-    room: "210",
-    description: "ไฟฟ้าดับทั้งห้อง ไม่สามารถเปิดไฟและปลั๊กไฟได้"
-  },
-  {
-    id: 2,
-    title: "น้ำไม่ไหล",
-    dateRequested: "2025-12-01",
-    reporter: "ไอตี๋",
-    technician: "ช่างธนภาค",
-    category: "ประปา",
-    urgency: "high",
-    status: "inprogress",
-    location: "หอพักนักศึกษา A",
-    room: "304",
-    description: "ในห้องน้ำไม่มีน้ำไหลจากฝักบัวและก๊อกอ่างล้างหน้า"
-  },
-  {
-    id: 3,
-    title: "เก้าอี้ชำรุด",
-    dateRequested: "2025-12-02",
-    reporter: "พิเชษฐ์",
-    technician: "ช่างอดิศร",
-    category: "เฟอร์นิเจอร์",
-    urgency: "medium",
-    status: "waiting",
-    location: "ตึกเรียนรวม 1",
-    room: "110",
-    description: "ขาเก้าอี้โยกเยก มีโอกาสหักเมื่อมีคนใช้งาน"
-  },
-  {
-    id: 4,
-    title: "ประตูล็อกไม่ได้",
-    dateRequested: "2025-12-02",
-    reporter: "เมเปิ้ล",
-    technician: "ช่างวีรัตน์",
-    category: "ประตู/ล็อก",
-    urgency: "low",
-    status: "checking",
-    location: "สำนักงานภาควิชา",
-    room: "305",
-    description: "ประตูปิดได้แต่บิดกุญแจแล้วไม่ล็อก"
-  },
-   {
-    id: 5,
-    title: "เครื่องปรับอากาศไม่เย็น",
-    dateRequested: "2025-12-03",
-    reporter: "พรปวีณ์",
-    technician: "ช่างปวิชย์",
-    category: "อื่นๆ",
-    urgency: "low",
-    status: "success",
-    location: "ตึกเรียนรวม 3",
-    room: "204",
-    description: "เปิดแอร์แล้วลมออกแต่ไม่เย็น อุณหภูมิในห้องสูง",
-    // >>> เพิ่มสองบรรทัดนี้ <<<
-    feedbackRating: 5,
-    feedbackComment: "งานซ่อมรอบนี้ดีมากค่ะ แอร์เย็นเร็ว ใช้งานได้ปกติ ขอบคุณทีมช่างค่ะ"
-  },
-  {
-    id: 6,
-    title: "ท่อหน้าห้องอุดตัน",
-    dateRequested: "2025-12-03",
-    reporter: "ริวา",
-    technician: "ช่างศศิศ",
-    category: "ประปา",
-    urgency: "high",
-    status: "waiting",
-    location: "หอพักนักศึกษา B",
-    room: "ทางเดินชั้น 2",
-    description: "น้ำขังตรงหน้าห้องเวลาฝนตก ระบายไม่ทัน"
-  },
-  {
-    id: 7,
-    title: "อ่างล้างมือรั่ว",
-    dateRequested: "2025-12-04",
-    reporter: "คุณภูมิกรณ์",
-    technician: "ช่างธรรมบุญ",
-    category: "ประปา",
-    urgency: "low",
-    status: "checking",
-    location: "ตึกปฏิบัติการ",
-    room: "117",
-    description: "มีน้ำหยดจากท่อใต้ซิงก์ตลอดเวลา"
-  },
-  // ---- page 2 ----
-  {
-    id: 8,
-    title: "ปลั๊กไฟชำรุด",
-    dateRequested: "2025-12-04",
-    reporter: "สุพล",
-    technician: "ช่างจรูญศักดิ์",
-    category: "ไฟฟ้า",
-    urgency: "medium",
-    status: "inprogress",
-    location: "ตึกเรียนรวม 2",
-    room: "220",
-    description: "ปลั๊กตรงมุมห้องหลวมและมีเสียงประกายไฟ"
-  },
-  {
-    id: 9,
-    title: "ไฟกะพริบ",
-    dateRequested: "2025-12-05",
-    reporter: "สุพล",
-    technician: "ช่างจรูญศักดิ์",
-    category: "ไฟฟ้า",
-    urgency: "low",
-    status: "wait_feedback",
-    location: "ตึกเรียนรวม 2",
-    room: "221",
-    description: "หลอดไฟเพดานกะพริบตลอดเวลา"
-  },
-  {
-    id: 10,
-    title: "ก๊อกน้ำหลวม",
-    dateRequested: "2025-12-05",
-    reporter: "สมปอง",
-    technician: "ช่างเอกชัย",
-    category: "ประปา",
-    urgency: "low",
-    status: "waiting",
-    location: "โรงอาหารกลาง",
-    room: "โซนล้างจาน",
-    description: "ก๊อกน้ำโยกไปมาเวลาบิดแรง ๆ"
-  },
-  {
-    id: 11,
-    title: "โคมไฟแตก",
-    dateRequested: "2025-12-06",
-    reporter: "อนงค์",
-    technician: "ช่างธนากฤต",
-    category: "ไฟฟ้า",
-    urgency: "high",
-    status: "inprogress",
-    location: "ลานจอดรถ",
-    room: "-",
-    description: "โคมไฟนอกอาคารแตก เสี่ยงต่อการบาดเจ็บ"
-  },
-  {
-    id: 12,
-    title: "โต๊ะเรียนโยก",
-    dateRequested: "2025-12-06",
-    reporter: "ชัยวัฒน์",
-    technician: "ช่างอดิศร",
-    category: "เฟอร์นิเจอร์",
-    urgency: "medium",
-    status: "waiting",
-    location: "ตึกเรียนรวม 4",
-    room: "312",
-    description: "โต๊ะเรียนโยกเยกใช้เขียนหนังสือลำบาก"
-  },
-  {
-    id: 13,
-    title: "ประตูล๊อกฝืด",
-    dateRequested: "2025-12-07",
-    reporter: "บรีนา",
-    technician: "ช่างวีรวัตน์",
-    category: "ประตู/ล็อก",
-    urgency: "low",
-    status: "checking",
-    location: "ห้องสมุดกลาง",
-    room: "ห้องประชุม",
-    description: "ต้องออกแรงมากเวลาเปิดประตู"
-  },
-  {
-    id: 14,
-    title: "ผนังแตกลอก",
-    dateRequested: "2025-12-07",
-    reporter: "พิกษา",
-    technician: "ช่างปวิชย์",
-    category: "อื่นๆ",
-    urgency: "low",
-    status: "success",
-    location: "ตึกเก่า",
-    room: "105",
-    description: "สีผนังลอกและเป็นคราบชื้น"
-  },
-  // ---- page 3 ----
-  {
-    id: 15,
-    title: "พัดลมเพดานเสียงดัง",
-    dateRequested: "2025-12-08",
-    reporter: "พิมพ์ชนก",
-    technician: "ช่างมนตรี",
-    category: "อื่นๆ",
-    urgency: "medium",
-    status: "pending",
-    location: "โรงอาหารคณะ",
-    room: "ชั้น 1",
-    description: "พัดลมมีเสียงดังเวลาเปิดความเร็วระดับ 3"
-  },
-  {
-    id: 16,
-    title: "สายแลนขาด",
-    dateRequested: "2025-12-08",
-    reporter: "ภคพงศ์",
-    technician: "ช่างไอที",
-    category: "เครือข่าย",
-    urgency: "high",
-    status: "inprogress",
-    location: "ห้องแลบคอมพิวเตอร์",
-    room: "Lab 2",
-    description: "ไม่สามารถเชื่อมต่ออินเทอร์เน็ตได้"
-  },
-  {
-    id: 17,
-    title: "หลอดไฟบันไดดับ",
-    dateRequested: "2025-12-09",
-    reporter: "ณัฐวุฒิ",
-    technician: "ช่างเอกชัย",
-    category: "ไฟฟ้า",
-    urgency: "low",
-    status: "success",
-    location: "บันไดหนีไฟ",
-    room: "ชั้น 3",
-    description: "หลอดไฟบันไดไม่ติด ทำให้ทางเดินมืด"
-  },
-  {
-    id: 18,
-    title: "ท่อน้ำทิ้งห้องน้ำตัน",
-    dateRequested: "2025-12-09",
-    reporter: "ธนากร",
-    technician: "ช่างปวิชย์",
-    category: "ประปา",
-    urgency: "high",
-    status: "waiting",
-    location: "อาคารเรียนรวม",
-    room: "ห้องน้ำชายชั้น 4",
-    description: "กดชักโครกแล้วน้ำล้นออกมา"
-  },
-  {
-    id: 19,
-    title: "ไฟฉุกเฉินไม่ทำงาน",
-    dateRequested: "2025-12-10",
-    reporter: "สุกัญญา",
-    technician: "ช่างวีรวัตน์",
-    category: "ไฟฟ้า",
-    urgency: "medium",
-    status: "checking",
-    location: "โถงหน้าลิฟต์",
-    room: "ชั้น 1",
-    description: "ทดสอบแล้วไฟฉุกเฉินไม่ติดเมื่อปิดเบรกเกอร์"
-  },
-  {
-    id: 20,
-    title: "ระบบเสียงไมค์ขัดข้อง",
-    dateRequested: "2025-12-10",
-    reporter: "กิตติคุณ",
-    technician: "ช่างไอที",
-    category: "อื่นๆ",
-    urgency: "none",
-    status: "pending",
-    location: "หอประชุม",
-    room: "-",
-    description: "ไมค์ไร้สายมีเสียงขาด ๆ หาย ๆ"
-  },
-  {
-    id: 21,
-    title: "หน้าต่างปิดไม่สนิท",
-    dateRequested: "2025-12-11",
-    reporter: "ปวีณา",
-    technician: "ช่างอดิศร",
-    category: "อื่นๆ",
-    urgency: "low",
-    status: "success",
-    location: "อาคารเรียนรวม 5",
-    room: "508",
-    description: "เวลาฝนตกมีน้ำซึมเข้ามาตามขอบกระจก"
-  }
-];
+let allRequests = [];
 
 // ===== STATE =====
 let currentPage = 1;
 let canChangeUrgency = true; // ใช้ล็อก dropdown ความเร่งด่วน
 let isEditMode = false;      // อยู่โหมดแก้ไข detail modal หรือไม่
+
+async function fetchRequests() {
+  try {
+    // เรียกไปยัง Endpoint ที่อยู่ใน ReportController
+    const response = await fetch('/api/requests'); 
+    if (!response.ok) {
+      throw new Error(`Failed to fetch requests: ${response.statusText}`);
+    }
+    allRequests = await response.json(); // นำข้อมูลที่ได้มาเก็บใน allRequests
+    
+    // (Optional) ตรวจสอบข้อมูลที่ดึงมาได้ใน console
+    console.log('Fetched data from API:', allRequests);
+
+  } catch (error) {
+    console.error('Error fetching requests:', error);
+    allRequests = []; // หากดึงข้อมูลไม่สำเร็จ ให้ใช้ค่าว่างแทน
+  }
+}
 
 // ===== DOM: ตาราง & filter =====
 const tbody = document.querySelector("#requestTable tbody");
@@ -422,7 +161,7 @@ function getFilteredData() {
     document.querySelectorAll('input[data-type="status"]:checked')
   ).map((c) => c.value);
 
-  return requests.filter((item) => {
+  return allRequests.filter((item) => {
     const searchOk =
       !text ||
       item.title.toLowerCase().includes(text) ||
@@ -992,6 +731,11 @@ nextBtn.addEventListener("click", () => {
 });
 
 // ===== INIT =====
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
+  // ทำให้เป็น async
+  // 1. สั่งดึงข้อมูลจาก API และรอจนกว่าจะเสร็จ
+  await fetchRequests();
+
+  // 2. เมื่อได้ข้อมูลแล้ว ค่อยสั่งให้ render ตาราง
   renderTableAndPagination();
 });
