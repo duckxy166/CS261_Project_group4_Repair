@@ -25,8 +25,8 @@ public class Feedback {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @ManyToOne
-    @JoinColumn(name = "report_id")
+    @OneToOne // เปลี่ยนจาก @ManyToOne
+@JoinColumn(name = "report_id", unique = true) // เพิ่ม unique = true
     @JsonIgnore // 2. เพิ่ม @JsonIgnore ตรงนี้
     private RepairRequest report;
 

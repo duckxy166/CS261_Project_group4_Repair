@@ -1,16 +1,13 @@
 package com.example.demo.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+
+// 1. เพิ่ม imports ที่จำเป็น
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 //import lombok.Data;
 //import lombok.NoArgsConstructor;
 //import lombok.AllArgsConstructor;
-
-// 1. เพิ่ม imports ที่จำเป็น
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.Transient;
 
 @Entity
 public class RepairRequest {
@@ -52,9 +49,8 @@ public class RepairRequest {
 	private User reporter;
 
 	// 2. เพิ่มความสัมพันธ์ OneToOne ไปยัง Feedback
-	@OneToOne(mappedBy = "report", fetch = FetchType.LAZY)
-	private Feedback feedback;
-
+@OneToOne(mappedBy = "report", fetch = FetchType.LAZY)
+private Feedback feedback;
 
 	// getters & setters (ของเดิม)
 	public long getId() {

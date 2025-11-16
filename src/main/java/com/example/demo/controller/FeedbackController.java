@@ -9,6 +9,8 @@ import jakarta.servlet.http.HttpSession;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/feedback")
@@ -46,6 +48,8 @@ public class FeedbackController {
         report.setStatus("สำเร็จ");
         reportRepository.save(report);
         
-        return ResponseEntity.ok("Feedback saved and report status updated");
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "Feedback saved and report status updated");
+        return ResponseEntity.ok(response);
     }
 }
