@@ -127,6 +127,33 @@ public class ReportController {
         reportService.deleteReport(id, user);
     }
 
+    // ---------------- Cancel report by User ----------------
+    @PostMapping("/{id}/cancel")
+    public ResponseEntity<?> cancelReport(@PathVariable Long id, HttpSession session) {
+        // 1. ตรวจสอบ User ใน Session
+        User user = (User) session.getAttribute("user");
+        if (user == null) {
+            return ResponseEntity
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .body("Not logged in");
+        }
+
+        try {
+            // 2. เรียกใช้ Service เพื่อยกเลิก
+            reportService.cancelReport(id, user);
+            
+            // 3. ส่งคำตอบสำเร็จ
+            return ResponseEntity.ok("Report " + id + " cancelled successfully.");
+
+        } catch (RuntimeException e) {
+            // 4. จัดการ Error (เช่น "Report not found" หรือ "Cannot cancel")
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(e.getMessage());
+        }
+    }
+    
+
     // ---------------- Get report detail ----------------
    @GetMapping("/{id}")
 public ResponseEntity<?> getReportDetail(@PathVariable Long id, HttpSession session) {

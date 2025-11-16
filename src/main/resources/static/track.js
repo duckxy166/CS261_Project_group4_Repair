@@ -122,7 +122,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			return [
 				{ action: 'detail', text: 'รายละเอียด' },
 				{ action: 'edit', text: 'แก้ไข' },
-				{ action: 'delete', text: 'ยกเลิกคำขอ', warn: true }
+				{ action: 'delete', text: 'ยกเลิกคำขอ', warn: true } // 'delete' action triggers showDeleteConfirm
 			];
 		}
 		return [
@@ -485,48 +485,52 @@ document.addEventListener('DOMContentLoaded', function() {
 	if (btnNo) btnNo.addEventListener('click', hideDeleteConfirm);
 	if (overlay) overlay.addEventListener('click', hideDeleteConfirm);
     
-    // (นี่คือ 'btnYes' (ปุ่มยืนยันใน popup) จากโค้ดเก่าของคุณ - ซึ่งทำงานถูกต้อง)
+    // --- ★★★ START: FIX 2 - แก้ไขปุ่มยืนยัน (3 จุด) ★★★ ---
 	if (btnYes) btnYes.addEventListener('click', async () => {
 	    if (!deleteTargetId) return hideDeleteConfirm();
 	    try {
-			console.log('deleteTargetId:', deleteTargetId);
+			console.log('Cancelling reportId:', deleteTargetId);
 
-	        const resp = await fetch('/api/requests/update-status', {
-	            method: 'POST',
-	            headers: { 'Content-Type': 'application/json' },
-	            body: JSON.stringify({
-	                id: deleteTargetId,
-	                status: 'ยกเลิก',
-	                technicianId: null,
-	                priority: null
-	            }),
-	            credentials: 'include'
-	        });
+	        // ★★★ นี่คือโค้ดที่แก้ไข ★★★
+            // เปลี่ยนไปเรียก API ใหม่ที่เราสร้าง: POST /api/requests/{id}/cancel
+            const resp = await fetch(`/api/requests/${encodeURIComponent(deleteTargetId)}/cancel`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                    // ไม่ต้องส่ง body
+                },
+                credentials: 'include'
+            });
+            // ★★★ จบส่วนที่แก้ไข ★★★
 
-	        if (!resp.ok) throw new Error('ไม่สามารถยกเลิกงานได้');
+	        if (!resp.ok) {
+                 // พยายามอ่าน text error จาก backend
+                const errorText = await resp.text();
+                console.error('Server response:', errorText);
+                throw new Error(errorText || 'ไม่สามารถยกเลิกงานได้');
+            }
 
-	        const result = await resp.json(); // (หาก server ไม่ส่ง json กลับมา อาจต้องแก้ตรงนี้)
-	        console.log('Update result:', result);
 	        alert('ยกเลิกงานเรียบร้อยแล้ว');
 
-            // ★★★ นี่คือตรรกะที่ถูกต้อง (จากโค้ดเก่าของคุณ) ★★★
+            // Logic นี้ถูกต้อง: ลบออกจาก array แล้ววาดใหม่
 	        allItems = allItems.filter(it => String(it.id || it._id) !== String(deleteTargetId));
 	        applySearch();
 
 	    } catch (err) {
 	        console.error('Cancel request error:', err);
-	        alert('เกิดข้อผิดพลาดขณะยกเลิกงาน');
+	        alert(`เกิดข้อผิดพลาดขณะยกเลิกงาน: ${err.message}`); // แสดง error ที่ชัดเจนขึ้น
 	    } finally {
 	        hideDeleteConfirm();
 	    }
 	});
+    // --- ★★★ END: FIX 2 ★★★ ---
 
 
 	// Detail modal logic
 	const dOverlay = document.getElementById('detailOverlay');
 	const dModal = document.getElementById('detailModal');
 	const dClose = document.getElementById('detailCloseBtn');
-	const dCancel = document.getElementById('detailCancelBtn');
+	const dCancel = document.getElementById('detailCancelBtn'); // ปุ่มยกเลิก "ใน" Modal
 	const dEdit = document.getElementById('detailEditBtn');
 	const dSave = document.getElementById('detailSaveBtn');
 	const dAbort = document.getElementById('detailAbortBtn');
@@ -760,10 +764,8 @@ document.addEventListener('DOMContentLoaded', function() {
 		}
 	}
 
-	// --- ★★★ START: FIX 2 - แก้ไขปุ่มยกเลิกใน Modal ★★★ ---
-    // (นี่คือ 'dCancel' (ปุ่มยกเลิกใน Modal) จากโค้ดเก่าของคุณ - ซึ่งทำงานถูกต้อง)
-    // (ปรับปรุงเล็กน้อย: ให้ทำงานเหมือน btnYes คือลบออกจาก Array ทันที แทนการ reload)
-	dCancel.addEventListener('click', async () => {
+	// --- ★★★ START: FIX 3 - แก้ไขปุ่มยกเลิกใน Modal ★★★ ---
+	if (dCancel) dCancel.addEventListener('click', async () => {
 	  if (!currentDetailId) {
 	    alert('ไม่พบรหัสคำขอ');
 	    return;
@@ -772,19 +774,21 @@ document.addEventListener('DOMContentLoaded', function() {
 	  if (!confirm('คุณต้องการยกเลิกงานนี้ใช่หรือไม่?')) return;
 
 	  try {
-	    const resp = await fetch('/api/requests/update-status', {
-	      method: 'POST',
-	      headers: { 'Content-Type': 'application/json' },
-	      body: JSON.stringify({
-	        id: currentDetailId,
-	        status: 'ยกเลิก',
-	        technicianId: null,
-	        priority: null
-	      }),
-	      credentials: 'include'
-	    });
+        // ★★★ นี่คือโค้ดที่แก้ไข ★★★
+	    // เปลี่ยนไปเรียก API ใหม่ที่เราสร้าง: POST /api/requests/{id}/cancel
+        const resp = await fetch(`/api/requests/${encodeURIComponent(currentDetailId)}/cancel`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include'
+            // ไม่ต้องส่ง body
+        });
+        // ★★★ จบส่วนที่แก้ไข ★★★
 
-	    if (!resp.ok) throw new Error('ไม่สามารถยกเลิกงานได้');
+	    if (!resp.ok) {
+            const errorText = await resp.text();
+            console.error('Server response:', errorText);
+            throw new Error(errorText || 'ไม่สามารถยกเลิกงานได้');
+        }
 
         // (เพิ่ม try/catch เผื่อ server ไม่ส่ง JSON กลับมา)
         try { await resp.json(); } catch {}
@@ -798,10 +802,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
 	  } catch (err) {
 	    console.error('Cancel request error:', err);
-	    alert('เกิดข้อผิดพลาดขณะยกเลิกงาน');
+	    alert(`เกิดข้อผิดพลาดขณะยกเลิกงาน: ${err.message}`);
 	  }
 	});
-    // --- ★★★ END: FIX 2 ★★★ ---
+    // --- ★★★ END: FIX 3 ★★★ ---
 
 	async function openDetailModal(id) {
 	    const item = allItems.find(it => String(it.id || it._id) === String(id));
@@ -871,10 +875,8 @@ document.addEventListener('DOMContentLoaded', function() {
 	if (dClose) dClose.addEventListener('click', closeDetailModal);
 	if (dOverlay) dOverlay.addEventListener('click', closeDetailModal);
     
-    // --- ★★★ START: FIX 3 - ลบ Listener ซ้ำซ้อน ★★★ ---
-    // (ลบ dCancel.addEventListener() ตัวที่สองที่เคยอยู่ตรงนี้ออกไป)
-    // --- ★★★ END: FIX 3 ★★★ ---
-
+    // (ลบ dCancel.addEventListener() ที่ซ้ำซ้อน (ถ้ามี) ออก)
+    
 	function enterEditMode() {
 		const locInput = document.getElementById('detailLocation');
 		const locCombo = document.getElementById('locCombo');

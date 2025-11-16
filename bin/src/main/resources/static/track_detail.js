@@ -2,13 +2,15 @@
 const toggleBtn = document.getElementById("menu-toggle");
 const menuPopup = document.getElementById("menu-popup");
 
-toggleBtn.addEventListener("click", (e) => {
-  e.stopPropagation();
-  menuPopup.classList.toggle("show");
-});
+if (toggleBtn && menuPopup) {
+  toggleBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    menuPopup.classList.toggle("show");
+  });
+}
 
 window.addEventListener("click", (e) => {
-  if (!e.target.closest("#menu-popup") && !e.target.closest("#menu-toggle")) {
+  if (menuPopup && !e.target.closest("#menu-popup") && !e.target.closest("#menu-toggle")) {
     menuPopup.classList.remove("show");
   }
 });
@@ -49,20 +51,17 @@ async function loadReportDetail() {
 
     // Render 
     const container = document.querySelector(".container");
-container.innerHTML = `
-  <p>วันที่แจ้งซ่อม : ${report.createdAt ? report.createdAt.replace("T", " ").slice(0,16) : "-"}</p>
-  <p>ชื่อผู้แจ้ง : ${report.reporterName || "-"}</p>
-  <p>ผู้รับผิดชอบ : ${report.technician || "-"}</p>
-  <p>ประเภทของงาน : ${report.title || "-"}</p>
-  <p>สถานที่ : ${report.location || "-"}</p>
-  <p>รายละเอียดสถานที่เพิ่มเติม : ${report.locationDetail || "-"}</p>
-  <p>รายละเอียดงาน : ${report.description || "-"}</p>
-  <p>สถานะการซ่อม : ${report.status || "-"} <span class="dot"></span></p>
+    container.innerHTML = `
+      <p>วันที่แจ้งซ่อม : ${report.createdAt ? report.createdAt.replace("T", " ").slice(0,16) : "-"}</p>
+      <p>ชื่อผู้แจ้ง : ${report.reporterName || "-"}</p>
+      <p>ผู้รับผิดชอบ : ${report.technician || "-"}</p>
+      <p>ประเภทของงาน : ${report.title || "-"}</p>
+      <p>สถานที่ : ${report.location || "-"}</p>
+	  <p>รายละเอียดสถานที่เพิ่มเติม : ${report.locationDetail || "-"}</p>
+      <p>รายละเอียดงาน : ${report.description || "-"}</p>
+      <p>สถานะการซ่อม : ${report.status || "-"} <span class="dot"></span></p>
 
-  <p>สาเหตุของปัญหา : ${report.cause || "-"}</p>
-  <p>วิธีการซ่อม : ${report.method || "-"}</p>
-  <p>ชิ้นส่วนที่เปลี่ยน : ${report.parts || "-"}</p>
-  <div class="image-box">${filesHTML}</div>
+      <div class="image-box">${filesHTML}</div>
 
       <div class="actions">
         ${report.status === "รอดำเนินการ" ? `<button class="cancel" id="cancelRequest">ยกเลิกการแจ้งซ่อม</button>` : ""}
@@ -84,28 +83,42 @@ function setupCancelButton() {
   const modal = document.getElementById("confirmModal");
   const closeModal = document.getElementById("closeModal");
   const cancelModal = document.getElementById("cancelModal");
-  const confirmDelete = document.getElementById("confirmDelete");
+  const confirmDelete = document.getElementById("confirmDelete"); // นี่คือปุ่ม "ยืนยัน"
 
-  cancelBtn.addEventListener("click", () => modal.classList.add("show"));
-
-  closeModal.onclick = () => modal.classList.remove("show");
-  cancelModal.onclick = () => modal.classList.remove("show");
+  if (cancelBtn) cancelBtn.addEventListener("click", () => modal.classList.add("show"));
+  if (closeModal) closeModal.onclick = () => modal.classList.remove("show");
+  if (cancelModal) cancelModal.onclick = () => modal.classList.remove("show");
+  
   window.onclick = (e) => e.target === modal && modal.classList.remove("show");
 
-  confirmDelete.addEventListener("click", async () => {
+  // --- ★★★ START: FIX - แก้ไขปุ่มยืนยัน ★★★ ---
+  if (confirmDelete) confirmDelete.addEventListener("click", async () => {
     try {
-      const res = await fetch(`/api/requests/${reportId}`, { method: "DELETE" });
+      
+      // ★★★ นี่คือโค้ดที่แก้ไข ★★★
+      // เปลี่ยนจาก "DELETE" เป็น "POST" และเปลี่ยน URL ไปที่ .../cancel
+      const res = await fetch(`/api/requests/${encodeURIComponent(reportId)}/cancel`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' }
+          // ไม่ต้องส่ง body
+      });
+      // ★★★ จบส่วนที่แก้ไข ★★★
+
       if (res.ok) {
+        alert('ยกเลิกงานเรียบร้อยแล้ว'); // แจ้งเตือนก่อน
         modal.classList.remove("show");
-        window.location.href = "track.html";
+        window.location.href = "track.html"; // ค่อย redirect
       } else {
-        alert("ไม่สามารถยกเลิกการแจ้งซ่อมได้");
+        const errorText = await res.text();
+        console.error('Server response:', errorText);
+        alert(`ไม่สามารถยกเลิกการแจ้งซ่อมได้: ${errorText || res.status}`);
       }
     } catch (err) {
-      console.error("Delete error:", err);
+      console.error("Cancel error:", err); // เปลี่ยนจาก Delete error
       alert("เกิดข้อผิดพลาดในการยกเลิกการแจ้งซ่อม");
     }
   });
+  // --- ★★★ END: FIX ★★★ ---
 }
 
 // logout
@@ -114,9 +127,13 @@ if (logoutBtn) {
   logoutBtn.addEventListener("click", async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch("/logout", { method: "GET" });
-      if (res.ok) window.location.href = "login.html";
-      else alert("ไม่สามารถออกจากระบบได้");
+      // (เปลี่ยนเป็น /api/logout และ POST ให้เหมือน track.js)
+      const res = await fetch("/api/logout", { method: "POST" }); 
+      if (res.ok || res.status === 401 || res.status === 403) {
+        window.location.href = "login.html?logout=true";
+      } else {
+        alert("ไม่สามารถออกจากระบบได้");
+      }
     } catch (err) {
       console.error("Logout error:", err);
       alert("เกิดข้อผิดพลาดในการออกจากระบบ");

@@ -128,6 +128,30 @@ public List<RepairRequest> getUserHistoryReports(User user) {
         reportRepository.delete(report);
     }
 
+    // ---------------- Cancel report by User ----------------
+    @Transactional
+    public RepairRequest cancelReport(Long id, User user) {
+        // 1. ดึงงานซ่อม
+        RepairRequest report = reportRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Report not found"));
+
+        // 2. ตรวจสอบสิทธิ์ (ต้องเป็นคนแจ้งเท่านั้น)
+        if (!report.getReporter().getId().equals(user.getId())) {
+            throw new RuntimeException("Cannot cancel others' reports");
+        }
+        
+        // 3. (Optional) ตรวจสอบว่างานยังไม่เสร็จหรือกำลังซ่อม
+        //    (ในที่นี้ ผมขอข้ามไปก่อน เพื่อให้ยกเลิกได้เสมอ)
+
+        // 4. อัปเดตสถานะ
+        report.setStatus("ยกเลิก");
+
+        // 5. บันทึกและคืนค่า
+        return reportRepository.save(report);
+    }
+
+    
+
     // ---------------- Fetch single report by ID ----------------
     public ReportResponse getReportDetail(Long id, User currentUser) {
         RepairRequest report = reportRepository.findById(id)
