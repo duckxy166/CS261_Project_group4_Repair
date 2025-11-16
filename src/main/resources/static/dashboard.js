@@ -34,25 +34,56 @@ function renderLatestTable(requests) {
   const tbody = document.querySelector("#latestTable tbody");
   tbody.innerHTML = "";
 
-  // ⭐ Sort by updatedAt descending (latest first)
-  const sorted = [...requests].sort(
+  // 1. ⭐ กรองสถานะ "สำเร็จ", "ยังไม่ได้ให้คะแนน" และ "ยกเลิก" ออก
+  const filtered = requests.filter(
+    (r) =>
+      r.status !== "สำเร็จ" &&
+      r.status !== "ยังไม่ได้ให้คะแนน" && // <--- แก้ไขตามที่แจ้งครับ
+      r.status !== "ยกเลิก"
+  );
+
+  // 2. เรียงลำดับตาม updatedAt (ล่าสุดก่อน)
+  const sorted = filtered.sort(
     (a, b) => new Date(b.updatedAt) - new Date(a.updatedAt)
   );
 
-  sorted.forEach((r) => {
+  // 3. จำกัดให้แสดงผล 10 รายการล่าสุด
+  const latest10 = sorted.slice(0, 10);
+
+  // 4. วนลูปเพื่อสร้างแถวในตาราง
+  latest10.forEach((r) => {
     const tr = document.createElement("tr");
+
+    // 5. ทำให้แถวคลิกได้ และไปยังหน้า RequestControl.html
+    tr.style.cursor = "pointer";
+    tr.onclick = () => {
+      window.location.href = `RequestControl.html?id=${r.id}`;
+    };
+
+    // 6. ตัดข้อความ Title ให้สั้นลง (ไม่เกิน 25 ตัวอักษร)
+    const title = r.title ?? "";
+    const shortTitle =
+      title.length > 25 ? title.substring(0, 25) + "..." : title;
+
+    // 7. ตัดนามสกุลผู้แจ้ง (แสดงเฉพาะชื่อ)
+    const fullName = r.reporter?.fullName ?? "-";
+    const displayName = fullName.split(" ")[0]; // เอาเฉพาะส่วนแรกของชื่อ
+
+    // 8. จัดรูปแบบวันที่ (YYYY-MM-DD)
+    const shortDate = r.createdAt ? r.createdAt.split("T")[0] : "-";
+
+    // 9. สร้าง HTML ของแถว
     tr.innerHTML = `
-      <td>${r.title}</td>
-      <td>${r.createdAt}</td>
-      <td>${r.reporter?.fullName ?? "-"}</td>
-      <td>${r.technician}</td>
-      <td>${r.category}</td>
+      <td>${shortTitle}</td>
+      <td>${shortDate}</td>
+      <td>${displayName}</td>
+      <td>${r.technician ?? "-"}</td>
+      <td>${r.category ?? "-"}</td>
       <td>${getStatusChip(r.status)}</td>
     `;
     tbody.appendChild(tr);
   });
 }
-
 /**************************************************
  * Load data from backend
  **************************************************/
