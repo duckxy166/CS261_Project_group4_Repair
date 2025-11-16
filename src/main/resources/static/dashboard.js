@@ -11,7 +11,7 @@ function getStatusChip(status) {
       return '<span class="status-chip status-waiting">อยู่ระหว่างซ่อม</span>';
     case "กำลังตรวจสอบงานซ่อม":
       return '<span class="status-chip status-checking">กำลังตรวจสอบงานซ่อม</span>';
-    case "สำเร้จ":
+    case "สำเร็จ":
       return '<span class="status-chip status-success">สำเร็จ</span>';
     default:
       return "";
