@@ -160,7 +160,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			const subjectDisplay = truncate(item.title || item.subject, 30);
 
 			const reporter = item.reporterFullName || item.reporterName || '-';
-			const assignee = item.assigneeName || '-';
+			const assignee = item.assigneeName || item.technicianName || item.technician || (item.assignee && item.assignee.fullName) || '-';
 			const category = item.category || item.type || '-';
 			const created = fmtDate(item.createdAt || item.created_at || item.date);
 			const id = item.id || item._id || '';
@@ -704,7 +704,8 @@ document.addEventListener('DOMContentLoaded', function() {
 		byId('detailDate').value = fmtDate(item.createdAt || item.created_at || item.date);
 		byId('detailReporter').value = item.reporterFullName || item.reporterName || '-';
 		byId('detailLocation').value = item.location || item.place || '-';
-		byId('detailAssignee').value = item.assigneeName || '-';
+		const assigneeName = item.assigneeName || item.technicianName || item.technician || (item.assignee && item.assignee.fullName) || '-';
+		byId('detailAssignee').value = assigneeName;
 		byId('detailCategory').value = item.category || item.type || '-';
 		byId('detailDesc').value = item.description || item.desc || '-';
 		const extraField = byId('detailLocationExtra');

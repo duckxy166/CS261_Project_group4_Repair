@@ -564,12 +564,12 @@ fbSubmit?.addEventListener("click", async () => {
 
       // map & normalize; keep only the 3 states
 	  rawItems = (Array.isArray(list) ? list : []).map((x) => {
-	      const mapped = {
-	          id: x.id || x._id,
-	          title: x.title || "",
-	          reporter: x.reporter || { fullName: x.requesterName || "" },
-	          assignee: x.assignee || { fullName: x.technicianName || "" },
-	          createdAt: x.createdAt || x.requestDate || x.submittedAt,
+	  	      const mapped = {
+	  	      id: x.id || x._id,
+	  	      title: x.title || "",
+	  	      reporter: x.reporter || { fullName: x.requesterName || "" },
+	  	      assignee: x.assignee || { fullName: x.technicianName || x.technician || "" },
+	  	      createdAt: x.createdAt || x.requestDate || x.submittedAt,
 	          closedAt: x.closedAt || x.completedAt,
 			  updatedAt: x.updatedAt || x.completedAt,
 	          status: x.status || x.currentStatus || "",
