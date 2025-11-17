@@ -166,7 +166,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	async function updateStatusFromTechnician(id, status, technician = "self") {
 		const body = {
 			status: status,
-			technician: technician || "self",
+			technician: technician,
 			priority: null
 		};
 
@@ -281,7 +281,16 @@ document.addEventListener('DOMContentLoaded', () => {
 						<button class="menu-item" data-action="submit-report" data-id="${item.id}">
 							<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0.7;"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><polyline points="13 2 13 9 20 9"></polyline></svg>
 							<span class="mi-text">ส่งรายงานซ่อม</span>
-						</button>`;
+						</button>
+						
+						<button class="menu-item" data-action="cancel-job" data-id="${item.id}">
+							<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0.7; color: #dc3545;">
+								<line x1="18" y1="6" x2="6" y2="18"></line>
+								<line x1="6" y1="6" x2="18" y2="18"></line>
+							</svg>
+							<span class="mi-text" style="color: #dc3545;">ยกเลิกงาน</span>
+						</button>
+						`;
 			}
 
 			return `
@@ -357,7 +366,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	}
 
 	if (tbody) {
-		tbody.addEventListener('click', (e) => {
+		tbody.addEventListener('click', async (e) => {
 			const moreBtn = e.target.closest('.more-btn');
 			const menuItem = e.target.closest('.menu-item');
 			if (moreBtn) {
@@ -385,6 +394,27 @@ document.addEventListener('DOMContentLoaded', () => {
 				} else if (action === 'submit-report') {
 					cameFromModal = 'list';
 					openReportModal();
+					
+				// ⭐️⭐️⭐️ โค้ดที่เพิ่มเข้ามาสำหรับปุ่มยกเลิก ⭐️⭐️⭐️
+				} else if (action === 'cancel-job') {
+					
+					// 1. ถามยืนยัน
+					if (!confirm('คุณต้องการยกเลิกงานนี้ และนำกลับไปที่ "กำลังดำเนินการ" หรือไม่?')) {
+						return; // ถ้ากดยกเลิก ก็ไม่ต้องทำอะไร
+					}
+
+					try {
+						// 2. ยิง API เพื่อเปลี่ยนสถานะกลับเป็น "กำลังดำเนินการ" และลบชื่อช่าง (ส่ง null)
+						await updateStatusFromTechnician(currentJobId, "กำลังดำเนินการ", null);
+						
+						// 3. โหลดข้อมูลใหม่ (งานที่ยกเลิกจะยังคงเห็นในรายการ แต่สถานะเปลี่ยน)
+						await loadRepairRequests();
+
+					} catch (err) {
+						console.error("Failed to cancel job:", err);
+						alert("เกิดข้อผิดพลาดในการยกเลิกงาน");
+					}
+					
 				}
 				return;
 			}
