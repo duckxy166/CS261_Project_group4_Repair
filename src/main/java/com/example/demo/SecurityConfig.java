@@ -82,7 +82,7 @@ public class SecurityConfig {
                 
                 .addFilterBefore(new CacheControlFilter(), SecurityContextHolderFilter.class)
                 
-                .headers(headers -> headers.disable())
+                //.headers(headers -> headers.disable())
                 
                 .addFilterBefore(new SessionUserFilter(), UsernamePasswordAuthenticationFilter.class)
 
@@ -98,13 +98,13 @@ public class SecurityConfig {
                                 "/logout",
                                 "/api/webhook",  
                                 "/error",
-                                "/history.css"        
+                                "/history.css",
+                                "/dashboard.css",
+                                "/dashboard.js"
                         ).permitAll()
                         
                         .requestMatchers(
                         		"/dashboard.html", 
-                        		"/dashboard.css", 
-                        		"/dashboard.js",
                         		"/RequestControl.html", 
                         		"/RequestControl.css",
                         		"/RequestControl.js",
