@@ -74,67 +74,64 @@
           </button>
 
           <div class="filter-panel" id="filterPanel">
-            <ul class="filter-list">
-              <!-- Dates (UI only right now) -->
-              <li class="filter-item">
-                <input type="checkbox" id="dateRequested" />
-                <label for="dateRequested">วันที่แจ้งซ่อม</label>
-              </li>
-              <li class="filter-item">
-                <input type="checkbox" id="dateCompleted" />
-                <label for="dateCompleted">วันที่ซ่อมเสร็จสิ้น</label>
-              </li>
-          
-              <li class="filter-divider"></li>
-          
-              <!-- Urgency -->
-              <li class="filter-caption">เรียงตามความเร่งด่วน</li>
-              <li class="filter-item">
-                <input type="checkbox" id="urgHigh" data-type="urgency" value="high" />
-                <label for="urgHigh">ความเร่งด่วน: High</label>
-              </li>
-              <li class="filter-item">
-                <input type="checkbox" id="urgMedium" data-type="urgency" value="medium" />
-                <label for="urgMedium">ความเร่งด่วน: Medium</label>
-              </li>
-              <li class="filter-item">
-                <input type="checkbox" id="urgLow" data-type="urgency" value="low" />
-                <label for="urgLow">ความเร่งด่วน: Low</label>
-              </li>
-              <li class="filter-item">
-                <input type="checkbox" id="urgNone" data-type="urgency" value="none" />
-                <label for="urgNone">ความเร่งด่วน: None</label>
-              </li>
-          
-              <li class="filter-divider"></li>
-          
-              <!-- Status -->
-              <li class="filter-caption">เรียงตามสถานะ</li>
-              <li class="filter-item">
-                <input type="checkbox" id="stPending" data-type="status" value="pending" />
-                <label for="stPending">สถานะ: รอดำเนินการ</label>
-              </li>
-              <li class="filter-item">
-                <input type="checkbox" id="stInProgress" data-type="status" value="inprogress" />
-                <label for="stInProgress">สถานะ: กำลังดำเนินการ</label>
-              </li>
-              <li class="filter-item">
-                <input type="checkbox" id="stWaiting" data-type="status" value="waiting" />
-                <label for="stWaiting">สถานะ: อยู่ระหว่างซ่อม</label>
-              </li>
-              <li class="filter-item">
-                <input type="checkbox" id="stChecking" data-type="status" value="checking" />
-                <label for="stChecking">สถานะ: กำลังตรวจสอบงานซ่อม</label>
-              </li>
-              <li class="filter-item">
-                <input type="checkbox" id="stWaitFeedback" data-type="status" value="wait_feedback" />
-                <label for="stWaitFeedback">สถานะ: ยังไม่ได้ให้คะแนน</label>
-              </li>
-              <li class="filter-item">
-                <input type="checkbox" id="stSuccess" data-type="status" value="success" />
-                <label for="stSuccess">สถานะ: สำเร็จ</label>
-              </li>
-            </ul>
+			<ul class="filter-list">
+			              <li class="filter-item">
+			                <input type="checkbox" id="dateRequested" />
+			                <label for="dateRequested">วันที่แจ้งซ่อม</label>
+			              </li>
+			              <li class="filter-item">
+			                <input type="checkbox" id="dateCompleted" />
+			                <label for="dateCompleted">วันที่ซ่อมเสร็จสิ้น</label>
+			              </li>
+			          
+			              <li class="filter-divider"></li>
+			          
+			              <li class="filter-caption">เรียงตามความเร่งด่วน</li>
+			              <li class="filter-item">
+			                <input type="checkbox" id="urgHigh" data-type="urgency" value="high" />
+			                <label for="urgHigh">ความเร่งด่วน: High</label>
+			              </li>
+			              <li class="filter-item">
+			                <input type="checkbox" id="urgMedium" data-type="urgency" value="medium" />
+			                <label for="urgMedium">ความเร่งด่วน: Medium</label>
+			              </li>
+			              <li class="filter-item">
+			                <input type="checkbox" id="urgLow" data-type="urgency" value="low" />
+			                <label for="urgLow">ความเร่งด่วน: Low</label>
+			              </li>
+			              <li class="filter-item">
+			                <input type="checkbox" id="urgNone" data-type="urgency" value="none" />
+			                <label for="urgNone">ความเร่งด่วน: None</label>
+			              </li>
+			          
+			              <li class="filter-divider"></li>
+			          
+			              <li class="filter-caption">เรียงตามสถานะ</li>
+			              <li class="filter-item">
+			                <input type="checkbox" id="stPending" data-type="status" value="รอดำเนินการ" />
+			                <label for="stPending">สถานะ: รอดำเนินการ</label>
+			              </li>
+			              <li class="filter-item">
+			                <input type="checkbox" id="stInProgress" data-type="status" value="กำลังดำเนินการ" />
+			                <label for="stInProgress">สถานะ: กำลังดำเนินการ</label>
+			              </li>
+			              <li class="filter-item">
+			                <input type="checkbox" id="stWaiting" data-type="status" value="อยู่ระหว่างซ่อม" />
+			                <label for="stWaiting">สถานะ: อยู่ระหว่างซ่อม</label>
+			              </li>
+			              <li class="filter-item">
+			                <input type="checkbox" id="stChecking" data-type="status" value="กำลังตรวจสอบงานซ่อม" />
+			                <label for="stChecking">สถานะ: กำลังตรวจสอบงานซ่อม</label>
+			              </li>
+			              <li class="filter-item">
+			                <input type="checkbox" id="stWaitFeedback" data-type="status" value="ซ่อมเสร็จ" />
+			                <label for="stWaitFeedback">สถานะ: ยังไม่ได้ให้คะแนน</label>
+			              </li>
+			              <li class="filter-item">
+			                <input type="checkbox" id="stSuccess" data-type="status" value="สำเร็จ" />
+			                <label for="stSuccess">สถานะ: สำเร็จ</label>
+			              </li>
+			            </ul>
           
             <div class="filter-actions">
               <button type="button" class="filter-clear" id="filterClear">
